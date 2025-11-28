@@ -24,12 +24,12 @@ Simularás ser un administrador de sistemas junior que acaba de unirse a una emp
 
 La empresa tiene los siguientes servidores:
 
-| Servidor | Función | IP | Puerto | Usuario |
-|----------|---------|-----|--------|---------|
-| **web-prod** | Servidor web producción | Tu VPS real | 22 | root |
-| **web-staging** | Servidor web staging | 10.0.1.10 | 22 | deploy |
-| **db-prod** | Base de datos producción | 10.0.1.20 | 22 | dba |
-| **monitoring** | Servidor de monitoreo | 10.0.1.30 | 2222 | monitor |
+| Servidor        | Función                  | IP          | Puerto | Usuario |
+| --------------- | ------------------------ | ----------- | ------ | ------- |
+| **web-prod**    | Servidor web producción  | Tu VPS real | 22     | root    |
+| **web-staging** | Servidor web staging     | 10.0.1.10   | 22     | deploy  |
+| **db-prod**     | Base de datos producción | 10.0.1.20   | 22     | dba     |
+| **monitoring**  | Servidor de monitoreo    | 10.0.1.30   | 2222   | monitor |
 
 > **Nota:** Usa tu servidor VPS real para `web-prod`. Los demás son ficticios para practicar la sintaxis del archivo config.
 
@@ -50,16 +50,20 @@ Al completar este proyecto, habrás:
 ## 📦 Entregables
 
 ### 1. Archivo de Configuración SSH
+
 `~/.ssh/config` con al menos 4 hosts configurados
 
 ### 2. Documentación Personal
+
 `README.md` con:
+
 - Datos de tus servidores (censurados)
 - Comandos utilizados
 - Capturas de pantalla
 - Problemas encontrados y soluciones
 
 ### 3. Evidencias
+
 - Captura de `ssh -V`
 - Captura de conexión exitosa
 - Captura de `cat ~/.ssh/config` (censurado)
@@ -69,23 +73,23 @@ Al completar este proyecto, habrás:
 
 ## 📊 Rúbrica de Evaluación (50 puntos)
 
-| Criterio | Puntos | Descripción |
-|----------|--------|-------------|
-| **Funcionalidad** | 20 pts | Conexión SSH exitosa + config funcional |
+| Criterio          | Puntos | Descripción                                   |
+| ----------------- | ------ | --------------------------------------------- |
+| **Funcionalidad** | 20 pts | Conexión SSH exitosa + config funcional       |
 | **Configuración** | 10 pts | Archivo config con 4+ hosts bien estructurado |
-| **Documentación** | 10 pts | README claro con comandos y explicaciones |
-| **Evidencias** | 5 pts | Capturas de pantalla de cada paso |
-| **Organización** | 5 pts | Estructura limpia, comentarios en config |
+| **Documentación** | 10 pts | README claro con comandos y explicaciones     |
+| **Evidencias**    | 5 pts  | Capturas de pantalla de cada paso             |
+| **Organización**  | 5 pts  | Estructura limpia, comentarios en config      |
 
 ### Escala de Calificación
 
-| Puntos | Nivel |
-|--------|-------|
-| 45-50 | 🏆 Excelente |
-| 40-44 | 🌟 Muy Bueno |
-| 35-39 | ✅ Bueno |
-| 30-34 | ⚠️ Suficiente |
-| 0-29 | ❌ Insuficiente |
+| Puntos | Nivel           |
+| ------ | --------------- |
+| 45-50  | 🏆 Excelente    |
+| 40-44  | 🌟 Muy Bueno    |
+| 35-39  | ✅ Bueno        |
+| 30-34  | ⚠️ Suficiente   |
+| 0-29   | ❌ Insuficiente |
 
 ---
 
