@@ -43,12 +43,12 @@ telnet servidor.ejemplo.com 23
 
 **El problema fatal de Telnet:**
 
-| Aspecto | Telnet | Consecuencia |
-|---------|--------|--------------|
-| Contraseñas | Texto plano | Cualquiera en la red puede verlas |
-| Comandos | Sin cifrar | Todo lo que escribes es visible |
-| Autenticación | Solo contraseña | Sin verificación del servidor |
-| Integridad | Ninguna | Los datos pueden ser modificados |
+| Aspecto       | Telnet          | Consecuencia                      |
+| ------------- | --------------- | --------------------------------- |
+| Contraseñas   | Texto plano     | Cualquiera en la red puede verlas |
+| Comandos      | Sin cifrar      | Todo lo que escribes es visible   |
+| Autenticación | Solo contraseña | Sin verificación del servidor     |
+| Integridad    | Ninguna         | Los datos pueden ser modificados  |
 
 #### Otros Protocolos Inseguros de la Época
 
@@ -68,6 +68,7 @@ telnet servidor.ejemplo.com 23
 En **1995**, Tatu Ylönen era investigador en la Universidad Tecnológica de Helsinki, Finlandia. Un día, la red de la universidad sufrió un **ataque de sniffing** (captura de paquetes de red).
 
 Los atacantes capturaron:
+
 - Miles de nombres de usuario
 - Miles de contraseñas
 - Credenciales de acceso a sistemas críticos
@@ -128,12 +129,12 @@ Esta huella digital (fingerprint) es **única** para cada servidor. Si alguien i
 
 SSH ofrece múltiples métodos de autenticación:
 
-| Método | Seguridad | Uso Recomendado |
-|--------|-----------|-----------------|
-| Contraseña | ⭐⭐ | Solo para pruebas |
-| Llave pública | ⭐⭐⭐⭐ | Uso diario |
-| Certificados | ⭐⭐⭐⭐⭐ | Entornos empresariales |
-| 2FA (TOTP) | ⭐⭐⭐⭐⭐ | Máxima seguridad |
+| Método        | Seguridad  | Uso Recomendado        |
+| ------------- | ---------- | ---------------------- |
+| Contraseña    | ⭐⭐       | Solo para pruebas      |
+| Llave pública | ⭐⭐⭐⭐   | Uso diario             |
+| Certificados  | ⭐⭐⭐⭐⭐ | Entornos empresariales |
+| 2FA (TOTP)    | ⭐⭐⭐⭐⭐ | Máxima seguridad       |
 
 ---
 
@@ -167,13 +168,13 @@ En 1999, el equipo de **OpenBSD** creó OpenSSH, una implementación completamen
 
 **¿Por qué OpenSSH ganó?**
 
-| Característica | OpenSSH |
-|----------------|---------|
-| Licencia | BSD (muy permisiva) |
-| Código | Abierto y auditado |
-| Seguridad | Prioridad #1 del proyecto |
-| Portabilidad | Funciona en casi cualquier sistema |
-| Adopción | 90%+ de servidores en Internet |
+| Característica | OpenSSH                            |
+| -------------- | ---------------------------------- |
+| Licencia       | BSD (muy permisiva)                |
+| Código         | Abierto y auditado                 |
+| Seguridad      | Prioridad #1 del proyecto          |
+| Portabilidad   | Funciona en casi cualquier sistema |
+| Adopción       | 90%+ de servidores en Internet     |
 
 ```bash
 # Verificar tu versión de OpenSSH
