@@ -19,10 +19,14 @@ Este es un **bootcamp profesional de SSH** diseñado para administradores de sis
 
 ## 📁 Estructura de Archivos Obligatoria
 
+> **IMPORTANTE**: Todas las semanas del bootcamp se ubican en la carpeta `bootcamp/`
+> Ruta base: `/home/epti/Documents/epti-dev/bc-channel/bc-ssh/bootcamp/`
+
 Cada semana DEBE seguir esta estructura exacta:
 
 ```
-semana-XX/
+bootcamp/
+└── semana-XX/
 ├── README.md                    # 📋 Índice principal de la semana
 ├── RUBRICA-EVALUACION.md        # 📊 Criterios de evaluación (100 pts)
 │
@@ -350,6 +354,18 @@ Al generar contenido para una semana, asegurar:
 - Usar lenguaje técnico preciso pero accesible
 - Tutear al estudiante (tú, no usted)
 - Mantener tono motivacional y práctico
+
+### ⚠️ Límites de Respuesta:
+
+- **SIEMPRE dividir las respuestas** para evitar superar los límites de tokens
+- Crear archivos de uno en uno o en grupos pequeños (máximo 3-4 archivos por respuesta)
+- Si se solicita crear una semana completa, dividir en múltiples respuestas:
+  1. Primera respuesta: README.md + RUBRICA-EVALUACION.md
+  2. Segunda respuesta: 1-teoria/ (3 módulos)
+  3. Tercera respuesta: 2-practicas/ (3 prácticas)
+  4. Cuarta respuesta: 3-proyecto/ + 4-recursos/
+  5. Quinta respuesta: 5-glosario/
+- Preguntar al usuario si desea continuar antes de cada bloque
 
 ---
 

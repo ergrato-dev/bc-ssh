@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300">
+  <!-- Background -->
+  <rect width="1200" height="300" fill="#0d1117"/>
+  
+  <!-- Grid pattern -->
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#21262d" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="300" fill="url(#grid)"/>
+  
+  <!-- Left decoration - Terminal window -->
+  <g transform="translate(80, 80)">
+    <!-- Terminal frame -->
+    <rect x="0" y="0" width="200" height="140" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+    <!-- Terminal header -->
+    <rect x="0" y="0" width="200" height="28" rx="8" fill="#21262d"/>
+    <rect x="0" y="20" width="200" height="10" fill="#21262d"/>
+    <!-- Terminal buttons -->
+    <circle cx="16" cy="14" r="5" fill="#f85149"/>
+    <circle cx="34" cy="14" r="5" fill="#f0883e"/>
+    <circle cx="52" cy="14" r="5" fill="#3fb950"/>
+    <!-- Terminal content -->
+    <text x="12" y="52" font-family="monospace" font-size="11" fill="#7ee787">$</text>
+    <text x="24" y="52" font-family="monospace" font-size="11" fill="#c9d1d9">ssh user@server</text>
+    <text x="12" y="72" font-family="monospace" font-size="11" fill="#8b949e">Connected to 192.168.1.10</text>
+    <text x="12" y="92" font-family="monospace" font-size="11" fill="#7ee787">$</text>
+    <text x="24" y="92" font-family="monospace" font-size="11" fill="#c9d1d9">whoami</text>
+    <text x="12" y="112" font-family="monospace" font-size="11" fill="#58a6ff">admin</text>
+    <text x="12" y="132" font-family="monospace" font-size="11" fill="#7ee787">$</text>
+    <rect x="24" y="122" width="8" height="14" fill="#58a6ff" opacity="0.8"/>
+  </g>
+  
+  <!-- Center content -->
+  <g transform="translate(600, 150)">
+    <!-- Lock icon -->
+    <g transform="translate(-180, -50)">
+      <rect x="0" y="20" width="40" height="35" rx="4" fill="none" stroke="#58a6ff" stroke-width="3"/>
+      <path d="M 8 20 L 8 12 Q 8 0 20 0 Q 32 0 32 12 L 32 20" fill="none" stroke="#58a6ff" stroke-width="3"/>
+      <circle cx="20" cy="35" r="4" fill="#58a6ff"/>
+      <rect x="18" y="35" width="4" height="10" fill="#58a6ff"/>
+    </g>
+    
+    <!-- Main title -->
+    <text x="-110" y="-15" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#ffffff">Bootcamp</text>
+    <text x="-110" y="40" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#58a6ff">SSH</text>
+    
+    <!-- Subtitle -->
+    <text x="-110" y="75" font-family="Arial, sans-serif" font-size="18" fill="#8b949e">De Zero a Hero</text>
+  </g>
+  
+  <!-- Right decoration - Key icon -->
+  <g transform="translate(920, 100)">
+    <!-- Key body -->
+    <ellipse cx="40" cy="40" rx="30" ry="30" fill="none" stroke="#f0883e" stroke-width="3"/>
+    <ellipse cx="40" cy="40" rx="15" ry="15" fill="none" stroke="#f0883e" stroke-width="3"/>
+    <rect x="65" y="35" width="80" height="10" fill="#f0883e"/>
+    <rect x="120" y="35" width="10" height="25" fill="#f0883e"/>
+    <rect x="135" y="35" width="10" height="20" fill="#f0883e"/>
+  </g>
+  
+  <!-- Bottom stats -->
+  <g transform="translate(0, 260)">
+    <!-- Divider line -->
+    <line x1="80" y1="0" x2="1120" y2="0" stroke="#21262d" stroke-width="1"/>
+    
+    <!-- Stats -->
+    <text x="120" y="25" font-family="Arial, sans-serif" font-size="13" fill="#8b949e">
+      <tspan fill="#58a6ff">10</tspan> semanas
+    </text>
+    <circle cx="230" cy="20" r="2" fill="#30363d"/>
+    <text x="260" y="25" font-family="Arial, sans-serif" font-size="13" fill="#8b949e">
+      <tspan fill="#58a6ff">40</tspan> horas
+    </text>
+    <circle cx="360" cy="20" r="2" fill="#30363d"/>
+    <text x="390" y="25" font-family="Arial, sans-serif" font-size="13" fill="#8b949e">
+      <tspan fill="#58a6ff">30</tspan> prácticas
+    </text>
+    <circle cx="510" cy="20" r="2" fill="#30363d"/>
+    <text x="540" y="25" font-family="Arial, sans-serif" font-size="13" fill="#8b949e">
+      <tspan fill="#58a6ff">10</tspan> proyectos
+    </text>
+    
+    <!-- Right side badges -->
+    <text x="900" y="25" font-family="Arial, sans-serif" font-size="13" fill="#3fb950">● OpenSSH</text>
+    <text x="1020" y="25" font-family="Arial, sans-serif" font-size="13" fill="#f0883e">● Ansible</text>
+  </g>
+</svg>
