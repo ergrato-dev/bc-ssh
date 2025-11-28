@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 450">
+  <!-- Background -->
+  <rect width="900" height="450" fill="#0d1117"/>
+  
+  <!-- Title -->
+  <text x="450" y="35" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#58a6ff" text-anchor="middle">Comparación: Telnet vs SSH</text>
+  
+  <!-- Telnet Side -->
+  <rect x="50" y="60" width="380" height="350" rx="10" fill="#161b22" stroke="#da3633" stroke-width="2"/>
+  <text x="240" y="95" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#f85149" text-anchor="middle">❌ TELNET (Puerto 23)</text>
+  <text x="240" y="115" font-family="Arial, sans-serif" font-size="12" fill="#8b949e" text-anchor="middle">Creado: 1969 • INSEGURO</text>
+  
+  <!-- Telnet Connection Diagram -->
+  <rect x="80" y="140" width="80" height="50" rx="5" fill="#238636"/>
+  <text x="120" y="170" font-family="Arial, sans-serif" font-size="11" fill="#ffffff" text-anchor="middle">Cliente</text>
+  
+  <rect x="320" y="140" width="80" height="50" rx="5" fill="#1f6feb"/>
+  <text x="360" y="170" font-family="Arial, sans-serif" font-size="11" fill="#ffffff" text-anchor="middle">Servidor</text>
+  
+  <!-- Telnet unencrypted line -->
+  <line x1="160" y1="165" x2="320" y2="165" stroke="#da3633" stroke-width="3"/>
+  <text x="240" y="155" font-family="Arial, sans-serif" font-size="10" fill="#f85149" text-anchor="middle">TEXTO PLANO</text>
+  
+  <!-- Attacker -->
+  <rect x="190" y="200" width="100" height="40" rx="5" fill="#da3633"/>
+  <text x="240" y="225" font-family="Arial, sans-serif" font-size="11" fill="#ffffff" text-anchor="middle">👁️ Atacante</text>
+  <line x1="240" y1="175" x2="240" y2="200" stroke="#f85149" stroke-width="2" stroke-dasharray="4,2"/>
+  
+  <!-- Telnet Problems List -->
+  <text x="80" y="270" font-family="Arial, sans-serif" font-size="12" fill="#f85149">⚠️ Problemas de Telnet:</text>
+  
+  <text x="90" y="295" font-family="Arial, sans-serif" font-size="11" fill="#c9d1d9">• Contraseñas en texto plano</text>
+  <text x="90" y="315" font-family="Arial, sans-serif" font-size="11" fill="#c9d1d9">• Comandos visibles para atacantes</text>
+  <text x="90" y="335" font-family="Arial, sans-serif" font-size="11" fill="#c9d1d9">• Sin verificación de servidor</text>
+  <text x="90" y="355" font-family="Arial, sans-serif" font-size="11" fill="#c9d1d9">• Vulnerable a man-in-the-middle</text>
+  <text x="90" y="375" font-family="Arial, sans-serif" font-size="11" fill="#c9d1d9">• Sin integridad de datos</text>
+  
+  <!-- Packet example -->
+  <rect x="80" y="390" width="330" height="25" rx="3" fill="#21262d" stroke="#da3633"/>
+  <text x="245" y="407" font-family="monospace" font-size="10" fill="#f85149" text-anchor="middle">password: MiContraseña123 (visible!)</text>
+  
+  <!-- SSH Side -->
+  <rect x="470" y="60" width="380" height="350" rx="10" fill="#161b22" stroke="#238636" stroke-width="2"/>
+  <text x="660" y="95" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#3fb950" text-anchor="middle">✅ SSH (Puerto 22)</text>
+  <text x="660" y="115" font-family="Arial, sans-serif" font-size="12" fill="#8b949e" text-anchor="middle">Creado: 1995 • SEGURO</text>
+  
+  <!-- SSH Connection Diagram -->
+  <rect x="500" y="140" width="80" height="50" rx="5" fill="#238636"/>
+  <text x="540" y="170" font-family="Arial, sans-serif" font-size="11" fill="#ffffff" text-anchor="middle">Cliente</text>
+  
+  <rect x="740" y="140" width="80" height="50" rx="5" fill="#1f6feb"/>
+  <text x="780" y="170" font-family="Arial, sans-serif" font-size="11" fill="#ffffff" text-anchor="middle">Servidor</text>
+  
+  <!-- SSH encrypted tunnel -->
+  <rect x="585" y="150" width="150" height="30" rx="5" fill="none" stroke="#58a6ff" stroke-width="2" stroke-dasharray="6,3"/>
+  <text x="660" y="170" font-family="Arial, sans-serif" font-size="10" fill="#58a6ff" text-anchor="middle">🔒 CIFRADO</text>
+  
+  <!-- Attacker blocked -->
+  <rect x="610" y="200" width="100" height="40" rx="5" fill="#21262d" stroke="#30363d"/>
+  <text x="660" y="225" font-family="Arial, sans-serif" font-size="11" fill="#8b949e" text-anchor="middle">🚫 Atacante</text>
+  <line x1="660" y1="185" x2="660" y2="200" stroke="#30363d" stroke-width="2" stroke-dasharray="4,2"/>
+  <text x="660" y="195" font-family="Arial, sans-serif" font-size="9" fill="#3fb950">BLOQUEADO</text>
+  
+  <!-- SSH Benefits List -->
+  <text x="500" y="270" font-family="Arial, sans-serif" font-size="12" fill="#3fb950">✓ Beneficios de SSH:</text>
+  
+  <text x="510" y="295" font-family="Arial, sans-serif" font-size="11" fill="#c9d1d9">• Cifrado AES-256 / ChaCha20</text>
+  <text x="510" y="315" font-family="Arial, sans-serif" font-size="11" fill="#c9d1d9">• Autenticación con llaves públicas</text>
+  <text x="510" y="335" font-family="Arial, sans-serif" font-size="11" fill="#c9d1d9">• Verificación de host (fingerprint)</text>
+  <text x="510" y="355" font-family="Arial, sans-serif" font-size="11" fill="#c9d1d9">• Protección man-in-the-middle</text>
+  <text x="510" y="375" font-family="Arial, sans-serif" font-size="11" fill="#c9d1d9">• Integridad con HMAC</text>
+  
+  <!-- Encrypted packet example -->
+  <rect x="500" y="390" width="330" height="25" rx="3" fill="#21262d" stroke="#238636"/>
+  <text x="665" y="407" font-family="monospace" font-size="10" fill="#3fb950" text-anchor="middle">aG5kZmpoZ2tkZm... (cifrado!)</text>
+  
+  <!-- VS divider -->
+  <circle cx="450" cy="235" r="25" fill="#0d1117" stroke="#58a6ff" stroke-width="2"/>
+  <text x="450" y="241" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#58a6ff" text-anchor="middle">VS</text>
+  
+  <!-- Bottom recommendation -->
+  <rect x="300" y="420" width="300" height="25" rx="5" fill="#238636"/>
+  <text x="450" y="438" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle">🎯 SIEMPRE usa SSH, NUNCA Telnet</text>
+</svg>

@@ -15,6 +15,12 @@
 
 ---
 
+## 📊 Diagrama: Arquitectura Cliente-Servidor
+
+![Arquitectura SSH](../0-assets/01-arquitectura-ssh.svg)
+
+---
+
 ## 📋 Contenido
 
 ### 2.1 Componentes del Sistema SSH
@@ -30,6 +36,8 @@
 <!-- TODO -->
 
 ### 2.4 Flujo de Conexión
+
+![Flujo de Conexión SSH](../0-assets/02-flujo-conexion.svg)
 
 <!-- TODO -->
 

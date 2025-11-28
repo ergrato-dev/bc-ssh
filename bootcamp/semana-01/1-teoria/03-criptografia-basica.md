@@ -15,6 +15,12 @@
 
 ---
 
+## 📊 Diagrama: Criptografía en SSH
+
+![Criptografía Simétrica vs Asimétrica](../0-assets/04-criptografia-ssh.svg)
+
+---
+
 ## 📋 Contenido
 
 ### 3.1 ¿Qué es la Criptografía?

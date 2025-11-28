@@ -15,6 +15,12 @@
 
 ---
 
+## 📊 Diagrama: Telnet vs SSH
+
+![Comparación Telnet vs SSH](../0-assets/03-comparacion-telnet-ssh.svg)
+
+---
+
 ## 📋 Contenido
 
 ### 1.1 La Era del Acceso Remoto Inseguro

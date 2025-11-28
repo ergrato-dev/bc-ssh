@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400">
+  <!-- Background -->
+  <rect width="800" height="400" fill="#0d1117"/>
+  
+  <!-- Title -->
+  <text x="400" y="35" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#58a6ff" text-anchor="middle">Arquitectura Cliente-Servidor SSH</text>
+  
+  <!-- Client Box -->
+  <rect x="50" y="80" width="200" height="250" rx="10" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="150" y="110" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#c9d1d9" text-anchor="middle">🖥️ CLIENTE SSH</text>
+  
+  <!-- Client Components -->
+  <rect x="70" y="130" width="160" height="35" rx="5" fill="#238636" stroke="#2ea043" stroke-width="1"/>
+  <text x="150" y="153" font-family="Arial, sans-serif" font-size="12" fill="#ffffff" text-anchor="middle">ssh (comando)</text>
+  
+  <rect x="70" y="175" width="160" height="35" rx="5" fill="#1f6feb" stroke="#388bfd" stroke-width="1"/>
+  <text x="150" y="198" font-family="Arial, sans-serif" font-size="12" fill="#ffffff" text-anchor="middle">~/.ssh/config</text>
+  
+  <rect x="70" y="220" width="160" height="35" rx="5" fill="#8957e5" stroke="#a371f7" stroke-width="1"/>
+  <text x="150" y="243" font-family="Arial, sans-serif" font-size="12" fill="#ffffff" text-anchor="middle">Llaves (id_ed25519)</text>
+  
+  <rect x="70" y="265" width="160" height="35" rx="5" fill="#da3633" stroke="#f85149" stroke-width="1"/>
+  <text x="150" y="288" font-family="Arial, sans-serif" font-size="12" fill="#ffffff" text-anchor="middle">known_hosts</text>
+  
+  <!-- Server Box -->
+  <rect x="550" y="80" width="200" height="250" rx="10" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="650" y="110" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#c9d1d9" text-anchor="middle">🖧 SERVIDOR SSH</text>
+  
+  <!-- Server Components -->
+  <rect x="570" y="130" width="160" height="35" rx="5" fill="#238636" stroke="#2ea043" stroke-width="1"/>
+  <text x="650" y="153" font-family="Arial, sans-serif" font-size="12" fill="#ffffff" text-anchor="middle">sshd (daemon)</text>
+  
+  <rect x="570" y="175" width="160" height="35" rx="5" fill="#1f6feb" stroke="#388bfd" stroke-width="1"/>
+  <text x="650" y="198" font-family="Arial, sans-serif" font-size="12" fill="#ffffff" text-anchor="middle">/etc/ssh/sshd_config</text>
+  
+  <rect x="570" y="220" width="160" height="35" rx="5" fill="#8957e5" stroke="#a371f7" stroke-width="1"/>
+  <text x="650" y="243" font-family="Arial, sans-serif" font-size="12" fill="#ffffff" text-anchor="middle">Host Keys</text>
+  
+  <rect x="570" y="265" width="160" height="35" rx="5" fill="#da3633" stroke="#f85149" stroke-width="1"/>
+  <text x="650" y="288" font-family="Arial, sans-serif" font-size="12" fill="#ffffff" text-anchor="middle">authorized_keys</text>
+  
+  <!-- Connection Arrow -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#58a6ff"/>
+    </marker>
+    <marker id="arrowhead-reverse" markerWidth="10" markerHeight="7" refX="1" refY="3.5" orient="auto">
+      <polygon points="10 0, 0 3.5, 10 7" fill="#58a6ff"/>
+    </marker>
+  </defs>
+  
+  <!-- Encrypted Tunnel -->
+  <rect x="280" y="165" width="240" height="80" rx="8" fill="none" stroke="#58a6ff" stroke-width="2" stroke-dasharray="8,4"/>
+  <text x="400" y="195" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#58a6ff" text-anchor="middle">🔒 Túnel Cifrado</text>
+  <text x="400" y="215" font-family="Arial, sans-serif" font-size="11" fill="#8b949e" text-anchor="middle">Puerto TCP/22</text>
+  
+  <!-- Arrows -->
+  <line x1="250" y1="190" x2="280" y2="190" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="550" y1="220" x2="520" y2="220" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrowhead-reverse)"/>
+  
+  <!-- Legend -->
+  <rect x="50" y="350" width="700" height="40" rx="5" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <circle cx="100" cy="370" r="8" fill="#238636"/>
+  <text x="115" y="374" font-family="Arial, sans-serif" font-size="11" fill="#8b949e">Ejecutable</text>
+  <circle cx="220" cy="370" r="8" fill="#1f6feb"/>
+  <text x="235" y="374" font-family="Arial, sans-serif" font-size="11" fill="#8b949e">Config</text>
+  <circle cx="320" cy="370" r="8" fill="#8957e5"/>
+  <text x="335" y="374" font-family="Arial, sans-serif" font-size="11" fill="#8b949e">Llaves</text>
+  <circle cx="420" cy="370" r="8" fill="#da3633"/>
+  <text x="435" y="374" font-family="Arial, sans-serif" font-size="11" fill="#8b949e">Verificación</text>
+  <rect x="520" y="362" width="30" height="16" rx="3" fill="none" stroke="#58a6ff" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="555" y="374" font-family="Arial, sans-serif" font-size="11" fill="#8b949e">Túnel cifrado</text>
+</svg>
