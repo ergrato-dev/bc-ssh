@@ -1,0 +1,227 @@
+# ====================================
+# 🔐 Bootcamp SSH - .gitignore
+# ====================================
+
+# ------------------------------------
+# 🔑 SSH Keys & Credentials (CRÍTICO)
+# ------------------------------------
+# Nunca subir llaves SSH ni credenciales
+*.pem
+*.key
+*.pub
+id_rsa*
+id_ed25519*
+id_ecdsa*
+id_dsa*
+known_hosts
+authorized_keys
+*.ppk
+
+# Archivos de configuración SSH con datos sensibles
+**/ssh_config.local
+**/sshd_config.local
+**/*.credentials
+**/*.secret
+
+# ------------------------------------
+# 🔒 Seguridad y Secretos
+# ------------------------------------
+.env
+.env.*
+*.env
+secrets/
+credentials/
+.secrets
+*.password
+*.token
+
+# Archivos de Ansible con secretos
+**/vault.yml
+**/secrets.yml
+**/*vault*.yml
+.vault_pass
+.vault_password
+
+# ------------------------------------
+# 💻 Sistemas Operativos
+# ------------------------------------
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ------------------------------------
+# 📝 Editores e IDEs
+# ------------------------------------
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# JetBrains (PyCharm, IntelliJ, etc.)
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Vim
+*.swp
+*.swo
+*.swn
+*~
+.netrwhist
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+auto-save-list
+tramp
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# ------------------------------------
+# 📦 Dependencias y Builds
+# ------------------------------------
+# Node.js (si se usa para herramientas)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Python (si se usa para scripts)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+.env/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# ------------------------------------
+# 🧪 Logs y Archivos Temporales
+# ------------------------------------
+*.log
+logs/
+*.tmp
+*.temp
+tmp/
+temp/
+cache/
+.cache/
+
+# Logs de SSH y sistemas
+auth.log
+syslog
+secure.log
+fail2ban.log
+
+# ------------------------------------
+# 📊 Archivos de Práctica/Estudiantes
+# ------------------------------------
+# Entregas de estudiantes (si aplica)
+entregas/
+submissions/
+student-work/
+
+# Archivos de backup de prácticas
+*.bak
+*.backup
+*.old
+
+# Capturas de pantalla de evidencias (pueden ser grandes)
+# Descomentar si no se quieren versionar
+# screenshots/
+# evidencias/
+
+# ------------------------------------
+# 🐳 Docker y Virtualización
+# ------------------------------------
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Vagrant
+.vagrant/
+Vagrantfile.local
+
+# VirtualBox
+*.vbox
+*.vbox-prev
+*.vdi
+*.vmdk
+*.ova
+
+# ------------------------------------
+# 🤖 Ansible
+# ------------------------------------
+# Archivos generados por Ansible
+*.retry
+inventory.local
+hosts.local
+
+# ------------------------------------
+# 📁 Archivos Grandes y Media
+# ------------------------------------
+# Videos (pueden ser muy grandes)
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
+
+# Archivos comprimidos grandes
+*.tar.gz
+*.zip
+*.7z
+*.rar
+
+# ISOs de sistemas operativos
+*.iso
+
+# ------------------------------------
+# 📋 Misceláneos
+# ------------------------------------
+# Archivos de notas personales
+NOTAS-PERSONALES.md
+notas-*.md
+TODO-PERSONAL.md
+
+# Archivos de prueba
+test-*
+prueba-*
+*.test
+
+# Documentación generada
+docs/_build/
+site/
+
+# ====================================
+# FIN .gitignore
+# ====================================
