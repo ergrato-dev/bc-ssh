@@ -13,47 +13,47 @@ Esta carpeta contiene material complementario para profundizar en los temas de l
 
 ### 📹 Videos
 
-| # | Archivo | Descripción |
-|---|---------|-------------|
-| 01 | [Videos de Conceptos](01-videos-conceptos.md) | Videos explicativos sobre fundamentos SSH |
-| 02 | [Videos Prácticos](02-videos-practicos.md) | Tutoriales paso a paso |
+| #   | Archivo                                       | Descripción                               |
+| --- | --------------------------------------------- | ----------------------------------------- |
+| 01  | [Videos de Conceptos](01-videos-conceptos.md) | Videos explicativos sobre fundamentos SSH |
+| 02  | [Videos Prácticos](02-videos-practicos.md)    | Tutoriales paso a paso                    |
 
 ---
 
 ### 📄 Artículos y Documentación
 
-| # | Archivo | Descripción |
-|---|---------|-------------|
-| 03 | [Artículos SSH](03-articulos-ssh.md) | Artículos técnicos seleccionados |
-| 04 | [Documentación Oficial](04-documentacion-oficial.md) | Manuales y RFCs oficiales |
+| #   | Archivo                                              | Descripción                      |
+| --- | ---------------------------------------------------- | -------------------------------- |
+| 03  | [Artículos SSH](03-articulos-ssh.md)                 | Artículos técnicos seleccionados |
+| 04  | [Documentación Oficial](04-documentacion-oficial.md) | Manuales y RFCs oficiales        |
 
 ---
 
 ### 🔧 Herramientas
 
-| # | Archivo | Descripción |
-|---|---------|-------------|
-| 05 | [Herramientas SSH](05-herramientas-ssh.md) | Software y utilidades recomendadas |
-| 06 | [Playgrounds Online](06-playgrounds-online.md) | Entornos para practicar sin instalar nada |
+| #   | Archivo                                        | Descripción                               |
+| --- | ---------------------------------------------- | ----------------------------------------- |
+| 05  | [Herramientas SSH](05-herramientas-ssh.md)     | Software y utilidades recomendadas        |
+| 06  | [Playgrounds Online](06-playgrounds-online.md) | Entornos para practicar sin instalar nada |
 
 ---
 
 ### 👥 Comunidad
 
-| # | Archivo | Descripción |
-|---|---------|-------------|
-| 07 | [Comunidades SysAdmin](07-comunidades-sysadmin.md) | Foros y comunidades de ayuda |
-| 08 | [Canales YouTube](08-canales-youtube.md) | Creadores de contenido recomendados |
+| #   | Archivo                                            | Descripción                         |
+| --- | -------------------------------------------------- | ----------------------------------- |
+| 07  | [Comunidades SysAdmin](07-comunidades-sysadmin.md) | Foros y comunidades de ayuda        |
+| 08  | [Canales YouTube](08-canales-youtube.md)           | Creadores de contenido recomendados |
 
 ---
 
 ### 📁 Subcarpetas
 
-| Carpeta | Contenido |
-|---------|-----------|
+| Carpeta        | Contenido                         |
+| -------------- | --------------------------------- |
 | `ebooks-free/` | PDFs y libros gratuitos sobre SSH |
-| `videografia/` | Notas y resúmenes de videos |
-| `webgrafia/` | Enlaces web organizados |
+| `videografia/` | Notas y resúmenes de videos       |
+| `webgrafia/`   | Enlaces web organizados           |
 
 ---
 

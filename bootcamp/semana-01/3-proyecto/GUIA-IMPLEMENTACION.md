@@ -257,10 +257,10 @@ para gestionar múltiples servidores de forma eficiente.
 
 ## 1. Verificación de Instalación
 
-| Item | Valor |
-|------|-------|
-| Versión SSH | OpenSSH_X.Xp1 |
-| Sistema Operativo | [Tu SO] |
+| Item              | Valor           |
+| ----------------- | --------------- |
+| Versión SSH       | OpenSSH_X.Xp1   |
+| Sistema Operativo | [Tu SO]         |
 | Directorio ~/.ssh | ✅ Permisos 700 |
 
 **Comando utilizado:**
@@ -272,19 +272,19 @@ ssh -V
 
 ## 2. Primera Conexión
 
-| Item | Valor |
-|------|-------|
-| Servidor | web-prod |
-| IP | XXX.XXX.XXX.XXX |
-| Puerto | 22 |
-| Usuario | root |
-| Conexión | ✅ Exitosa |
+| Item     | Valor           |
+| -------- | --------------- |
+| Servidor | web-prod        |
+| IP       | XXX.XXX.XXX.XXX |
+| Puerto   | 22              |
+| Usuario  | root            |
+| Conexión | ✅ Exitosa      |
 
 **Comandos ejecutados en el servidor:**
 \`\`\`bash
-whoami    # root
-hostname  # [nombre-servidor]
-uname -a  # Linux...
+whoami # root
+hostname # [nombre-servidor]
+uname -a # Linux...
 \`\`\`
 
 ---
@@ -293,20 +293,24 @@ uname -a  # Linux...
 
 ### Servidores Configurados
 
-| Alias | Función | Puerto |
-|-------|---------|--------|
-| web-prod | Servidor web producción | 22 |
-| web-staging | Servidor web staging | 22 |
-| db-prod | Base de datos | 22 |
-| monitoring | Monitoreo | 2222 |
+| Alias       | Función                 | Puerto |
+| ----------- | ----------------------- | ------ |
+| web-prod    | Servidor web producción | 22     |
+| web-staging | Servidor web staging    | 22     |
+| db-prod     | Base de datos           | 22     |
+| monitoring  | Monitoreo               | 2222   |
 
 ### Verificación
 
 \`\`\`bash
 ssh -G web-prod
+
 # user root
+
 # hostname XXX.XXX.XXX.XXX
+
 # port 22
+
 \`\`\`
 
 ---
@@ -323,9 +327,11 @@ ssh -G web-prod
 ## 5. Problemas y Soluciones
 
 ### Problema 1: [Descripción]
+
 **Solución:** [Cómo lo resolviste]
 
 ### Problema 2: [Descripción]
+
 **Solución:** [Cómo lo resolviste]
 
 ---
@@ -376,13 +382,13 @@ proyecto-semana-01/
 
 ## 🎯 Criterios de Éxito
 
-| Criterio | Cumplido |
-|----------|----------|
-| Conexión SSH exitosa | ⬜ |
-| Config con 4+ hosts | ⬜ |
-| Permisos correctos | ⬜ |
-| README documentado | ⬜ |
-| Evidencias completas | ⬜ |
+| Criterio             | Cumplido |
+| -------------------- | -------- |
+| Conexión SSH exitosa | ⬜       |
+| Config con 4+ hosts  | ⬜       |
+| Permisos correctos   | ⬜       |
+| README documentado   | ⬜       |
+| Evidencias completas | ⬜       |
 
 ---
 

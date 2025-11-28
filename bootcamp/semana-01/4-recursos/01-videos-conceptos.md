@@ -14,6 +14,7 @@ Videos explicativos sobre los fundamentos de SSH, historia y conceptos de cripto
 ### 🔐 Fundamentos de SSH
 
 #### 1. "SSH Crash Course" - Traversy Media
+
 - **Duración:** 32 min
 - **Idioma:** Inglés
 - **Nivel:** Principiante
@@ -21,6 +22,7 @@ Videos explicativos sobre los fundamentos de SSH, historia y conceptos de cripto
 - **Temas:** Qué es SSH, conexión básica, llaves SSH
 
 #### 2. "How SSH Works" - Computerphile
+
 - **Duración:** 15 min
 - **Idioma:** Inglés
 - **Nivel:** Principiante
@@ -28,6 +30,7 @@ Videos explicativos sobre los fundamentos de SSH, historia y conceptos de cripto
 - **Temas:** Funcionamiento interno de SSH, intercambio de llaves
 
 #### 3. "SSH Tutorial for Beginners" - NetworkChuck
+
 - **Duración:** 21 min
 - **Idioma:** Inglés (subtítulos disponibles)
 - **Nivel:** Principiante
@@ -39,6 +42,7 @@ Videos explicativos sobre los fundamentos de SSH, historia y conceptos de cripto
 ### 📜 Historia y Evolución
 
 #### 4. "The History of SSH" - SSH Academy
+
 - **Duración:** 8 min
 - **Idioma:** Inglés
 - **Nivel:** Todos
@@ -46,6 +50,7 @@ Videos explicativos sobre los fundamentos de SSH, historia y conceptos de cripto
 - **Temas:** Tatu Ylönen, Telnet vs SSH, evolución del protocolo
 
 #### 5. "Why We Stopped Using Telnet" - Ben Eater
+
 - **Duración:** 12 min
 - **Idioma:** Inglés
 - **Nivel:** Intermedio
@@ -57,6 +62,7 @@ Videos explicativos sobre los fundamentos de SSH, historia y conceptos de cripto
 ### 🔒 Criptografía Básica
 
 #### 6. "Public Key Cryptography" - Computerphile
+
 - **Duración:** 7 min
 - **Idioma:** Inglés
 - **Nivel:** Principiante
@@ -64,6 +70,7 @@ Videos explicativos sobre los fundamentos de SSH, historia y conceptos de cripto
 - **Temas:** Criptografía asimétrica explicada visualmente
 
 #### 7. "How Does HTTPS Work?" - ByteByteGo
+
 - **Duración:** 10 min
 - **Idioma:** Inglés
 - **Nivel:** Principiante
@@ -71,6 +78,7 @@ Videos explicativos sobre los fundamentos de SSH, historia y conceptos de cripto
 - **Temas:** TLS/SSL (conceptos aplicables a SSH)
 
 #### 8. "Diffie-Hellman Key Exchange" - Computerphile
+
 - **Duración:** 9 min
 - **Idioma:** Inglés
 - **Nivel:** Intermedio
@@ -82,6 +90,7 @@ Videos explicativos sobre los fundamentos de SSH, historia y conceptos de cripto
 ### 🇪🇸 Videos en Español
 
 #### 9. "Qué es SSH y cómo funciona" - HolaMundo
+
 - **Duración:** 18 min
 - **Idioma:** Español
 - **Nivel:** Principiante
@@ -89,6 +98,7 @@ Videos explicativos sobre los fundamentos de SSH, historia y conceptos de cripto
 - **Temas:** Introducción a SSH en español
 
 #### 10. "Curso SSH desde cero" - Fazt
+
 - **Duración:** 45 min
 - **Idioma:** Español
 - **Nivel:** Principiante
@@ -102,11 +112,13 @@ Videos explicativos sobre los fundamentos de SSH, historia y conceptos de cripto
 Después de ver cada video, responde estas preguntas:
 
 ### Fundamentos
+
 - [ ] ¿Qué problema resuelve SSH?
 - [ ] ¿Cuál es la diferencia principal con Telnet?
 - [ ] ¿Qué puerto usa SSH por defecto?
 
 ### Criptografía
+
 - [ ] ¿Qué es criptografía simétrica vs asimétrica?
 - [ ] ¿Para qué sirve una llave pública?
 - [ ] ¿Por qué la llave privada debe mantenerse secreta?

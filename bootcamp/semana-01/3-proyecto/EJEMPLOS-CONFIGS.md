@@ -22,6 +22,7 @@ Host mi-servidor
 ```
 
 **Uso:**
+
 ```bash
 ssh mi-servidor
 ```
@@ -212,20 +213,20 @@ Host bitbucket.org
 Host *
     # Agregar llaves al agente automáticamente
     AddKeysToAgent yes
-    
+
     # Mantener conexión activa
     ServerAliveInterval 60
     ServerAliveCountMax 3
-    
+
     # Timeout de conexión
     ConnectTimeout 30
-    
+
     # Usar IPv4 preferentemente
     AddressFamily inet
-    
+
     # Algoritmos de cifrado modernos
     Ciphers aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
-    
+
     # Verificar huella del servidor
     StrictHostKeyChecking ask
 ```
@@ -278,20 +279,20 @@ Host *
 
 ## 📊 Referencia Rápida de Directivas
 
-| Directiva | Descripción | Valor Común |
-|-----------|-------------|-------------|
-| `Host` | Alias del servidor | `mi-servidor` |
-| `HostName` | IP o dominio real | `192.168.1.1` |
-| `User` | Usuario SSH | `root`, `admin` |
-| `Port` | Puerto SSH | `22`, `2222` |
-| `IdentityFile` | Ruta a llave privada | `~/.ssh/id_ed25519` |
-| `ServerAliveInterval` | Segundos entre keep-alive | `60` |
-| `ServerAliveCountMax` | Máx intentos keep-alive | `3` |
-| `ConnectTimeout` | Timeout de conexión | `30` |
-| `Compression` | Habilitar compresión | `yes`, `no` |
-| `StrictHostKeyChecking` | Verificar huella | `yes`, `no`, `ask` |
-| `AddKeysToAgent` | Agregar llave al agent | `yes`, `no` |
-| `ForwardAgent` | Reenviar agent SSH | `yes`, `no` |
+| Directiva               | Descripción               | Valor Común         |
+| ----------------------- | ------------------------- | ------------------- |
+| `Host`                  | Alias del servidor        | `mi-servidor`       |
+| `HostName`              | IP o dominio real         | `192.168.1.1`       |
+| `User`                  | Usuario SSH               | `root`, `admin`     |
+| `Port`                  | Puerto SSH                | `22`, `2222`        |
+| `IdentityFile`          | Ruta a llave privada      | `~/.ssh/id_ed25519` |
+| `ServerAliveInterval`   | Segundos entre keep-alive | `60`                |
+| `ServerAliveCountMax`   | Máx intentos keep-alive   | `3`                 |
+| `ConnectTimeout`        | Timeout de conexión       | `30`                |
+| `Compression`           | Habilitar compresión      | `yes`, `no`         |
+| `StrictHostKeyChecking` | Verificar huella          | `yes`, `no`, `ask`  |
+| `AddKeysToAgent`        | Agregar llave al agent    | `yes`, `no`         |
+| `ForwardAgent`          | Reenviar agent SSH        | `yes`, `no`         |
 
 ---
 

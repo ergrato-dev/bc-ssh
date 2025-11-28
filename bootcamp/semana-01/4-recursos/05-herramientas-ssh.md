@@ -15,21 +15,21 @@ Herramientas y utilidades para trabajar con SSH de forma más eficiente.
 
 ### Línea de Comandos (Recomendado)
 
-| Herramienta | Plataforma | Descripción |
-|-------------|------------|-------------|
-| **OpenSSH** | Linux/macOS/Windows | Cliente estándar, incluido en el SO |
-| **Git Bash** | Windows | Incluye OpenSSH + herramientas Unix |
-| **WSL2** | Windows | Linux real dentro de Windows |
+| Herramienta  | Plataforma          | Descripción                         |
+| ------------ | ------------------- | ----------------------------------- |
+| **OpenSSH**  | Linux/macOS/Windows | Cliente estándar, incluido en el SO |
+| **Git Bash** | Windows             | Incluye OpenSSH + herramientas Unix |
+| **WSL2**     | Windows             | Linux real dentro de Windows        |
 
 ### Interfaz Gráfica (GUI)
 
-| Herramienta | Plataforma | Descripción | URL |
-|-------------|------------|-------------|-----|
-| **PuTTY** | Windows | Cliente SSH clásico para Windows | https://putty.org |
-| **MobaXterm** | Windows | Terminal con SFTP integrado | https://mobaxterm.mobatek.net |
-| **Termius** | Todas | Cliente moderno multiplataforma | https://termius.com |
-| **Royal TSX** | macOS | Gestor de conexiones avanzado | https://royalapps.com |
-| **Remmina** | Linux | Cliente de escritorio remoto + SSH | https://remmina.org |
+| Herramienta   | Plataforma | Descripción                        | URL                           |
+| ------------- | ---------- | ---------------------------------- | ----------------------------- |
+| **PuTTY**     | Windows    | Cliente SSH clásico para Windows   | https://putty.org             |
+| **MobaXterm** | Windows    | Terminal con SFTP integrado        | https://mobaxterm.mobatek.net |
+| **Termius**   | Todas      | Cliente moderno multiplataforma    | https://termius.com           |
+| **Royal TSX** | macOS      | Gestor de conexiones avanzado      | https://royalapps.com         |
+| **Remmina**   | Linux      | Cliente de escritorio remoto + SSH | https://remmina.org           |
 
 ---
 
@@ -37,52 +37,52 @@ Herramientas y utilidades para trabajar con SSH de forma más eficiente.
 
 ### macOS
 
-| Terminal | Descripción | URL |
-|----------|-------------|-----|
-| **iTerm2** | El mejor terminal para macOS | https://iterm2.com |
-| **Terminal.app** | Terminal nativo (incluido) | - |
-| **Warp** | Terminal moderno con AI | https://warp.dev |
-| **Alacritty** | Terminal GPU-accelerated | https://alacritty.org |
+| Terminal         | Descripción                  | URL                   |
+| ---------------- | ---------------------------- | --------------------- |
+| **iTerm2**       | El mejor terminal para macOS | https://iterm2.com    |
+| **Terminal.app** | Terminal nativo (incluido)   | -                     |
+| **Warp**         | Terminal moderno con AI      | https://warp.dev      |
+| **Alacritty**    | Terminal GPU-accelerated     | https://alacritty.org |
 
 ### Windows
 
-| Terminal | Descripción | URL |
-|----------|-------------|-----|
-| **Windows Terminal** | Terminal moderno de Microsoft | Microsoft Store |
-| **Git Bash** | Bash para Windows | https://git-scm.com |
-| **Cmder** | Emulador portable | https://cmder.app |
+| Terminal             | Descripción                   | URL                 |
+| -------------------- | ----------------------------- | ------------------- |
+| **Windows Terminal** | Terminal moderno de Microsoft | Microsoft Store     |
+| **Git Bash**         | Bash para Windows             | https://git-scm.com |
+| **Cmder**            | Emulador portable             | https://cmder.app   |
 
 ### Linux
 
-| Terminal | Descripción | DE |
-|----------|-------------|-----|
-| **GNOME Terminal** | Terminal de GNOME | GNOME |
-| **Konsole** | Terminal de KDE | KDE |
-| **Alacritty** | Rápido, GPU-accelerated | Cualquiera |
-| **Kitty** | Feature-rich, GPU-accelerated | Cualquiera |
-| **Terminator** | Split terminals | Cualquiera |
+| Terminal           | Descripción                   | DE         |
+| ------------------ | ----------------------------- | ---------- |
+| **GNOME Terminal** | Terminal de GNOME             | GNOME      |
+| **Konsole**        | Terminal de KDE               | KDE        |
+| **Alacritty**      | Rápido, GPU-accelerated       | Cualquiera |
+| **Kitty**          | Feature-rich, GPU-accelerated | Cualquiera |
+| **Terminator**     | Split terminals               | Cualquiera |
 
 ---
 
 ## 🔑 Gestores de Llaves SSH
 
-| Herramienta | Plataforma | Descripción |
-|-------------|------------|-------------|
-| **ssh-agent** | Todas | Agente nativo de OpenSSH |
-| **Keychain** | Linux/macOS | Gestor de ssh-agent |
-| **1Password** | Todas | Password manager + SSH agent |
-| **KeePassXC** | Todas | Password manager con soporte SSH |
+| Herramienta   | Plataforma  | Descripción                      |
+| ------------- | ----------- | -------------------------------- |
+| **ssh-agent** | Todas       | Agente nativo de OpenSSH         |
+| **Keychain**  | Linux/macOS | Gestor de ssh-agent              |
+| **1Password** | Todas       | Password manager + SSH agent     |
+| **KeePassXC** | Todas       | Password manager con soporte SSH |
 
 ---
 
 ## 📁 Clientes SFTP/SCP (GUI)
 
-| Herramienta | Plataforma | Descripción | URL |
-|-------------|------------|-------------|-----|
-| **FileZilla** | Todas | Cliente SFTP popular | https://filezilla-project.org |
-| **WinSCP** | Windows | SFTP/SCP con interfaz | https://winscp.net |
-| **Cyberduck** | macOS/Windows | Cliente elegante | https://cyberduck.io |
-| **Transmit** | macOS | Cliente premium | https://panic.com/transmit |
+| Herramienta   | Plataforma    | Descripción           | URL                           |
+| ------------- | ------------- | --------------------- | ----------------------------- |
+| **FileZilla** | Todas         | Cliente SFTP popular  | https://filezilla-project.org |
+| **WinSCP**    | Windows       | SFTP/SCP con interfaz | https://winscp.net            |
+| **Cyberduck** | macOS/Windows | Cliente elegante      | https://cyberduck.io          |
+| **Transmit**  | macOS         | Cliente premium       | https://panic.com/transmit    |
 
 ---
 
@@ -115,10 +115,10 @@ ssh -vvv usuario@servidor  # máximo detalle
 
 ## 🧪 Herramientas de Testing
 
-| Herramienta | Descripción | URL |
-|-------------|-------------|-----|
+| Herramienta   | Descripción                    | URL                                 |
+| ------------- | ------------------------------ | ----------------------------------- |
 | **ssh-audit** | Auditoría de configuración SSH | https://github.com/jtesta/ssh-audit |
-| **sslscan** | Escaneo de cifrados | https://github.com/rbsec/sslscan |
+| **sslscan**   | Escaneo de cifrados            | https://github.com/rbsec/sslscan    |
 
 ### Instalación de ssh-audit
 
@@ -138,21 +138,21 @@ ssh-audit servidor
 
 ## 📱 Apps Móviles
 
-| App | Plataforma | Descripción |
-|-----|------------|-------------|
-| **Termius** | iOS/Android | Cliente SSH profesional |
-| **JuiceSSH** | Android | Cliente SSH gratuito |
-| **Prompt 3** | iOS | Cliente SSH premium |
-| **Blink Shell** | iOS | Terminal con mosh |
+| App             | Plataforma  | Descripción             |
+| --------------- | ----------- | ----------------------- |
+| **Termius**     | iOS/Android | Cliente SSH profesional |
+| **JuiceSSH**    | Android     | Cliente SSH gratuito    |
+| **Prompt 3**    | iOS         | Cliente SSH premium     |
+| **Blink Shell** | iOS         | Terminal con mosh       |
 
 ---
 
 ## 🎨 Extensiones VS Code
 
-| Extensión | Descripción |
-|-----------|-------------|
-| **Remote - SSH** | Desarrollo remoto via SSH |
-| **SSH FS** | Montar sistemas de archivos SSH |
+| Extensión        | Descripción                     |
+| ---------------- | ------------------------------- |
+| **Remote - SSH** | Desarrollo remoto via SSH       |
+| **SSH FS**       | Montar sistemas de archivos SSH |
 
 ### Instalar Remote SSH
 
@@ -170,22 +170,22 @@ code --install-extension ms-vscode-remote.remote-ssh
 
 ### Crear Servidores de Prueba
 
-| Opción | Costo | Descripción |
-|--------|-------|-------------|
-| **DigitalOcean** | $6/mes | VPS fácil de usar |
-| **Linode** | $5/mes | VPS económico |
-| **Vultr** | $5/mes | VPS con ubicaciones globales |
-| **AWS EC2** | Free tier | 12 meses gratis (limitado) |
-| **Google Cloud** | Free tier | Créditos gratuitos |
+| Opción           | Costo     | Descripción                  |
+| ---------------- | --------- | ---------------------------- |
+| **DigitalOcean** | $6/mes    | VPS fácil de usar            |
+| **Linode**       | $5/mes    | VPS económico                |
+| **Vultr**        | $5/mes    | VPS con ubicaciones globales |
+| **AWS EC2**      | Free tier | 12 meses gratis (limitado)   |
+| **Google Cloud** | Free tier | Créditos gratuitos           |
 
 ### Alternativas Locales (Gratis)
 
-| Opción | Descripción |
-|--------|-------------|
+| Opción         | Descripción           |
+| -------------- | --------------------- |
 | **VirtualBox** | VMs locales gratuitas |
-| **Multipass** | VMs Ubuntu fáciles |
-| **Docker** | Contenedores con SSH |
-| **Vagrant** | VMs automatizadas |
+| **Multipass**  | VMs Ubuntu fáciles    |
+| **Docker**     | Contenedores con SSH  |
+| **Vagrant**    | VMs automatizadas     |
 
 ---
 

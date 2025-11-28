@@ -14,18 +14,21 @@ Lecturas técnicas recomendadas para complementar la teoría de la Semana 01.
 ### 🔐 Fundamentos de SSH
 
 #### 1. "Understanding the SSH Encryption and Connection Process"
+
 - **Fuente:** DigitalOcean Community
 - **Tiempo de lectura:** 15 min
 - **URL:** https://www.digitalocean.com/community/tutorials/understanding-the-ssh-encryption-and-connection-process
 - **Por qué leerlo:** Explica paso a paso cómo funciona el cifrado SSH
 
 #### 2. "SSH Essentials: Working with SSH Servers, Clients, and Keys"
+
 - **Fuente:** DigitalOcean Community
 - **Tiempo de lectura:** 20 min
 - **URL:** https://www.digitalocean.com/community/tutorials/ssh-essentials-working-with-ssh-servers-clients-and-keys
 - **Por qué leerlo:** Guía completa de referencia para SSH
 
 #### 3. "How Does SSH Work"
+
 - **Fuente:** SSH Academy
 - **Tiempo de lectura:** 10 min
 - **URL:** https://www.ssh.com/academy/ssh/protocol
@@ -36,12 +39,14 @@ Lecturas técnicas recomendadas para complementar la teoría de la Semana 01.
 ### 📜 Historia de SSH
 
 #### 4. "The Story of SSH"
+
 - **Fuente:** SSH Academy
 - **Tiempo de lectura:** 8 min
 - **URL:** https://www.ssh.com/academy/ssh/history
 - **Por qué leerlo:** Historia contada por la empresa fundada por Tatu Ylönen
 
 #### 5. "From Telnet to SSH: The Evolution of Secure Remote Access"
+
 - **Fuente:** Medium / Dev.to
 - **Tiempo de lectura:** 12 min
 - **Búsqueda:** "Telnet to SSH evolution"
@@ -52,18 +57,21 @@ Lecturas técnicas recomendadas para complementar la teoría de la Semana 01.
 ### 🔒 Criptografía Aplicada
 
 #### 6. "A Deep Dive into SSH"
+
 - **Fuente:** Cloudflare Blog
 - **Tiempo de lectura:** 20 min
 - **URL:** https://blog.cloudflare.com/a-deep-dive-into-ssh/
 - **Por qué leerlo:** Explicación técnica detallada del protocolo
 
 #### 7. "Public Key Cryptography for Non-Cryptographers"
+
 - **Fuente:** Medium
 - **Tiempo de lectura:** 15 min
 - **Búsqueda:** "Public key cryptography explained simple"
 - **Por qué leerlo:** Criptografía explicada sin matemáticas complejas
 
 #### 8. "RSA vs Ed25519: Which SSH Key is Better?"
+
 - **Fuente:** Varios blogs técnicos
 - **Tiempo de lectura:** 10 min
 - **Búsqueda:** "RSA vs Ed25519 SSH"
@@ -74,12 +82,14 @@ Lecturas técnicas recomendadas para complementar la teoría de la Semana 01.
 ### ⚙️ Configuración y Mejores Prácticas
 
 #### 9. "How to Configure SSH Config File"
+
 - **Fuente:** Linuxize
 - **Tiempo de lectura:** 12 min
 - **URL:** https://linuxize.com/post/using-the-ssh-config-file/
 - **Por qué leerlo:** Referencia completa del archivo config
 
 #### 10. "SSH Best Practices"
+
 - **Fuente:** SSH Academy
 - **Tiempo de lectura:** 15 min
 - **URL:** https://www.ssh.com/academy/ssh/security
@@ -90,11 +100,13 @@ Lecturas técnicas recomendadas para complementar la teoría de la Semana 01.
 ## 🇪🇸 Artículos en Español
 
 #### 11. "Guía completa de SSH"
+
 - **Fuente:** Linuxito
 - **URL:** https://www.linuxito.com/gnu-linux/nivel-basico/ssh
 - **Por qué leerlo:** Explicación completa en español
 
 #### 12. "Cómo funciona SSH"
+
 - **Fuente:** Redeszone
 - **URL:** https://www.redeszone.net/tutoriales/servidores/ssh-que-es-como-funciona/
 - **Por qué leerlo:** Fundamentos en español con ejemplos
@@ -104,18 +116,22 @@ Lecturas técnicas recomendadas para complementar la teoría de la Semana 01.
 ## 📋 Lista de Lectura Sugerida
 
 ### Día 1-2: Fundamentos
+
 - [ ] Artículo 1: SSH Encryption Process
 - [ ] Artículo 3: How Does SSH Work
 
 ### Día 3-4: Historia
+
 - [ ] Artículo 4: Story of SSH
 - [ ] Artículo 5: Telnet to SSH Evolution
 
 ### Día 5-6: Criptografía
+
 - [ ] Artículo 6: Deep Dive into SSH
 - [ ] Artículo 7: Public Key Cryptography
 
 ### Día 7: Configuración
+
 - [ ] Artículo 9: SSH Config File
 - [ ] Artículo 10: SSH Best Practices
 
