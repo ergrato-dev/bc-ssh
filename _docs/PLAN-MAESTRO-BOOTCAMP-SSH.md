@@ -1,4 +1,4 @@
-# 🔐 PLAN MAESTRO: Bootcamp SSH - 10 Semanas
+ṕóíééé# 🔐 PLAN MAESTRO: Bootcamp SSH - 10 Semanas
 
 **Parámetros del Bootcamp:**
 - Duración: 10 semanas
