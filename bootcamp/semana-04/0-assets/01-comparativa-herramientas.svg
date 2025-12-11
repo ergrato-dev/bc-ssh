@@ -1,0 +1,150 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600">
+  <defs>
+    <style>
+      .bg { fill: #0d1117; }
+      .box { fill: #161b22; stroke: #30363d; stroke-width: 2; rx: 8; }
+      .box-scp { fill: #1a2332; stroke: #58a6ff; stroke-width: 2; rx: 8; }
+      .box-sftp { fill: #1a2832; stroke: #3fb950; stroke-width: 2; rx: 8; }
+      .box-rsync { fill: #2a1a22; stroke: #f85149; stroke-width: 2; rx: 8; }
+      .title { fill: #c9d1d9; font-family: sans-serif; font-size: 24px; font-weight: bold; }
+      .subtitle { fill: #8b949e; font-family: sans-serif; font-size: 14px; }
+      .header { fill: #c9d1d9; font-family: sans-serif; font-size: 18px; font-weight: bold; }
+      .text { fill: #c9d1d9; font-family: sans-serif; font-size: 13px; }
+      .text-small { fill: #8b949e; font-family: sans-serif; font-size: 11px; }
+      .accent-blue { fill: #58a6ff; }
+      .accent-green { fill: #3fb950; }
+      .accent-red { fill: #f85149; }
+      .accent-yellow { fill: #d29922; }
+      .check { fill: #3fb950; font-family: sans-serif; font-size: 14px; }
+      .cross { fill: #f85149; font-family: sans-serif; font-size: 14px; }
+      .partial { fill: #d29922; font-family: sans-serif; font-size: 14px; }
+    </style>
+  </defs>
+  
+  <!-- Background -->
+  <rect class="bg" width="900" height="600"/>
+  
+  <!-- Title -->
+  <text x="450" y="40" text-anchor="middle" class="title">Comparativa: SCP vs SFTP vs rsync</text>
+  <text x="450" y="62" text-anchor="middle" class="subtitle">Herramientas de Transferencia de Archivos sobre SSH</text>
+  
+  <!-- Header Row -->
+  <rect x="30" y="85" width="170" height="40" class="box"/>
+  <text x="115" y="110" text-anchor="middle" class="header">Característica</text>
+  
+  <rect x="210" y="85" width="200" height="40" class="box-scp"/>
+  <text x="310" y="110" text-anchor="middle" class="header accent-blue">SCP</text>
+  
+  <rect x="420" y="85" width="200" height="40" class="box-sftp"/>
+  <text x="520" y="110" text-anchor="middle" class="header accent-green">SFTP</text>
+  
+  <rect x="630" y="85" width="240" height="40" class="box-rsync"/>
+  <text x="750" y="110" text-anchor="middle" class="header accent-red">rsync</text>
+  
+  <!-- Row 1: Tipo -->
+  <rect x="30" y="135" width="170" height="50" class="box"/>
+  <text x="115" y="165" text-anchor="middle" class="text">Tipo de Operación</text>
+  
+  <rect x="210" y="135" width="200" height="50" class="box"/>
+  <text x="310" y="158" text-anchor="middle" class="text">Copia simple</text>
+  <text x="310" y="175" text-anchor="middle" class="text-small">Un comando, una tarea</text>
+  
+  <rect x="420" y="135" width="200" height="50" class="box"/>
+  <text x="520" y="158" text-anchor="middle" class="text">Sesión interactiva</text>
+  <text x="520" y="175" text-anchor="middle" class="text-small">Múltiples operaciones</text>
+  
+  <rect x="630" y="135" width="240" height="50" class="box"/>
+  <text x="750" y="158" text-anchor="middle" class="text">Sincronización</text>
+  <text x="750" y="175" text-anchor="middle" class="text-small">Solo diferencias</text>
+  
+  <!-- Row 2: Transferencia Incremental -->
+  <rect x="30" y="195" width="170" height="50" class="box"/>
+  <text x="115" y="218" text-anchor="middle" class="text">Transferencia</text>
+  <text x="115" y="235" text-anchor="middle" class="text">Incremental</text>
+  
+  <rect x="210" y="195" width="200" height="50" class="box"/>
+  <text x="310" y="225" text-anchor="middle" class="cross">✗ No</text>
+  
+  <rect x="420" y="195" width="200" height="50" class="box"/>
+  <text x="520" y="225" text-anchor="middle" class="cross">✗ No</text>
+  
+  <rect x="630" y="195" width="240" height="50" class="box"/>
+  <text x="750" y="225" text-anchor="middle" class="check">✓ Sí (algoritmo delta)</text>
+  
+  <!-- Row 3: Gestión Remota -->
+  <rect x="30" y="255" width="170" height="50" class="box"/>
+  <text x="115" y="285" text-anchor="middle" class="text">Gestión Remota</text>
+  
+  <rect x="210" y="255" width="200" height="50" class="box"/>
+  <text x="310" y="285" text-anchor="middle" class="cross">✗ No</text>
+  
+  <rect x="420" y="255" width="200" height="50" class="box"/>
+  <text x="520" y="278" text-anchor="middle" class="check">✓ Completa</text>
+  <text x="520" y="295" text-anchor="middle" class="text-small">mkdir, rm, chmod, rename</text>
+  
+  <rect x="630" y="255" width="240" height="50" class="box"/>
+  <text x="750" y="285" text-anchor="middle" class="partial">◐ Limitada (--delete)</text>
+  
+  <!-- Row 4: Reanudación -->
+  <rect x="30" y="315" width="170" height="50" class="box"/>
+  <text x="115" y="345" text-anchor="middle" class="text">Reanudar Transfer.</text>
+  
+  <rect x="210" y="315" width="200" height="50" class="box"/>
+  <text x="310" y="345" text-anchor="middle" class="cross">✗ No</text>
+  
+  <rect x="420" y="315" width="200" height="50" class="box"/>
+  <text x="520" y="338" text-anchor="middle" class="check">✓ Sí</text>
+  <text x="520" y="355" text-anchor="middle" class="text-small">reget, reput</text>
+  
+  <rect x="630" y="315" width="240" height="50" class="box"/>
+  <text x="750" y="338" text-anchor="middle" class="check">✓ Sí</text>
+  <text x="750" y="355" text-anchor="middle" class="text-small">--partial, --append</text>
+  
+  <!-- Row 5: Uso Ideal -->
+  <rect x="30" y="375" width="170" height="70" class="box"/>
+  <text x="115" y="415" text-anchor="middle" class="text">Caso de Uso Ideal</text>
+  
+  <rect x="210" y="375" width="200" height="70" class="box"/>
+  <text x="310" y="400" text-anchor="middle" class="text">Copia rápida</text>
+  <text x="310" y="420" text-anchor="middle" class="text-small">Archivos individuales</text>
+  <text x="310" y="437" text-anchor="middle" class="text-small">Sin necesidad de gestión</text>
+  
+  <rect x="420" y="375" width="200" height="70" class="box"/>
+  <text x="520" y="400" text-anchor="middle" class="text">Gestión interactiva</text>
+  <text x="520" y="420" text-anchor="middle" class="text-small">Explorar y transferir</text>
+  <text x="520" y="437" text-anchor="middle" class="text-small">Múltiples operaciones</text>
+  
+  <rect x="630" y="375" width="240" height="70" class="box"/>
+  <text x="750" y="400" text-anchor="middle" class="text">Sincronización/Backups</text>
+  <text x="750" y="420" text-anchor="middle" class="text-small">Grandes volúmenes</text>
+  <text x="750" y="437" text-anchor="middle" class="text-small">Transferencias recurrentes</text>
+  
+  <!-- Row 6: Complejidad -->
+  <rect x="30" y="455" width="170" height="50" class="box"/>
+  <text x="115" y="485" text-anchor="middle" class="text">Complejidad</text>
+  
+  <rect x="210" y="455" width="200" height="50" class="box"/>
+  <text x="310" y="478" text-anchor="middle" class="accent-green">⬤ Baja</text>
+  <text x="310" y="495" text-anchor="middle" class="text-small">Fácil de usar</text>
+  
+  <rect x="420" y="455" width="200" height="50" class="box"/>
+  <text x="520" y="478" text-anchor="middle" class="accent-yellow">⬤ Media</text>
+  <text x="520" y="495" text-anchor="middle" class="text-small">Comandos interactivos</text>
+  
+  <rect x="630" y="455" width="240" height="50" class="box"/>
+  <text x="750" y="478" text-anchor="middle" class="accent-red">⬤ Alta</text>
+  <text x="750" y="495" text-anchor="middle" class="text-small">Muchas opciones</text>
+  
+  <!-- Summary Icons -->
+  <rect x="30" y="520" width="260" height="60" class="box-scp"/>
+  <text x="160" y="545" text-anchor="middle" class="accent-blue">📤 SCP</text>
+  <text x="160" y="565" text-anchor="middle" class="text-small">"Copia rápida y sencilla"</text>
+  
+  <rect x="320" y="520" width="260" height="60" class="box-sftp"/>
+  <text x="450" y="545" text-anchor="middle" class="accent-green">📂 SFTP</text>
+  <text x="450" y="565" text-anchor="middle" class="text-small">"Gestión interactiva completa"</text>
+  
+  <rect x="610" y="520" width="260" height="60" class="box-rsync"/>
+  <text x="740" y="545" text-anchor="middle" class="accent-red">🔄 rsync</text>
+  <text x="740" y="565" text-anchor="middle" class="text-small">"El rey de la sincronización"</text>
+</svg>
