@@ -103,7 +103,7 @@ semana-02/
 ├── 0-assets/                      # Diagramas SVG
 │   ├── 01-flujo-autenticacion-llaves.svg
 │   ├── 02-generacion-llaves.svg
-│   └── 03-authorized-keys.svg
+│   └── 03-estructura-authorized-keys.svg
 ├── 1-teoria/                      # Módulos teóricos
 │   ├── README.md
 │   ├── 01-contrasena-vs-llaves.md

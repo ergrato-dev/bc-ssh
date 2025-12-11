@@ -19,9 +19,9 @@ Al finalizar este módulo, serás capaz de:
 
 ---
 
-## 📊 Diagrama: Authorized Keys
+## 📊 Diagrama: Estructura de Authorized Keys
 
-![Authorized Keys](../0-assets/03-authorized-keys.svg)
+![Estructura Authorized Keys](../0-assets/03-estructura-authorized-keys.svg)
 
 ---
 
