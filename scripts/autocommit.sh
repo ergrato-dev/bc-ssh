@@ -9,7 +9,7 @@
 
 # Configuration
 REPO_DIR="/home/epti/Documents/epti-dev/bc-channel/bc-ssh"
-LOG_FILE="${REPO_DIR}/_scripts/autocommit.log"
+LOG_FILE="${REPO_DIR}/scripts/autocommit.log"
 BRANCH="main"
 
 # Colors for terminal output (disabled in cron)
@@ -75,7 +75,7 @@ determine_type() {
     local files="$1"
     
     # Check for specific patterns
-    if echo "$files" | grep -qE "^_docs/|README\.md|\.md$"; then
+    if echo "$files" | grep -qE "^docs/|README\.md|\.md$"; then
         echo "docs"
         return
     fi
@@ -110,7 +110,7 @@ determine_type() {
         return
     fi
     
-    if echo "$files" | grep -qE "^_scripts/|\.sh$"; then
+    if echo "$files" | grep -qE "^scripts/|\.sh$"; then
         echo "chore"
         return
     fi
@@ -179,12 +179,12 @@ determine_what() {
     fi
     
     # Check for specific file types
-    if echo "$files" | grep -qE "^_docs/"; then
+    if echo "$files" | grep -qE "^docs/"; then
         echo "bootcamp documentation"
         return
     fi
     
-    if echo "$files" | grep -qE "^_scripts/"; then
+    if echo "$files" | grep -qE "^scripts/"; then
         echo "automation scripts"
         return
     fi

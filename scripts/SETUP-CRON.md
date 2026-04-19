@@ -13,7 +13,7 @@
 ### 1. Make script executable
 
 ```bash
-chmod +x /home/epti/Documents/epti-dev/bc-channel/bc-ssh/_scripts/autocommit.sh
+chmod +x /home/epti/Documents/epti-dev/bc-channel/bc-ssh/scripts/autocommit.sh
 ```
 
 ### 2. Edit user crontab
@@ -25,7 +25,7 @@ crontab -e
 ### 3. Add this line (runs every 5 minutes)
 
 ```cron
-*/5 * * * * /home/epti/Documents/epti-dev/bc-channel/bc-ssh/_scripts/autocommit.sh >> /home/epti/Documents/epti-dev/bc-channel/bc-ssh/_scripts/autocommit.log 2>&1
+*/5 * * * * /home/epti/Documents/epti-dev/bc-channel/bc-ssh/scripts/autocommit.sh >> /home/epti/Documents/epti-dev/bc-channel/bc-ssh/scripts/autocommit.log 2>&1
 ```
 
 ### 4. Verify cron is running (Fedora 43 uses cronie)
@@ -92,7 +92,7 @@ Description=Bootcamp SSH Autocommit Service
 
 [Service]
 Type=oneshot
-ExecStart=/home/epti/Documents/epti-dev/bc-channel/bc-ssh/_scripts/autocommit.sh
+ExecStart=/home/epti/Documents/epti-dev/bc-channel/bc-ssh/scripts/autocommit.sh
 WorkingDirectory=/home/epti/Documents/epti-dev/bc-channel/bc-ssh
 
 [Install]
@@ -121,13 +121,13 @@ systemctl --user status bc-ssh-autocommit.timer
 ### View autocommit log
 
 ```bash
-tail -f /home/epti/Documents/epti-dev/bc-channel/bc-ssh/_scripts/autocommit.log
+tail -f /home/epti/Documents/epti-dev/bc-channel/bc-ssh/scripts/autocommit.log
 ```
 
 ### Manually run the script
 
 ```bash
-/home/epti/Documents/epti-dev/bc-channel/bc-ssh/_scripts/autocommit.sh
+/home/epti/Documents/epti-dev/bc-channel/bc-ssh/scripts/autocommit.sh
 ```
 
 ### Disable autocommit (cron)

@@ -1,6 +1,6 @@
 <div align="center">
 
-![Bootcamp SSH Banner](_assets/banner-header.svg)
+![Bootcamp SSH Banner](assets/banner-header.svg)
 
 [![SSH](https://img.shields.io/badge/SSH-OpenSSH_9.0+-red?style=for-the-badge&logo=openssh&logoColor=white)](https://www.openssh.com/)
 [![Nivel](https://img.shields.io/badge/Nivel-Principiante_→_Avanzado-green?style=for-the-badge)](/)
@@ -167,9 +167,9 @@ Necesitarás acceso a un servidor SSH. Opciones:
 bc-ssh/
 ├── 📄 README.md                 # Este archivo
 ├── 📄 LICENSE                   # Licencia MIT
-├── 📁 _assets/                  # Recursos gráficos
-├── 📁 _docs/                    # Documentación del proyecto
-├── 📁 _scripts/                 # Scripts de automatización
+├── 📁 assets/                  # Recursos gráficos
+├── 📁 docs/                    # Documentación del proyecto
+├── 📁 scripts/                 # Scripts de automatización
 │
 └── 📁 bootcamp/                 # 📚 Contenido del bootcamp
     ├── 📁 week-01-fundamentos_ssh_y_primera_conexion/            # Fundamentos y primera conexión
