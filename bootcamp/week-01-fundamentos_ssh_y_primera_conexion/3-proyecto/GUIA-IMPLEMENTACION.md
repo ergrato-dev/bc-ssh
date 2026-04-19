@@ -229,15 +229,15 @@ ssh root@tu-ip-real -p 22
 
 ```bash
 # Crear carpeta del proyecto
-mkdir -p ~/proyecto-semana-01/evidencias
+mkdir -p ~/proyecto-week-01-fundamentos_ssh_y_primera_conexion/evidencias
 
 # Copiar archivo config (censurado)
-cat ~/.ssh/config | sed 's/[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}/XXX.XXX.XXX.XXX/g' > ~/proyecto-semana-01/ssh-config.txt
+cat ~/.ssh/config | sed 's/[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}/XXX.XXX.XXX.XXX/g' > ~/proyecto-week-01-fundamentos_ssh_y_primera_conexion/ssh-config.txt
 ```
 
 ### 4.2 Crear README del proyecto
 
-Crea el archivo `~/proyecto-semana-01/README.md`:
+Crea el archivo `~/proyecto-week-01-fundamentos_ssh_y_primera_conexion/README.md`:
 
 ```markdown
 # 🔐 Proyecto Semana 01 - Gestión Centralizada SSH
@@ -368,7 +368,7 @@ Antes de entregar, verifica:
 ### Estructura final
 
 ```
-proyecto-semana-01/
+proyecto-week-01-fundamentos_ssh_y_primera_conexion/
 ├── README.md              ✅
 ├── ssh-config.txt         ✅
 └── evidencias/

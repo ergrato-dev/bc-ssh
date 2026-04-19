@@ -47,7 +47,7 @@ ssh-keygen --help
 
 ### Conocimientos Previos
 
-- ✅ Completar [Semana 01: Fundamentos SSH](../semana-01/README.md)
+- ✅ Completar [Semana 01: Fundamentos SSH](../week-01-fundamentos_ssh_y_primera_conexion/README.md)
 - ✅ Leer los 3 módulos teóricos de esta semana
 - ✅ Acceso a un servidor remoto (VPS, VM local o contenedor)
 

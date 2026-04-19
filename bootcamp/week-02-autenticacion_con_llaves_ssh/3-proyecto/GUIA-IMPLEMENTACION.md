@@ -35,8 +35,8 @@ ls -la ~/.ssh || mkdir -p ~/.ssh && chmod 700 ~/.ssh
 
 ```bash
 # Crear directorio para el proyecto (documentación)
-mkdir -p ~/bootcamp-ssh/semana-02-proyecto
-cd ~/bootcamp-ssh/semana-02-proyecto
+mkdir -p ~/bootcamp-ssh/week-02-autenticacion_con_llaves_ssh-proyecto
+cd ~/bootcamp-ssh/week-02-autenticacion_con_llaves_ssh-proyecto
 ```
 
 ### 1.3 Respaldar Configuración Existente

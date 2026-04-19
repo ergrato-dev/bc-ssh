@@ -82,7 +82,7 @@ Al completar esta semana, serás capaz de:
 ## 🗂️ Estructura de Archivos
 
 ```
-semana-04/
+week-04-transferencia_archivos_scp_sftp_rsync/
 ├── README.md
 ├── RUBRICA-EVALUACION.md
 │
@@ -127,9 +127,9 @@ semana-04/
 
 Antes de iniciar esta semana, asegúrate de:
 
-- ✅ Haber completado [Semana 01: Fundamentos de SSH](../semana-01/README.md)
-- ✅ Haber completado [Semana 02: Autenticación con Llaves](../semana-02/README.md)
-- ✅ Haber completado [Semana 03: Configuración Avanzada](../semana-03/README.md)
+- ✅ Haber completado [Semana 01: Fundamentos de SSH](../week-01-fundamentos_ssh_y_primera_conexion/README.md)
+- ✅ Haber completado [Semana 02: Autenticación con Llaves](../week-02-autenticacion_con_llaves_ssh/README.md)
+- ✅ Haber completado [Semana 03: Configuración Avanzada](../week-03-configuracion_avanzada_cliente_ssh/README.md)
 - ✅ Tener acceso a al menos un servidor remoto
 - ✅ Tener archivos de prueba para transferir
 
@@ -164,7 +164,7 @@ Semana 04 (4 horas totales)
 
 | ⬅️ Anterior                                                 |          🏠 Inicio           |                                      Siguiente ➡️ |
 | :---------------------------------------------------------- | :--------------------------: | ------------------------------------------------: |
-| [Semana 03: Configuración Avanzada](../semana-03/README.md) | [Bootcamp SSH](../README.md) | [Semana 05: Servidor SSH](../semana-05/README.md) |
+| [Semana 03: Configuración Avanzada](../week-03-configuracion_avanzada_cliente_ssh/README.md) | [Bootcamp SSH](../README.md) | [Semana 05: Servidor SSH](../week-05-configuracion_servidor_ssh/README.md) |
 
 ---
 

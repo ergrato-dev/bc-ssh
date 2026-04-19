@@ -74,7 +74,7 @@ Al finalizar esta semana, serás capaz de:
 
 ### Conocimientos
 
-- ✅ Completar [Semana 01](../semana-01/README.md)
+- ✅ Completar [Semana 01](../week-01-fundamentos_ssh_y_primera_conexion/README.md)
 - ✅ Entender arquitectura cliente-servidor SSH
 - ✅ Conceptos básicos de criptografía (simétrica/asimétrica)
 
@@ -97,7 +97,7 @@ Al finalizar esta semana, serás capaz de:
 ## 📁 Estructura de la Semana
 
 ```
-semana-02/
+week-02-autenticacion_con_llaves_ssh/
 ├── README.md                      # Este archivo
 ├── RUBRICA-EVALUACION.md          # Criterios de evaluación
 ├── 0-assets/                      # Diagramas SVG
@@ -133,7 +133,7 @@ semana-02/
 
 | ⬅️ Anterior                                      | 🏠 Inicio                | Siguiente ➡️                                         |
 | ------------------------------------------------ | ------------------------ | ---------------------------------------------------- |
-| [Semana 01: Fundamentos](../semana-01/README.md) | [Bootcamp](../README.md) | [Semana 03: Config Avanzada](../semana-03/README.md) |
+| [Semana 01: Fundamentos](../week-01-fundamentos_ssh_y_primera_conexion/README.md) | [Bootcamp](../README.md) | [Semana 03: Config Avanzada](../week-03-configuracion_avanzada_cliente_ssh/README.md) |
 
 ---
 

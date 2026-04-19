@@ -414,7 +414,7 @@ Challenge-Response, Fingerprint, Passphrase, Public Key Authentication, Agent Fo
 
 | ← Anterior                            | Actual         | Siguiente →                            |
 | ------------------------------------- | -------------- | -------------------------------------- |
-| [4-Recursos](../4-recursos/README.md) | **5-Glosario** | [Semana 03](../../semana-03/README.md) |
+| [4-Recursos](../4-recursos/README.md) | **5-Glosario** | [Semana 03](../../week-03-configuracion_avanzada_cliente_ssh/README.md) |
 
 ---
 

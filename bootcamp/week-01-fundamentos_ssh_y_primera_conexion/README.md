@@ -50,4 +50,4 @@ Ver [RUBRICA-EVALUACION.md](RUBRICA-EVALUACION.md) para criterios detallados.
 
 | ⬅️ Anterior | 🏠 Inicio                        | Siguiente ➡️               |
 | ----------- | -------------------------------- | -------------------------- |
-| -           | [README Principal](../README.md) | [Semana 02](../semana-02/) |
+| -           | [README Principal](../README.md) | [Semana 02](../week-02-autenticacion_con_llaves_ssh/) |

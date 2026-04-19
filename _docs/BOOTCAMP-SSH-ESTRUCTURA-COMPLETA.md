@@ -547,7 +547,7 @@ Eres el administrador de sistemas de "DevOps Corp", una startup con 15 desarroll
 Cada semana seguirá esta estructura exacta:
 
 ```
-semana-XX/
+week-XX-tema_principal/
 ├── README.md                    # 📋 Índice principal de la semana
 ├── RUBRICA-EVALUACION.md        # 📊 Criterios de evaluación (100 pts)
 │

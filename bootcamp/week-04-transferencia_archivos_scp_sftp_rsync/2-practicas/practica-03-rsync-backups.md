@@ -41,7 +41,7 @@ ssh tu-servidor "rsync --version | head -1"
 ### Ejercicio 1.1: Primera Sincronización (Local → Remoto)
 
 ```bash
-cd ~/ssh-lab/semana-04/archivos
+cd ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/archivos
 
 # Sincronizar directorio al servidor
 rsync -avz proyecto/ tu-servidor:~/lab-transferencias/proyecto-sync/
@@ -68,13 +68,13 @@ ssh tu-servidor "ls -laR ~/lab-transferencias/proyecto-sync/"
 ### Ejercicio 1.3: Sincronización Inversa (Remoto → Local)
 
 ```bash
-mkdir -p ~/ssh-lab/semana-04/sync-remoto
+mkdir -p ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/sync-remoto
 
 # Descargar del servidor
-rsync -avz tu-servidor:~/lab-transferencias/proyecto-sync/ ~/ssh-lab/semana-04/sync-remoto/
+rsync -avz tu-servidor:~/lab-transferencias/proyecto-sync/ ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/sync-remoto/
 
 # Verificar
-ls -la ~/ssh-lab/semana-04/sync-remoto/
+ls -la ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/sync-remoto/
 ```
 
 ---
@@ -84,7 +84,7 @@ ls -la ~/ssh-lab/semana-04/sync-remoto/
 ### Ejercicio 2.1: Modificar Archivos Locales
 
 ```bash
-cd ~/ssh-lab/semana-04/archivos/proyecto
+cd ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/archivos/proyecto
 
 # Modificar un archivo
 echo "Nueva línea añadida" >> src/index.php
@@ -100,7 +100,7 @@ ls src/
 ### Ejercicio 2.2: Re-sincronizar (Solo Diferencias)
 
 ```bash
-cd ~/ssh-lab/semana-04/archivos
+cd ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/archivos
 
 # Sincronizar nuevamente
 rsync -avz proyecto/ tu-servidor:~/lab-transferencias/proyecto-sync/
@@ -129,7 +129,7 @@ ssh tu-servidor "ls ~/lab-transferencias/proyecto-sync/src/"
 ### Ejercicio 3.1: Simular Sincronización
 
 ```bash
-cd ~/ssh-lab/semana-04/archivos
+cd ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/archivos
 
 # Ver qué haría sin ejecutar
 rsync -avzn proyecto/ tu-servidor:~/lab-transferencias/proyecto-sync/
@@ -169,7 +169,7 @@ ssh tu-servidor "ls ~/lab-transferencias/proyecto-sync/src/"
 ### Ejercicio 4.1: Excluir Patrones
 
 ```bash
-cd ~/ssh-lab/semana-04/archivos
+cd ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/archivos
 
 # Crear archivos que queremos excluir
 echo "Log de prueba" > proyecto/app.log
@@ -193,7 +193,7 @@ ssh tu-servidor "ls -la ~/lab-transferencias/proyecto-clean/"
 
 ```bash
 # Crear archivo de exclusiones
-cat > ~/ssh-lab/semana-04/exclude.txt << 'EOF'
+cat > ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/exclude.txt << 'EOF'
 *.log
 *.tmp
 .cache
@@ -207,7 +207,7 @@ EOF
 
 # Usar archivo de exclusiones
 rsync -avz \
-    --exclude-from="$HOME/ssh-lab/semana-04/exclude.txt" \
+    --exclude-from="$HOME/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/exclude.txt" \
     proyecto/ \
     tu-servidor:~/lab-transferencias/proyecto-filtered/
 ```
@@ -224,8 +224,8 @@ ssh tu-servidor "mkdir -p ~/backups"
 
 # Backup del proyecto
 rsync -avz --delete \
-    --exclude-from="$HOME/ssh-lab/semana-04/exclude.txt" \
-    ~/ssh-lab/semana-04/archivos/proyecto/ \
+    --exclude-from="$HOME/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/exclude.txt" \
+    ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/archivos/proyecto/ \
     tu-servidor:~/backups/proyecto/
 
 # Verificar
@@ -239,8 +239,8 @@ ssh tu-servidor "ls -la ~/backups/proyecto/"
 FECHA=$(date +%Y%m%d-%H%M%S)
 
 rsync -avz \
-    --exclude-from="$HOME/ssh-lab/semana-04/exclude.txt" \
-    ~/ssh-lab/semana-04/archivos/proyecto/ \
+    --exclude-from="$HOME/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/exclude.txt" \
+    ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/archivos/proyecto/ \
     tu-servidor:~/backups/proyecto-$FECHA/
 
 # Verificar
@@ -265,7 +265,7 @@ ssh tu-servidor "mkdir -p ~/backups-incremental"
 FECHA=$(date +%Y%m%d-%H%M%S)
 
 rsync -avz \
-    ~/ssh-lab/semana-04/archivos/proyecto/ \
+    ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/archivos/proyecto/ \
     tu-servidor:~/backups-incremental/$FECHA/
 
 # Crear enlace simbólico a "latest"
@@ -279,7 +279,7 @@ ssh tu-servidor "ls -la ~/backups-incremental/"
 
 ```bash
 # Modificar un archivo
-echo "Cambio para backup incremental" >> ~/ssh-lab/semana-04/archivos/proyecto/docs/README.md
+echo "Cambio para backup incremental" >> ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/archivos/proyecto/docs/README.md
 
 # Esperar unos segundos para diferenciar timestamp
 sleep 2
@@ -289,7 +289,7 @@ FECHA_NUEVA=$(date +%Y%m%d-%H%M%S)
 
 rsync -avz \
     --link-dest=../latest \
-    ~/ssh-lab/semana-04/archivos/proyecto/ \
+    ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/archivos/proyecto/ \
     tu-servidor:~/backups-incremental/$FECHA_NUEVA/
 
 # Actualizar latest
@@ -319,7 +319,7 @@ ssh tu-servidor "du -sh ~/backups-incremental/*"
 ```bash
 # Limitar a 1 MB/s (1000 KB/s)
 rsync -avz --bwlimit=1000 \
-    ~/ssh-lab/semana-04/archivos/archivo-grande.bin \
+    ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/archivos/archivo-grande.bin \
     tu-servidor:~/lab-transferencias/
 ```
 
@@ -327,7 +327,7 @@ rsync -avz --bwlimit=1000 \
 
 ```bash
 rsync -avz --stats \
-    ~/ssh-lab/semana-04/archivos/proyecto/ \
+    ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/archivos/proyecto/ \
     tu-servidor:~/lab-transferencias/proyecto-stats/
 
 # Observar estadísticas al final:
@@ -354,7 +354,7 @@ rsync -avz --stats \
 ### Crear Script Profesional
 
 ```bash
-cat > ~/ssh-lab/semana-04/backup-rsync.sh << 'EOF'
+cat > ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/backup-rsync.sh << 'EOF'
 #!/bin/bash
 #############################################
 # Script de Backup con rsync
@@ -364,11 +364,11 @@ cat > ~/ssh-lab/semana-04/backup-rsync.sh << 'EOF'
 set -e  # Salir si hay error
 
 # Configuración
-ORIGEN="${1:-$HOME/ssh-lab/semana-04/archivos/proyecto}"
+ORIGEN="${1:-$HOME/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/archivos/proyecto}"
 SERVIDOR="${2:-tu-servidor}"
 BACKUP_DIR="~/backups-auto"
 FECHA=$(date +%Y%m%d-%H%M%S)
-EXCLUDE_FILE="$HOME/ssh-lab/semana-04/exclude.txt"
+EXCLUDE_FILE="$HOME/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/exclude.txt"
 LOG_FILE="/tmp/backup-$FECHA.log"
 
 echo "======================================"
@@ -417,18 +417,18 @@ echo "💾 Espacio utilizado:"
 ssh "$SERVIDOR" "du -sh $BACKUP_DIR/*"
 EOF
 
-chmod +x ~/ssh-lab/semana-04/backup-rsync.sh
+chmod +x ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/backup-rsync.sh
 ```
 
 ### Ejecutar Script
 
 ```bash
 # Ejecutar backup
-~/ssh-lab/semana-04/backup-rsync.sh
+~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/backup-rsync.sh
 
 # Modificar algo y ejecutar de nuevo
-echo "Otro cambio" >> ~/ssh-lab/semana-04/archivos/proyecto/config/app.yml
-~/ssh-lab/semana-04/backup-rsync.sh
+echo "Otro cambio" >> ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/archivos/proyecto/config/app.yml
+~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/backup-rsync.sh
 ```
 
 ---

@@ -225,13 +225,13 @@ crontab -e
 # Agregar las siguientes líneas:
 
 # Backup de staging cada 6 horas
-0 */6 * * * /home/usuario/ssh-lab/semana-04/proyecto-sync/scripts/backup-incremental.sh staging >> /home/usuario/ssh-lab/semana-04/proyecto-sync/logs/cron-backup.log 2>&1
+0 */6 * * * /home/usuario/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/proyecto-sync/scripts/backup-incremental.sh staging >> /home/usuario/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/proyecto-sync/logs/cron-backup.log 2>&1
 
 # Backup de producción diario a las 2 AM
-0 2 * * * /home/usuario/ssh-lab/semana-04/proyecto-sync/scripts/backup-incremental.sh production >> /home/usuario/ssh-lab/semana-04/proyecto-sync/logs/cron-backup.log 2>&1
+0 2 * * * /home/usuario/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/proyecto-sync/scripts/backup-incremental.sh production >> /home/usuario/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/proyecto-sync/logs/cron-backup.log 2>&1
 
 # Limpieza de logs viejos (más de 30 días) - semanal
-0 3 * * 0 find /home/usuario/ssh-lab/semana-04/proyecto-sync/logs -name "*.log" -mtime +30 -delete
+0 3 * * 0 find /home/usuario/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/proyecto-sync/logs -name "*.log" -mtime +30 -delete
 ```
 
 ### Script Wrapper para Cron

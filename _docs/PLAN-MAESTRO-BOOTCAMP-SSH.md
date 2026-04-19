@@ -205,7 +205,7 @@ Auditar y endurecer infraestructura completa del bootcamp: implementar 2FA en ba
 Cada semana debe contener:
 
 ```
-semana-XX/
+week-XX-tema_principal/
 ├── README.md                    # Índice principal
 ├── RUBRICA-EVALUACION.md        # 100 pts (20% teoría, 30% prácticas, 50% proyecto)
 │

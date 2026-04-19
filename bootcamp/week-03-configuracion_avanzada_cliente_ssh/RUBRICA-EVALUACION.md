@@ -157,7 +157,7 @@
 ### Formato de Entrega
 
 ```
-entrega-semana-03/
+entrega-week-03-configuracion_avanzada_cliente_ssh/
 ├── ssh-config/
 │   └── config                    # Tu archivo ~/.ssh/config
 ├── documentacion/

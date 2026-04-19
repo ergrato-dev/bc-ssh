@@ -309,7 +309,7 @@ Recuerda: incluso los administradores de sistemas más experimentados siguen con
 
 ### 🔐 Semana 1: Fundamentos de SSH y Primera Conexión
 
-**⬅️ Inicio del Bootcamp** | **[Semana 2: Autenticación con Llaves →](../semana-02/README.md)**
+**⬅️ Inicio del Bootcamp** | **[Semana 2: Autenticación con Llaves →](../week-02-autenticacion_con_llaves_ssh/README.md)**
 
 ---
 

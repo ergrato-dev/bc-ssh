@@ -54,8 +54,8 @@ ssh staging "tree ~/ -L 2 2>/dev/null || ls -laR ~/"
 
 ```bash
 # Crear directorio base
-mkdir -p ~/ssh-lab/semana-04/proyecto-sync
-cd ~/ssh-lab/semana-04/proyecto-sync
+mkdir -p ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/proyecto-sync
+cd ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/proyecto-sync
 
 # Crear estructura completa
 mkdir -p {proyecto-web/{src,config,assets/images},scripts,exclude-files,logs}
@@ -180,7 +180,7 @@ echo "temp file" > proyecto-web/tmp/cache.tmp
 echo "PNG_IMAGE_DATA" > proyecto-web/assets/images/logo.png
 
 echo "✅ Estructura del proyecto creada"
-tree ~/ssh-lab/semana-04/proyecto-sync/ 2>/dev/null || ls -laR ~/ssh-lab/semana-04/proyecto-sync/
+tree ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/proyecto-sync/ 2>/dev/null || ls -laR ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/proyecto-sync/
 ```
 
 ---
@@ -777,7 +777,7 @@ EOF
 ### 5.1 Probar Deploy a Staging
 
 ```bash
-cd ~/ssh-lab/semana-04/proyecto-sync
+cd ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/proyecto-sync
 
 # Ejecutar deploy
 ./scripts/deploy-staging.sh

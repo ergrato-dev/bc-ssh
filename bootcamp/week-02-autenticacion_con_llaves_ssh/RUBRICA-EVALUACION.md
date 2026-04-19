@@ -152,7 +152,7 @@ ssh-add -l
 ## 📝 Formato de Entrega
 
 ```
-entrega-semana-02/
+entrega-week-02-autenticacion_con_llaves_ssh/
 ├── README.md                    # Documentación personal
 ├── screenshots/
 │   ├── github-connection.png    # Prueba de conexión GitHub

@@ -26,7 +26,7 @@ Cada semana DEBE seguir esta estructura exacta:
 
 ```
 bootcamp/
-└── semana-XX/
+└── week-XX-tema_principal/
 ├── README.md                    # 📋 Índice principal de la semana
 ├── RUBRICA-EVALUACION.md        # 📊 Criterios de evaluación (100 pts)
 │

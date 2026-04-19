@@ -435,7 +435,7 @@ Ver [Compression](#compression).
 
 | ⬅️ Anterior                         |         🏠 Índice         |                           Siguiente ➡️ |
 | :---------------------------------- | :-----------------------: | -------------------------------------: |
-| [Recursos](../4-recursos/README.md) | [Semana 04](../README.md) | [Semana 05](../../semana-05/README.md) |
+| [Recursos](../4-recursos/README.md) | [Semana 04](../README.md) | [Semana 05](../../week-05-configuracion_servidor_ssh/README.md) |
 
 ---
 

@@ -160,7 +160,7 @@
 ### Formato de Entrega
 
 ```
-entrega-semana-04/
+entrega-week-04-transferencia_archivos_scp_sftp_rsync/
 ├── scripts/
 │   ├── backup.sh
 │   ├── restore.sh

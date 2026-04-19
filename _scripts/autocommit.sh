@@ -80,32 +80,32 @@ determine_type() {
         return
     fi
     
-    if echo "$files" | grep -qE "^semana-[0-9]+/1-teoria/"; then
+    if echo "$files" | grep -qE "^week-[0-9]+-[a-z_]+/1-teoria/"; then
         echo "docs"
         return
     fi
     
-    if echo "$files" | grep -qE "^semana-[0-9]+/2-practicas/"; then
+    if echo "$files" | grep -qE "^week-[0-9]+-[a-z_]+/2-practicas/"; then
         echo "feat"
         return
     fi
     
-    if echo "$files" | grep -qE "^semana-[0-9]+/3-proyecto/"; then
+    if echo "$files" | grep -qE "^week-[0-9]+-[a-z_]+/3-proyecto/"; then
         echo "feat"
         return
     fi
     
-    if echo "$files" | grep -qE "^semana-[0-9]+/4-recursos/"; then
+    if echo "$files" | grep -qE "^week-[0-9]+-[a-z_]+/4-recursos/"; then
         echo "docs"
         return
     fi
     
-    if echo "$files" | grep -qE "^semana-[0-9]+/5-glosario/"; then
+    if echo "$files" | grep -qE "^week-[0-9]+-[a-z_]+/5-glosario/"; then
         echo "docs"
         return
     fi
     
-    if echo "$files" | grep -qE "^semana-[0-9]+/0-assets/"; then
+    if echo "$files" | grep -qE "^week-[0-9]+-[a-z_]+/0-assets/"; then
         echo "style"
         return
     fi
@@ -140,9 +140,9 @@ determine_what() {
     local files="$1"
     
     # Check for week-specific changes
-    local week=$(echo "$files" | grep -oE "semana-[0-9]+" | head -1)
+    local week=$(echo "$files" | grep -oE "week-[0-9]+-[a-z_]+" | head -1)
     if [ -n "$week" ]; then
-        local week_num=$(echo "$week" | grep -oE "[0-9]+")
+        local week_num=$(echo "$week" | grep -oE "[0-9]+" | head -1)
         
         if echo "$files" | grep -qE "1-teoria/"; then
             echo "week ${week_num} theory modules"

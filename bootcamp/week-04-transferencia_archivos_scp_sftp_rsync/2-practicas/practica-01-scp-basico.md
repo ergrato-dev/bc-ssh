@@ -32,7 +32,7 @@ Al completar esta práctica, serás capaz de:
 
 ```bash
 # Ir al directorio de trabajo
-cd ~/ssh-lab/semana-04/archivos
+cd ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/archivos
 
 # Copiar archivo al servidor
 scp config.txt tu-servidor:~/lab-transferencias/
@@ -78,20 +78,20 @@ ssh tu-servidor "ls ~/lab-transferencias/documento*"
 
 ```bash
 # Crear directorio de descargas
-mkdir -p ~/ssh-lab/semana-04/downloads
+mkdir -p ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/downloads
 
 # Descargar archivo del servidor
-scp tu-servidor:~/lab-transferencias/config.txt ~/ssh-lab/semana-04/downloads/
+scp tu-servidor:~/lab-transferencias/config.txt ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/downloads/
 
 # Verificar
-ls -la ~/ssh-lab/semana-04/downloads/
+ls -la ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/downloads/
 ```
 
 ### Ejercicio 2.2: Descargar al Directorio Actual
 
 ```bash
 # Ir a directorio de descargas
-cd ~/ssh-lab/semana-04/downloads
+cd ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/downloads
 
 # Descargar usando . para directorio actual
 scp tu-servidor:~/lab-transferencias/config-backup.txt .
@@ -104,10 +104,10 @@ ls -la
 
 ```bash
 # Descargar con wildcard
-scp "tu-servidor:~/lab-transferencias/documento-*.txt" ~/ssh-lab/semana-04/downloads/
+scp "tu-servidor:~/lab-transferencias/documento-*.txt" ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/downloads/
 
 # Verificar
-ls ~/ssh-lab/semana-04/downloads/documento*
+ls ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/downloads/documento*
 ```
 
 > **Nota**: Las comillas son necesarias para que el wildcard se expanda en el servidor, no en local.
@@ -119,7 +119,7 @@ ls ~/ssh-lab/semana-04/downloads/documento*
 ### Ejercicio 3.1: Subir Directorio Completo
 
 ```bash
-cd ~/ssh-lab/semana-04/archivos
+cd ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/archivos
 
 # Copiar directorio recursivamente
 scp -r proyecto/ tu-servidor:~/lab-transferencias/
@@ -146,11 +146,11 @@ drwxr-xr-x 2 usuario usuario  src
 
 ```bash
 # Descargar directorio del servidor
-scp -r tu-servidor:~/lab-transferencias/proyecto/ ~/ssh-lab/semana-04/downloads/
+scp -r tu-servidor:~/lab-transferencias/proyecto/ ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/downloads/
 
 # Verificar
-tree ~/ssh-lab/semana-04/downloads/proyecto/ 2>/dev/null || \
-    ls -laR ~/ssh-lab/semana-04/downloads/proyecto/
+tree ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/downloads/proyecto/ 2>/dev/null || \
+    ls -laR ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/downloads/proyecto/
 ```
 
 ---
@@ -161,7 +161,7 @@ tree ~/ssh-lab/semana-04/downloads/proyecto/ 2>/dev/null || \
 
 ```bash
 # Ver timestamps originales
-ls -la ~/ssh-lab/semana-04/archivos/config.txt
+ls -la ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/archivos/config.txt
 
 # Copiar preservando atributos
 scp -p config.txt tu-servidor:~/lab-transferencias/config-preserved.txt
@@ -240,13 +240,13 @@ Simula hacer un backup de configuraciones de un servidor:
 ```bash
 # 1. Crear directorio de backup con fecha
 FECHA=$(date +%Y%m%d)
-mkdir -p ~/ssh-lab/semana-04/backups/backup-$FECHA
+mkdir -p ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/backups/backup-$FECHA
 
 # 2. Descargar todas las configuraciones
-scp -rp "tu-servidor:~/lab-transferencias/*.txt" ~/ssh-lab/semana-04/backups/backup-$FECHA/
+scp -rp "tu-servidor:~/lab-transferencias/*.txt" ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/backups/backup-$FECHA/
 
 # 3. Verificar
-ls -la ~/ssh-lab/semana-04/backups/backup-$FECHA/
+ls -la ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/backups/backup-$FECHA/
 ```
 
 ---

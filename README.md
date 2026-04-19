@@ -66,41 +66,41 @@ SSH (Secure Shell) es **el estándar de facto** para:
 
 | Semana | Tema                                                         | Objetivo                                      |
 | ------ | ------------------------------------------------------------ | --------------------------------------------- |
-| **01** | [Fundamentos de SSH y Primera Conexión](bootcamp/semana-01/) | Comprender SSH y realizar tu primera conexión |
-| **02** | [Autenticación con Llaves SSH](bootcamp/semana-02/)          | Dominar criptografía de llave pública/privada |
+| **01** | [Fundamentos de SSH y Primera Conexión](bootcamp/week-01-fundamentos_ssh_y_primera_conexion/) | Comprender SSH y realizar tu primera conexión |
+| **02** | [Autenticación con Llaves SSH](bootcamp/week-02-autenticacion_con_llaves_ssh/)          | Dominar criptografía de llave pública/privada |
 
 ### Fase 2: Configuración Cliente (Semanas 3-4)
 
 | Semana | Tema                                                      | Objetivo                                 |
 | ------ | --------------------------------------------------------- | ---------------------------------------- |
-| **03** | [Configuración Avanzada del Cliente](bootcamp/semana-03/) | Optimizar `~/.ssh/config` y multiplexing |
-| **04** | [Transferencia de Archivos](bootcamp/semana-04/)          | Dominar SCP, SFTP y rsync                |
+| **03** | [Configuración Avanzada del Cliente](bootcamp/week-03-configuracion_avanzada_cliente_ssh/) | Optimizar `~/.ssh/config` y multiplexing |
+| **04** | [Transferencia de Archivos](bootcamp/week-04-transferencia_archivos_scp_sftp_rsync/)          | Dominar SCP, SFTP y rsync                |
 
 ### Fase 3: Servidor y Seguridad (Semana 5)
 
 | Semana | Tema                                                  | Objetivo                             |
 | ------ | ----------------------------------------------------- | ------------------------------------ |
-| **05** | [Configuración del Servidor SSH](bootcamp/semana-05/) | Endurecer seguridad de `sshd_config` |
+| **05** | [Configuración del Servidor SSH](bootcamp/week-05-configuracion_servidor_ssh/) | Endurecer seguridad de `sshd_config` |
 
 ### Fase 4: Funcionalidades Avanzadas (Semanas 6-7)
 
 | Semana | Tema                                                 | Objetivo                                  |
 | ------ | ---------------------------------------------------- | ----------------------------------------- |
-| **06** | [Port Forwarding y Túneles](bootcamp/semana-06/)     | Crear túneles seguros entre redes         |
-| **07** | [SSH Agent y Gestión de Llaves](bootcamp/semana-07/) | Gestionar múltiples llaves eficientemente |
+| **06** | [Port Forwarding y Túneles](bootcamp/week-06-port_forwarding_y_tuneles/)     | Crear túneles seguros entre redes         |
+| **07** | [SSH Agent y Gestión de Llaves](bootcamp/week-07-ssh_agent_y_gestion_llaves/) | Gestionar múltiples llaves eficientemente |
 
 ### Fase 5: Arquitecturas y Automatización (Semanas 8-9)
 
 | Semana | Tema                                                    | Objetivo                                |
 | ------ | ------------------------------------------------------- | --------------------------------------- |
-| **08** | [Bastion Hosts y Arquitecturas](bootcamp/semana-08/)    | Implementar servidores de salto seguros |
-| **09** | [Automatización con SSH y Ansible](bootcamp/semana-09/) | Automatizar tareas administrativas      |
+| **08** | [Bastion Hosts y Arquitecturas](bootcamp/week-08-bastion_hosts_y_arquitecturas/)    | Implementar servidores de salto seguros |
+| **09** | [Automatización con SSH y Ansible](bootcamp/week-09-automatizacion_ssh_y_ansible/) | Automatizar tareas administrativas      |
 
 ### Fase 6: Seguridad Empresarial (Semana 10)
 
 | Semana | Tema                                                  | Objetivo                                  |
 | ------ | ----------------------------------------------------- | ----------------------------------------- |
-| **10** | [Seguridad Avanzada y Auditoría](bootcamp/semana-10/) | 2FA, fail2ban y proyecto final integrador |
+| **10** | [Seguridad Avanzada y Auditoría](bootcamp/week-10-seguridad_avanzada_y_auditoria/) | 2FA, fail2ban y proyecto final integrador |
 
 ---
 
@@ -126,7 +126,7 @@ ssh -V
 ### 3. Comienza con la Semana 1
 
 ```bash
-cd bootcamp/semana-01
+cd bootcamp/week-01-fundamentos_ssh_y_primera_conexion
 cat README.md
 ```
 
@@ -172,22 +172,22 @@ bc-ssh/
 ├── 📁 _scripts/                 # Scripts de automatización
 │
 └── 📁 bootcamp/                 # 📚 Contenido del bootcamp
-    ├── 📁 semana-01/            # Fundamentos y primera conexión
-    ├── 📁 semana-02/            # Autenticación con llaves
-    ├── 📁 semana-03/            # Configuración avanzada cliente
-    ├── 📁 semana-04/            # Transferencia de archivos
-    ├── 📁 semana-05/            # Configuración servidor
-    ├── 📁 semana-06/            # Port forwarding y túneles
-    ├── 📁 semana-07/            # SSH Agent
-    ├── 📁 semana-08/            # Bastion hosts
-    ├── 📁 semana-09/            # Automatización y Ansible
-    └── 📁 semana-10/            # Seguridad avanzada + Proyecto Final
+    ├── 📁 week-01-fundamentos_ssh_y_primera_conexion/            # Fundamentos y primera conexión
+    ├── 📁 week-02-autenticacion_con_llaves_ssh/            # Autenticación con llaves
+    ├── 📁 week-03-configuracion_avanzada_cliente_ssh/            # Configuración avanzada cliente
+    ├── 📁 week-04-transferencia_archivos_scp_sftp_rsync/            # Transferencia de archivos
+    ├── 📁 week-05-configuracion_servidor_ssh/            # Configuración servidor
+    ├── 📁 week-06-port_forwarding_y_tuneles/            # Port forwarding y túneles
+    ├── 📁 week-07-ssh_agent_y_gestion_llaves/            # SSH Agent
+    ├── 📁 week-08-bastion_hosts_y_arquitecturas/            # Bastion hosts
+    ├── 📁 week-09-automatizacion_ssh_y_ansible/            # Automatización y Ansible
+    └── 📁 week-10-seguridad_avanzada_y_auditoria/            # Seguridad avanzada + Proyecto Final
 ```
 
 ### Estructura de cada Semana
 
 ```
-semana-XX/
+week-XX-tema_principal/
 ├── README.md                    # Índice de la semana
 ├── RUBRICA-EVALUACION.md        # Criterios (100 pts)
 ├── 0-assets/                    # Diagramas SVG

@@ -56,10 +56,10 @@ Práctica 03: ⭐⭐⭐ Avanzado
 
 ```bash
 # Crear directorio de pruebas
-mkdir -p ~/ssh-lab/semana-04/{archivos,backups,logs}
+mkdir -p ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/{archivos,backups,logs}
 
 # Crear archivos de diferentes tipos
-cd ~/ssh-lab/semana-04/archivos
+cd ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/archivos
 
 # Archivos de texto
 echo "Archivo de configuración de prueba" > config.txt
@@ -78,7 +78,7 @@ echo "# Documentación" > proyecto/docs/README.md
 dd if=/dev/urandom of=archivo-grande.bin bs=1M count=1 2>/dev/null
 
 # Verificar estructura
-tree ~/ssh-lab/semana-04/ 2>/dev/null || ls -laR ~/ssh-lab/semana-04/
+tree ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/ 2>/dev/null || ls -laR ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/
 ```
 
 ### Verificar Conectividad

@@ -96,7 +96,7 @@ Al completar este proyecto, habrás:
 ## 📁 Estructura de Entrega
 
 ```
-proyecto-semana-01/
+proyecto-week-01-fundamentos_ssh_y_primera_conexion/
 ├── README.md              # Tu documentación personal
 ├── ssh-config.txt         # Copia de tu ~/.ssh/config
 └── evidencias/

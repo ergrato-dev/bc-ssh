@@ -64,7 +64,7 @@ sftp> lpwd
 sftp> lls
 # Lista archivos locales
 
-sftp> lcd ~/ssh-lab/semana-04/archivos
+sftp> lcd ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/archivos
 sftp> lpwd
 # Ahora tu directorio local es archivos/
 
@@ -80,7 +80,7 @@ sftp> lls
 
 ```
 # Asegurarse de estar en directorios correctos
-sftp> lcd ~/ssh-lab/semana-04/archivos
+sftp> lcd ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/archivos
 sftp> cd ~/lab-transferencias
 
 # Subir un archivo
@@ -94,7 +94,7 @@ sftp> ls -la app.log
 ### Ejercicio 2.2: Descargar Archivo (get)
 
 ```
-sftp> lcd ~/ssh-lab/semana-04/downloads
+sftp> lcd ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/downloads
 sftp> cd ~/lab-transferencias
 
 # Descargar un archivo
@@ -126,7 +126,7 @@ sftp> lls config-downloaded.txt
 ### Ejercicio 3.1: Subir Múltiples (mput)
 
 ```
-sftp> lcd ~/ssh-lab/semana-04/archivos
+sftp> lcd ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/archivos
 sftp> cd ~/lab-transferencias
 
 # Subir todos los .txt
@@ -137,7 +137,7 @@ sftp> mput *.txt
 ### Ejercicio 3.2: Descargar Múltiples (mget)
 
 ```
-sftp> lcd ~/ssh-lab/semana-04/downloads
+sftp> lcd ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/downloads
 sftp> cd ~/lab-transferencias
 
 # Descargar todos los .txt
@@ -148,7 +148,7 @@ sftp> mget *.txt
 ### Ejercicio 3.3: Transferir Directorio
 
 ```
-sftp> lcd ~/ssh-lab/semana-04/archivos
+sftp> lcd ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/archivos
 sftp> cd ~/lab-transferencias
 
 # Subir directorio recursivamente
@@ -218,7 +218,7 @@ sftp> !ls -la
 sftp> !date
 
 # Ver contenido de archivo local
-sftp> !cat ~/ssh-lab/semana-04/archivos/config.txt
+sftp> !cat ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/archivos/config.txt
 ```
 
 ### Ejercicio 5.2: Crear Archivo Local
@@ -269,12 +269,12 @@ EOF
 
 ```bash
 # Crear script
-cat > ~/ssh-lab/semana-04/sftp-backup.sh << 'EOF'
+cat > ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/sftp-backup.sh << 'EOF'
 #!/bin/bash
 # Script de backup via SFTP
 
 FECHA=$(date +%Y%m%d-%H%M%S)
-DESTINO=~/ssh-lab/semana-04/backups/sftp-$FECHA
+DESTINO=~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/backups/sftp-$FECHA
 
 mkdir -p "$DESTINO"
 cd "$DESTINO"
@@ -291,10 +291,10 @@ echo "Backup completado en $DESTINO"
 ls -la "$DESTINO"
 EOF
 
-chmod +x ~/ssh-lab/semana-04/sftp-backup.sh
+chmod +x ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/sftp-backup.sh
 
 # Ejecutar
-~/ssh-lab/semana-04/sftp-backup.sh
+~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/sftp-backup.sh
 ```
 
 ---
@@ -339,30 +339,30 @@ bye
 EOF
 
 # 2. Subir logs simulados
-cd ~/ssh-lab/semana-04/archivos
+cd ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/archivos
 for i in {1..5}; do
     echo "Log entry $i - $(date)" > log-$i.txt
 done
 
 sftp tu-servidor << 'EOF'
 cd lab-transferencias/logs-app
-lcd ~/ssh-lab/semana-04/archivos
+lcd ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/archivos
 mput log-*.txt
 ls -la
 bye
 EOF
 
 # 3. Descargar para análisis
-mkdir -p ~/ssh-lab/semana-04/analisis
+mkdir -p ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/analisis
 sftp tu-servidor << 'EOF'
 cd lab-transferencias/logs-app
-lcd ~/ssh-lab/semana-04/analisis
+lcd ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/analisis
 mget *.txt
 bye
 EOF
 
 # 4. Verificar
-ls -la ~/ssh-lab/semana-04/analisis/
+ls -la ~/ssh-lab/week-04-transferencia_archivos_scp_sftp_rsync/analisis/
 ```
 
 ---
