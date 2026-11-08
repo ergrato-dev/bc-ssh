@@ -1,0 +1,139 @@
+{
+  "semana": "02",
+  "titulo": "Protocolo por dentro: KEX, host keys y known_hosts",
+  "checks": [
+    {
+      "id": "config-parsea",
+      "descripcion": "config carga sin errores con ssh -G",
+      "cmd": "ssh -G -F {proyecto}/config lab-server >/dev/null",
+      "assert": "exit0",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 1"
+    },
+    {
+      "id": "config-hereda-semana-01",
+      "descripcion": "El alias lab-server de la semana 01 sigue apuntando a server",
+      "cmd": "ssh -G -F {proyecto}/config lab-server",
+      "assert": "stdout~^hostname server$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 1"
+    },
+    {
+      "id": "config-strict",
+      "descripcion": "StrictHostKeyChecking yes aplica a cualquier host",
+      "cmd": "ssh -G -F {proyecto}/config host-cualquiera",
+      "assert": "stdout~^stricthostkeychecking true$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 2"
+    },
+    {
+      "id": "config-hash",
+      "descripcion": "HashKnownHosts yes aplica a cualquier host",
+      "cmd": "ssh -G -F {proyecto}/config host-cualquiera",
+      "assert": "stdout~^hashknownhosts yes$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 3"
+    },
+    {
+      "id": "config-no-desactiva-verificacion",
+      "descripcion": "config no desactiva la verificación de host keys",
+      "cmd": "grep -inE '^[^#]*(stricthostkeychecking +no|userknownhostsfile +/dev/null)' {proyecto}/config",
+      "assert": "exit!=0",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 2"
+    },
+    {
+      "id": "kh-uso",
+      "descripcion": "kh-add sin argumentos sale con 2",
+      "cmd": "{proyecto}/bin/kh-add",
+      "assert": "exit=2",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 4"
+    },
+    {
+      "id": "kh-huella-mal-formada",
+      "descripcion": "kh-add con una huella que no empieza por SHA256: sale con 2",
+      "cmd": "{proyecto}/bin/kh-add server abc",
+      "assert": "exit=2",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 4"
+    },
+    {
+      "id": "kh-anade",
+      "descripcion": "Con la huella correcta añade la llave e informa la huella",
+      "cmd": "f=/tmp/bc-kh-anade; rm -f $f; fp=$(ssh-keyscan -t ed25519 server 2>/dev/null | ssh-keygen -lf - | cut -d' ' -f2); KH_FILE=$f {proyecto}/bin/kh-add server \"$fp\"",
+      "assert": "stdout~^server añadida SHA256:",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 9"
+    },
+    {
+      "id": "kh-linea-hasheada",
+      "descripcion": "La línea añadida lleva el nombre hasheado",
+      "cmd": "f=/tmp/bc-kh-hash; rm -f $f; fp=$(ssh-keyscan -t ed25519 server 2>/dev/null | ssh-keygen -lf - | cut -d' ' -f2); KH_FILE=$f {proyecto}/bin/kh-add server \"$fp\" >/dev/null; grep -c '^|1|' $f",
+      "assert": "stdout~^1$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 6"
+    },
+    {
+      "id": "kh-crea-directorio",
+      "descripcion": "Crea el directorio de known_hosts con permisos 700",
+      "cmd": "rm -rf /tmp/bc-kh-dir; fp=$(ssh-keyscan -t ed25519 server 2>/dev/null | ssh-keygen -lf - | cut -d' ' -f2); KH_FILE=/tmp/bc-kh-dir/sub/known_hosts {proyecto}/bin/kh-add server \"$fp\" >/dev/null; stat -c %a /tmp/bc-kh-dir/sub",
+      "assert": "stdout~^700$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 9"
+    },
+    {
+      "id": "kh-ssh-confia",
+      "descripcion": "Tras kh-add, ssh con el config del kit entra sin preguntar",
+      "cmd": "f=/tmp/bc-kh-ssh; rm -f $f; fp=$(ssh-keyscan -t ed25519 server 2>/dev/null | ssh-keygen -lf - | cut -d' ' -f2); KH_FILE=$f {proyecto}/bin/kh-add server \"$fp\" >/dev/null; SSHPASS=alumno sshpass -e ssh -F {proyecto}/config -o UserKnownHostsFile=$f lab-server hostname",
+      "assert": "stdout~^server$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 10"
+    },
+    {
+      "id": "kh-idempotente",
+      "descripcion": "Ejecutarlo dos veces no duplica la línea",
+      "cmd": "f=/tmp/bc-kh-dos; rm -f $f; fp=$(ssh-keyscan -t ed25519 server 2>/dev/null | ssh-keygen -lf - | cut -d' ' -f2); KH_FILE=$f {proyecto}/bin/kh-add server \"$fp\" >/dev/null; KH_FILE=$f {proyecto}/bin/kh-add server \"$fp\"; echo lineas=$(wc -l < $f)",
+      "assert": "stdout~^lineas=1$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 8"
+    },
+    {
+      "id": "kh-huella-distinta",
+      "descripcion": "Con la huella de otro host sale con 1",
+      "cmd": "f=/tmp/bc-kh-otra; rm -f $f; fp=$(ssh-keyscan -t ed25519 bastion 2>/dev/null | ssh-keygen -lf - | cut -d' ' -f2); KH_FILE=$f {proyecto}/bin/kh-add server \"$fp\"",
+      "assert": "exit=1",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 7"
+    },
+    {
+      "id": "kh-distinta-no-escribe",
+      "descripcion": "Con una huella distinta no escribe nada",
+      "cmd": "f=/tmp/bc-kh-otra2; rm -f $f; fp=$(ssh-keyscan -t ed25519 bastion 2>/dev/null | ssh-keygen -lf - | cut -d' ' -f2); KH_FILE=$f {proyecto}/bin/kh-add server \"$fp\"; test ! -e $f",
+      "assert": "exit0",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 7"
+    },
+    {
+      "id": "kh-conflicto",
+      "descripcion": "Si known_hosts ya tiene otra llave del mismo tipo, sale con 1",
+      "cmd": "f=/tmp/bc-kh-conflicto; rm -f $f /tmp/bc-kh-falsa /tmp/bc-kh-falsa.pub; ssh-keygen -q -t ed25519 -N '' -f /tmp/bc-kh-falsa; echo \"server $(cut -d' ' -f1,2 /tmp/bc-kh-falsa.pub)\" > $f; fp=$(ssh-keyscan -t ed25519 server 2>/dev/null | ssh-keygen -lf - | cut -d' ' -f2); KH_FILE=$f {proyecto}/bin/kh-add server \"$fp\"",
+      "assert": "exit=1",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 8"
+    },
+    {
+      "id": "kh-puerto",
+      "descripcion": "Con HOST:PUERTO usa [host]:puerto y no duplica",
+      "cmd": "d=$(mktemp -d); ssh-keygen -q -t ed25519 -N '' -f $d/hk; /usr/sbin/sshd -f /dev/null -h $d/hk -p 2201 -o PidFile=$d/pid; sleep 0.5; fp=$(ssh-keygen -lf $d/hk.pub | cut -d' ' -f2); KH_FILE=$d/kh {proyecto}/bin/kh-add 127.0.0.1:2201 \"$fp\" >/dev/null; KH_FILE=$d/kh {proyecto}/bin/kh-add 127.0.0.1:2201 \"$fp\" >/dev/null; kill $(cat $d/pid); ssh-keygen -F '[127.0.0.1]:2201' -f $d/kh | grep -c '^|1|'",
+      "assert": "stdout~^1$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 5"
+    },
+    {
+      "id": "kh-fallo-scan",
+      "descripcion": "Un host que no responde sale con 3",
+      "cmd": "KH_FILE=/tmp/bc-kh-x {proyecto}/bin/kh-add interno SHA256:x",
+      "assert": "exit=3",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 6"
+    },
+    {
+      "id": "lc-sigue-funcionando",
+      "descripcion": "lab-check de la semana 01 sigue funcionando",
+      "cmd": "{proyecto}/bin/lab-check server",
+      "assert": "exit0",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 11"
+    },
+    {
+      "id": "bin-completo-y-limpio",
+      "descripcion": "bin/ sin TODOs y limpio para shellcheck",
+      "cmd": "! grep -n TODO {proyecto}/bin/* && shellcheck {proyecto}/bin/*",
+      "assert": "exit0",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 11"
+    }
+  ]
+}

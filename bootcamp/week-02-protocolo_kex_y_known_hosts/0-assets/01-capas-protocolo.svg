@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520">
+  <rect width="900" height="520" fill="#0d1117"/>
+  <text x="450" y="34" font-family="sans-serif" font-size="20" font-weight="bold" fill="#c9d1d9" text-anchor="middle">Las tres capas de SSH</text>
+
+  <!-- Encabezados de columnas -->
+  <text x="40" y="70" font-family="sans-serif" font-size="13" fill="#8b949e">Capa</text>
+  <text x="400" y="70" font-family="sans-serif" font-size="13" fill="#8b949e">Mensajes (tipo)</text>
+  <text x="700" y="70" font-family="sans-serif" font-size="13" fill="#8b949e">En la red</text>
+
+  <!-- Conexión -->
+  <rect x="30" y="85" width="340" height="80" rx="6" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+  <text x="50" y="112" font-family="sans-serif" font-size="16" font-weight="bold" fill="#58a6ff">Conexión · RFC 4254</text>
+  <text x="50" y="135" font-family="sans-serif" font-size="13" fill="#c9d1d9">Canales: shell, comando, sftp,</text>
+  <text x="50" y="153" font-family="sans-serif" font-size="13" fill="#c9d1d9">túneles, agente</text>
+  <rect x="390" y="85" width="290" height="80" rx="6" fill="#161b22" stroke="#30363d"/>
+  <text x="405" y="112" font-family="monospace" font-size="13" fill="#c9d1d9">80-127</text>
+  <text x="405" y="135" font-family="monospace" font-size="12" fill="#8b949e">90 CHANNEL_OPEN</text>
+  <text x="405" y="153" font-family="monospace" font-size="12" fill="#8b949e">98 CHANNEL_REQUEST · 94 DATA</text>
+
+  <!-- Autenticación -->
+  <rect x="30" y="180" width="340" height="80" rx="6" fill="#161b22" stroke="#d29922" stroke-width="2"/>
+  <text x="50" y="207" font-family="sans-serif" font-size="16" font-weight="bold" fill="#d29922">Autenticación · RFC 4252</text>
+  <text x="50" y="230" font-family="sans-serif" font-size="13" fill="#c9d1d9">Quién es el usuario:</text>
+  <text x="50" y="248" font-family="sans-serif" font-size="13" fill="#c9d1d9">contraseña, llave, certificado</text>
+  <rect x="390" y="180" width="290" height="80" rx="6" fill="#161b22" stroke="#30363d"/>
+  <text x="405" y="207" font-family="monospace" font-size="13" fill="#c9d1d9">50-79</text>
+  <text x="405" y="230" font-family="monospace" font-size="12" fill="#8b949e">50 USERAUTH_REQUEST</text>
+  <text x="405" y="248" font-family="monospace" font-size="12" fill="#8b949e">51 FAILURE · 52 SUCCESS</text>
+
+  <!-- Transporte -->
+  <rect x="30" y="275" width="340" height="100" rx="6" fill="#161b22" stroke="#3fb950" stroke-width="2"/>
+  <text x="50" y="302" font-family="sans-serif" font-size="16" font-weight="bold" fill="#3fb950">Transporte · RFC 4253</text>
+  <text x="50" y="325" font-family="sans-serif" font-size="13" fill="#c9d1d9">Negocia algoritmos, acuerda llaves,</text>
+  <text x="50" y="343" font-family="sans-serif" font-size="13" fill="#c9d1d9">verifica al servidor, cifra cada</text>
+  <text x="50" y="361" font-family="sans-serif" font-size="13" fill="#c9d1d9">paquete</text>
+  <rect x="390" y="275" width="290" height="100" rx="6" fill="#161b22" stroke="#30363d"/>
+  <text x="405" y="302" font-family="monospace" font-size="13" fill="#c9d1d9">1-49</text>
+  <text x="405" y="325" font-family="monospace" font-size="12" fill="#8b949e">20 KEXINIT · 21 NEWKEYS</text>
+  <text x="405" y="343" font-family="monospace" font-size="12" fill="#8b949e">30 KEX_ECDH_INIT · 31 REPLY</text>
+  <text x="405" y="361" font-family="monospace" font-size="12" fill="#8b949e">5 SERVICE_REQUEST · 1 DISCONNECT</text>
+
+  <!-- TCP -->
+  <rect x="30" y="390" width="650" height="44" rx="6" fill="#161b22" stroke="#30363d"/>
+  <text x="50" y="418" font-family="sans-serif" font-size="15" fill="#c9d1d9">TCP, puerto 22 · primero los banners en texto:</text>
+  <text x="455" y="418" font-family="monospace" font-size="13" fill="#c9d1d9">SSH-2.0-OpenSSH_9.6p1</text>
+
+  <!-- Columna "en la red" -->
+  <rect x="700" y="85" width="170" height="245" rx="6" fill="#161b22" stroke="#3fb950" stroke-width="2"/>
+  <text x="785" y="190" font-family="sans-serif" font-size="15" font-weight="bold" fill="#3fb950" text-anchor="middle">Cifrado</text>
+  <text x="785" y="212" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">todo lo que va</text>
+  <text x="785" y="229" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">después de NEWKEYS</text>
+  <rect x="700" y="340" width="170" height="94" rx="6" fill="#161b22" stroke="#f85149" stroke-width="2"/>
+  <text x="785" y="368" font-family="sans-serif" font-size="15" font-weight="bold" fill="#f85149" text-anchor="middle">Visible</text>
+  <text x="785" y="390" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">banners, KEXINIT,</text>
+  <text x="785" y="407" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">host key pública</text>
+  <text x="785" y="424" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">y su firma</text>
+
+  <!-- Nota inferior -->
+  <text x="450" y="475" font-family="sans-serif" font-size="13" fill="#8b949e" text-anchor="middle">Cada capa usa la de abajo. El número de tipo del mensaje (primer byte) dice su capa.</text>
+  <text x="450" y="497" font-family="sans-serif" font-size="13" fill="#8b949e" text-anchor="middle">La autenticación del usuario viaja dentro del transporte ya cifrado.</text>
+</svg>

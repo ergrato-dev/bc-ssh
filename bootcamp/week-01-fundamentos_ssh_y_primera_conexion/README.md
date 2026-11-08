@@ -75,6 +75,6 @@ bin/lab-check server bastion interno
 
 | Anterior | Actual | Siguiente |
 |---|---|---|
-| — | **Semana 01 — Fundamentos de SSH y primera conexión** | Semana 02 — Protocolo por dentro (en preparación) |
+| — | **Semana 01 — Fundamentos de SSH y primera conexión** | [Semana 02 — Protocolo por dentro: KEX, host keys y known_hosts →](../week-02-protocolo_kex_y_known_hosts/README.md) |
 
 [← Volver al índice del bootcamp](../README.md)

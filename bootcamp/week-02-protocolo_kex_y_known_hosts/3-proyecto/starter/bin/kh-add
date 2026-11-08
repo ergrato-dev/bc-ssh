@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# kh-add — añade a known_hosts la host key de un servidor solo si su huella
+# coincide con la que obtuviste por un canal independiente.
+#
+# Uso: kh-add HOST[:PUERTO] HUELLA
+#   HUELLA: SHA256:... tal como la imprime `ssh-keygen -lf` en el servidor.
+#
+# Qué: ssh-keyscan, comparación de huellas y una línea hasheada en known_hosts.
+# Para qué: cambiar el "yes" a ciegas de la primera conexión por una
+#   comparación hecha por la máquina, que no se salta un carácter.
+# Impacto: con `StrictHostKeyChecking yes` en config, esta es la única puerta
+#   de entrada a known_hosts; un intermediario no la cruza.
+#
+# Variables: KH_FILE (por defecto ~/.ssh/known_hosts), KH_TYPE (por defecto ed25519).
+# Salida: 0 añadida o ya estaba, 1 huella distinta o conflicto, 2 uso incorrecto,
+#         3 no se pudo leer la host key.
+set -euo pipefail
+
+KH_FILE=${KH_FILE:-$HOME/.ssh/known_hosts}
+KH_TYPE=${KH_TYPE:-ed25519}
+
+uso() {
+  echo "uso: kh-add HOST[:PUERTO] HUELLA   (HUELLA = SHA256:...)" >&2
+  exit 2
+}
+
+# TODO 3: llama a uso si no hay exactamente 2 argumentos o si el segundo no
+#   empieza por SHA256:. Separa HOST y PUERTO (22 si no viene); el puerto
+#   tiene que ser un número.
+destino=${1:-} esperada=${2:-}
+host=$destino puerto=22
+
+# TODO 4: known_hosts escribe un puerto distinto de 22 como [host]:puerto.
+#   Guarda en "nombre" el nombre tal como aparecerá en el archivo.
+nombre=$host
+
+# TODO 5: lee la llave con ssh-keyscan (hasheada, timeout 5 s, tipo KH_TYPE).
+#   Si no hay respuesta, avisa por stderr y sale con 3. Calcula su huella
+#   con ssh-keygen -lf - y compárala con la esperada: si no coincide,
+#   avisa por stderr con las dos huellas y sale con 1.
+linea=""
+llave=${linea#* }
+recibida=""
+
+# TODO 6: si known_hosts ya tiene esta llave para "nombre", informa
+#   "DESTINO ya estaba" y sale con 0. Si tiene otra llave del MISMO tipo,
+#   avisa por stderr y sale con 1 sin tocar el archivo.
+
+# TODO 7: crea el directorio de KH_FILE solo para ti (700), añade la línea e
+#   informa "DESTINO añadida HUELLA".
+echo "$destino ? $nombre $llave $recibida $esperada $puerto"
+exit 1

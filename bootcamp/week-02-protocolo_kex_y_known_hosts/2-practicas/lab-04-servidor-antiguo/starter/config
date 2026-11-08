@@ -1,0 +1,12 @@
+# Servidor "antiguo" del lab-04: server en el puerto 2200, que solo habla
+# diffie-hellman-group14-sha1 y firma con ssh-rsa (SHA-1).
+
+Host legado
+    HostName server
+    Port 2200
+    User alumno
+    # TODO: añade a la lista por defecto (con +) el KEX y el algoritmo de
+    #   host key que ofrece este servidor. Solo aquí: nunca en Host *.
+
+Host *
+    ConnectTimeout 5

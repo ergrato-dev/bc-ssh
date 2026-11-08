@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560">
+  <defs>
+    <marker id="fv" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8b949e"/>
+    </marker>
+  </defs>
+  <rect width="900" height="560" fill="#0d1117"/>
+  <text x="450" y="34" font-family="sans-serif" font-size="20" font-weight="bold" fill="#c9d1d9" text-anchor="middle">Qué hace ssh con la host key recibida</text>
+
+  <!-- Inicio -->
+  <rect x="290" y="55" width="320" height="40" rx="6" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+  <text x="450" y="80" font-family="sans-serif" font-size="14" fill="#c9d1d9" text-anchor="middle">Host key recibida, firma de H correcta</text>
+  <line x1="450" y1="95" x2="450" y2="118" stroke="#8b949e" stroke-width="1.5" marker-end="url(#fv)"/>
+
+  <!-- ¿revocada? -->
+  <rect x="290" y="120" width="320" height="40" rx="20" fill="#161b22" stroke="#d29922" stroke-width="2"/>
+  <text x="450" y="145" font-family="sans-serif" font-size="14" fill="#c9d1d9" text-anchor="middle">¿Marcada @revoked en known_hosts?</text>
+  <line x1="610" y1="140" x2="658" y2="140" stroke="#8b949e" stroke-width="1.5" marker-end="url(#fv)"/>
+  <text x="634" y="133" font-family="sans-serif" font-size="12" fill="#8b949e" text-anchor="middle">sí</text>
+  <rect x="660" y="120" width="220" height="40" rx="6" fill="#161b22" stroke="#f85149" stroke-width="2"/>
+  <text x="770" y="145" font-family="sans-serif" font-size="13" fill="#f85149" text-anchor="middle">Corta: REVOKED HOST KEY</text>
+  <line x1="450" y1="160" x2="450" y2="188" stroke="#8b949e" stroke-width="1.5" marker-end="url(#fv)"/>
+  <text x="462" y="179" font-family="sans-serif" font-size="12" fill="#8b949e">no</text>
+
+  <!-- ¿host conocido? -->
+  <rect x="290" y="190" width="320" height="40" rx="20" fill="#161b22" stroke="#d29922" stroke-width="2"/>
+  <text x="450" y="215" font-family="sans-serif" font-size="14" fill="#c9d1d9" text-anchor="middle">¿El host está en known_hosts?</text>
+  <polyline points="290,210 205,210 205,268" fill="none" stroke="#8b949e" stroke-width="1.5" marker-end="url(#fv)"/>
+  <text x="248" y="203" font-family="sans-serif" font-size="12" fill="#8b949e" text-anchor="middle">sí</text>
+  <polyline points="610,210 695,210 695,268" fill="none" stroke="#8b949e" stroke-width="1.5" marker-end="url(#fv)"/>
+  <text x="652" y="203" font-family="sans-serif" font-size="12" fill="#8b949e" text-anchor="middle">no</text>
+
+  <!-- Rama sí: ¿coincide? -->
+  <rect x="40" y="270" width="330" height="50" rx="20" fill="#161b22" stroke="#d29922" stroke-width="2"/>
+  <text x="205" y="291" font-family="sans-serif" font-size="14" fill="#c9d1d9" text-anchor="middle">¿Hay una línea con esta misma llave?</text>
+  <text x="205" y="310" font-family="sans-serif" font-size="12" fill="#8b949e" text-anchor="middle">un tipo que no tenías cuenta como "no"</text>
+  <line x1="120" y1="320" x2="120" y2="368" stroke="#8b949e" stroke-width="1.5" marker-end="url(#fv)"/>
+  <text x="132" y="349" font-family="sans-serif" font-size="12" fill="#8b949e">sí</text>
+  <line x1="290" y1="320" x2="290" y2="368" stroke="#8b949e" stroke-width="1.5" marker-end="url(#fv)"/>
+  <text x="302" y="349" font-family="sans-serif" font-size="12" fill="#8b949e">no</text>
+  <rect x="40" y="370" width="160" height="70" rx="6" fill="#161b22" stroke="#3fb950" stroke-width="2"/>
+  <text x="120" y="398" font-family="sans-serif" font-size="14" font-weight="bold" fill="#3fb950" text-anchor="middle">Continúa</text>
+  <text x="120" y="418" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">pasa a autenticar</text>
+  <text x="120" y="433" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">al usuario</text>
+  <rect x="210" y="370" width="160" height="70" rx="6" fill="#161b22" stroke="#f85149" stroke-width="2"/>
+  <text x="290" y="398" font-family="sans-serif" font-size="14" font-weight="bold" fill="#f85149" text-anchor="middle">Corta</text>
+  <text x="290" y="418" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">HOST IDENTIFICATION</text>
+  <text x="290" y="433" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">HAS CHANGED</text>
+
+  <!-- Rama no: StrictHostKeyChecking -->
+  <rect x="530" y="270" width="330" height="50" rx="20" fill="#161b22" stroke="#d29922" stroke-width="2"/>
+  <text x="695" y="300" font-family="sans-serif" font-size="14" fill="#c9d1d9" text-anchor="middle">Según StrictHostKeyChecking</text>
+  <line x1="580" y1="320" x2="580" y2="368" stroke="#8b949e" stroke-width="1.5" marker-end="url(#fv)"/>
+  <line x1="695" y1="320" x2="695" y2="368" stroke="#8b949e" stroke-width="1.5" marker-end="url(#fv)"/>
+  <line x1="815" y1="320" x2="815" y2="368" stroke="#8b949e" stroke-width="1.5" marker-end="url(#fv)"/>
+  <rect x="520" y="370" width="120" height="70" rx="6" fill="#161b22" stroke="#d29922" stroke-width="2"/>
+  <text x="580" y="392" font-family="monospace" font-size="13" fill="#d29922" text-anchor="middle">ask</text>
+  <text x="580" y="413" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">pregunta</text>
+  <text x="580" y="429" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">yes/no/huella</text>
+  <rect x="650" y="370" width="90" height="70" rx="6" fill="#161b22" stroke="#3fb950" stroke-width="2"/>
+  <text x="695" y="392" font-family="monospace" font-size="13" fill="#3fb950" text-anchor="middle">yes</text>
+  <text x="695" y="413" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">corta: no</text>
+  <text x="695" y="429" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">es conocida</text>
+  <rect x="750" y="370" width="130" height="70" rx="6" fill="#161b22" stroke="#f85149" stroke-width="2"/>
+  <text x="815" y="392" font-family="monospace" font-size="13" fill="#f85149" text-anchor="middle">accept-new · no</text>
+  <text x="815" y="413" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">la añade sin</text>
+  <text x="815" y="429" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">verificar</text>
+
+  <!-- Notas -->
+  <rect x="40" y="465" width="840" height="75" rx="6" fill="none" stroke="#30363d"/>
+  <text x="60" y="490" font-family="sans-serif" font-size="13" fill="#c9d1d9">Solo con StrictHostKeyChecking no, una llave cambiada o revocada conecta igualmente, con la contraseña</text>
+  <text x="60" y="508" font-family="sans-serif" font-size="13" fill="#c9d1d9">desactivada. Nunca fuera de un experimento.</text>
+  <text x="60" y="528" font-family="sans-serif" font-size="13" fill="#3fb950">Con yes, la llave entra antes y verificada: con bin/kh-add o un known_hosts preparado.</text>
+</svg>

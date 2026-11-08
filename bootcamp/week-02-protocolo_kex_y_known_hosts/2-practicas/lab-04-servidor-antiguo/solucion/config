@@ -1,0 +1,17 @@
+# Servidor "antiguo" del lab-04: server en el puerto 2200, que solo habla
+# diffie-hellman-group14-sha1 y firma con ssh-rsa (SHA-1).
+
+Host legado
+    HostName server
+    Port 2200
+    User alumno
+    # Qué: añade al final de las listas por defecto los dos algoritmos SHA-1
+    #   que este servidor necesita.
+    # Para qué: poder entrar mientras se actualiza el servidor.
+    # Impacto: solo este host negocia algoritmos débiles; con + al final, si
+    #   algún día admite otros mejores, se elegirán esos.
+    KexAlgorithms +diffie-hellman-group14-sha1
+    HostKeyAlgorithms +ssh-rsa
+
+Host *
+    ConnectTimeout 5

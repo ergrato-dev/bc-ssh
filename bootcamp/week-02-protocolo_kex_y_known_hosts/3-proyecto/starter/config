@@ -1,0 +1,26 @@
+# ssh-infra-kit — configuración de cliente SSH
+#
+# Qué: alias para los hosts del laboratorio.
+# Para qué: escribir `ssh -F config lab-server` en lugar de `ssh alumno@server`
+#   y no repetir opciones en cada comando.
+# Impacto: todo `ssh`, `scp` y `sftp` que lea este archivo usa estos valores.
+#
+# ssh usa el PRIMER valor que encuentra para cada opción: los bloques
+# concretos van arriba y `Host *` al final, como valor por defecto.
+# Pruébalo sin conectar: ssh -G -F config lab-server
+
+Host lab-server
+    HostName server
+    User alumno
+
+Host lab-bastion
+    HostName bastion
+    User alumno
+
+Host *
+    # Sin esto, un host que no responde deja la terminal colgada ~2 min
+    # (el timeout de TCP del sistema). Con 5 s, el fallo llega enseguida.
+    ConnectTimeout 5
+    # TODO 1: que ssh nunca acepte solo una host key desconocida o cambiada
+    #   (StrictHostKeyChecking). Documenta Qué / Para qué / Impacto.
+    # TODO 2: que los nombres de host se guarden cifrados en known_hosts.
