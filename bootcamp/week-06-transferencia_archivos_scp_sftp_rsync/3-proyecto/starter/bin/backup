@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+#
+# backup — copia ORIGEN en una carpeta nueva de DESTINO, con fecha y hora,
+# sin duplicar en disco lo que no cambió desde la copia anterior.
+#
+# Uso: backup ORIGEN DESTINO
+#
+#   ORIGEN   carpeta local o remota (lab-server:datos). Se copia su
+#            contenido, con o sin barra final.
+#   DESTINO  carpeta local donde viven las copias:
+#              DESTINO/2026-11-08T101500/   una copia completa
+#              DESTINO/latest -> 2026-11-08T101500
+#
+# Cada copia se ve completa, pero los archivos que no cambiaron son enlaces
+# duros a los de la copia anterior (rsync --link-dest): ocupan una sola vez.
+# Se guardan las BACKUP_KEEP copias más recientes (7 por defecto).
+# Conecta con `ssh -F config` del kit; RSYNC_RSH lo cambia.
+#
+# Códigos de salida: 0 copia hecha, 1 rsync falló o ya hay una copia de
+# este segundo, 2 uso incorrecto.
+
+set -euo pipefail
+
+if [[ $# -ne 2 ]]; then
+  echo "uso: backup ORIGEN DESTINO" >&2
+  exit 2
+fi
+keep="${BACKUP_KEEP:-7}"
+if [[ ! "$keep" =~ ^[1-9][0-9]*$ ]]; then
+  echo "backup: BACKUP_KEEP debe ser un entero mayor que 0" >&2
+  exit 2
+fi
+
+kit="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# TODO 1: que rsync conecte con `ssh -F $kit/config` salvo que RSYNC_RSH
+#   ya traiga otra orden. Comenta por qué (paso 2).
+
+# Con barra final, rsync copia el contenido y no la carpeta. "host:" ya
+# es el contenido del home: con barra sería la raíz (/) del servidor.
+case "$1" in
+  */ | *:) origen="$1" ;;
+  *)       origen="$1/" ;;
+esac
+mkdir -p "$2"
+destino="$(cd "$2" && pwd)"
+nombre="$(date +%Y-%m-%dT%H%M%S)"
+
+if [[ -e "$destino/$nombre" ]]; then
+  echo "backup: ya existe $destino/$nombre; espera un segundo y repite" >&2
+  exit 1
+fi
+
+opciones=(-a)
+# TODO 3: si existe $destino/latest, añade --link-dest con su ruta
+#   absoluta (paso 4).
+
+# TODO 2: rsync escribe en $destino/.parcial-$nombre; si falla, borra esa
+#   carpeta, avisa por stderr y sal con 1; si termina, renómbrala a
+#   $destino/$nombre. Comenta Qué / Para qué / Impacto (paso 3).
+rsync "${opciones[@]}" "$origen" "$destino/$nombre/"
+
+ln -sfn "$nombre" "$destino/latest"
+echo "backup: $destino/$nombre"
+
+# TODO 4: borra las copias más antiguas y deja solo las $keep últimas
+#   (paso 5).

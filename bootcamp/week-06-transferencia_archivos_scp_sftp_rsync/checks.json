@@ -1,0 +1,132 @@
+{
+  "semana": "06",
+  "titulo": "Transferencia de archivos: scp, sftp y rsync",
+  "checks": [
+    {
+      "id": "bk-uso",
+      "descripcion": "bin/backup rechaza un número de argumentos distinto de 2 y un BACKUP_KEEP no válido (sale con 2)",
+      "cmd": "{proyecto}/bin/backup x; a=$?; BACKUP_KEEP=0 {proyecto}/bin/backup x y; echo $a $?",
+      "assert": "stdout~^2 2$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 1"
+    },
+    {
+      "id": "bk-crea",
+      "descripcion": "bin/backup crea una copia con fecha y hora y latest apunta a ella",
+      "cmd": "t=$(mktemp -d); mkdir $t/o; echo a > $t/o/a; {proyecto}/bin/backup $t/o $t/b >/dev/null; echo \"$(ls $t/b | paste -sd\" \") $(cat $t/b/latest/a)\"; rm -rf $t",
+      "assert": "stdout~^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{6} latest a$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 1"
+    },
+    {
+      "id": "bk-usa-config",
+      "descripcion": "bin/backup conecta con ssh -F config del kit",
+      "cmd": "f=$(mktemp -d); echo \"#!/bin/sh\" > $f/ssh; echo 'echo \"$@\" > \"$(dirname \"$0\")/args\"; exit 1' >> $f/ssh; chmod +x $f/ssh; PATH=$f:$PATH {proyecto}/bin/backup lab-server:datos $f/b 2>/dev/null; cat $f/args; rm -rf $f",
+      "assert": "stdout~^-F /.+/config lab-server rsync --server --sender",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 2"
+    },
+    {
+      "id": "bk-falla",
+      "descripcion": "Si rsync falla, bin/backup sale con 1, no deja copia a medias y latest no cambia",
+      "cmd": "t=$(mktemp -d); mkdir $t/o; echo a > $t/o/a; {proyecto}/bin/backup $t/o $t/b >/dev/null; l=$(readlink $t/b/latest); sleep 1.1; {proyecto}/bin/backup $t/nada $t/b 2>/dev/null; r=$?; echo \"$r $(ls -A $t/b | wc -l) $([ \"$(readlink $t/b/latest)\" = \"$l\" ] && echo igual)\"; rm -rf $t",
+      "assert": "stdout~^1 2 igual$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 3"
+    },
+    {
+      "id": "bk-enlaza",
+      "descripcion": "Un archivo que no cambió es un enlace duro a la copia anterior",
+      "cmd": "t=$(mktemp -d); mkdir $t/o; echo a > $t/o/a; {proyecto}/bin/backup $t/o $t/b >/dev/null; sleep 1.1; {proyecto}/bin/backup $t/o $t/b >/dev/null; stat -c %h $t/b/latest/a; rm -rf $t",
+      "assert": "stdout~^2$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 4"
+    },
+    {
+      "id": "bk-cambio",
+      "descripcion": "Un archivo que cambió se copia de nuevo y la copia anterior conserva su versión",
+      "cmd": "t=$(mktemp -d); mkdir $t/o; echo a > $t/o/a; {proyecto}/bin/backup $t/o $t/b >/dev/null; sleep 1.1; echo a2 > $t/o/a; {proyecto}/bin/backup $t/o $t/b >/dev/null; cat $t/b/2*/a | paste -sd\" \"; rm -rf $t",
+      "assert": "stdout~^a a2$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 4"
+    },
+    {
+      "id": "bk-borrado",
+      "descripcion": "Un archivo borrado del origen sigue en la copia anterior y no en la nueva",
+      "cmd": "t=$(mktemp -d); mkdir $t/o; echo a > $t/o/a; echo c > $t/o/c; {proyecto}/bin/backup $t/o $t/b >/dev/null; sleep 1.1; rm $t/o/c; {proyecto}/bin/backup $t/o $t/b >/dev/null; echo \"$(cat $(ls -d $t/b/2* | head -1)/c) $(ls $t/b/latest | paste -sd\" \")\"; rm -rf $t",
+      "assert": "stdout~^c a$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 4"
+    },
+    {
+      "id": "bk-keep",
+      "descripcion": "Con BACKUP_KEEP=2 quedan las 2 copias más recientes y latest en la última",
+      "cmd": "t=$(mktemp -d); mkdir $t/o; echo a > $t/o/a; for i in 1 2 3; do BACKUP_KEEP=2 {proyecto}/bin/backup $t/o $t/b >/dev/null; sleep 1.1; done; echo \"$(ls -d $t/b/2* | wc -l) $([ \"$(readlink $t/b/latest)\" = \"$(ls $t/b | grep ^2 | tail -1)\" ] && echo latest-ok)\"; rm -rf $t",
+      "assert": "stdout~^2 latest-ok$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 5"
+    },
+    {
+      "id": "bk-ssh-real",
+      "descripcion": "bin/backup copia una carpeta remota por SSH",
+      "cmd": "d=$(mktemp -d -p ~); ssh-keygen -q -t ed25519 -N \"\" -f $d/hk; ssh-keygen -q -t ed25519 -N \"\" -f $d/k; echo \"[127.0.0.1]:2206 $(cat $d/hk.pub)\" > $d/kh; cp $d/k.pub $d/ak; /usr/sbin/sshd -f /dev/null -h $d/hk -p 2206 -o PidFile=$d/pid -o AuthorizedKeysFile=$d/ak; sleep 0.5; export RSYNC_RSH=\"ssh -F {proyecto}/config -o HostName=127.0.0.1 -o Port=2206 -o UserKnownHostsFile=$d/kh -o IdentityAgent=none -i $d/k -o BatchMode=yes -o ControlPath=none\"; mkdir $d/datos; echo remoto > $d/datos/a; {proyecto}/bin/backup lab-server:$d/datos $d/b >/dev/null 2>&1; cat $d/b/latest/a; kill $(cat $d/pid); rm -rf $d",
+      "assert": "stdout~^remoto$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 5"
+    },
+    {
+      "id": "mi-uso",
+      "descripcion": "bin/mirror rechaza argumentos de más o de menos y un origen que no es una carpeta (sale con 2)",
+      "cmd": "{proyecto}/bin/mirror; a=$?; {proyecto}/bin/mirror -y x; b=$?; {proyecto}/bin/mirror /etc/hostname /tmp/x 2>/dev/null; echo $a $b $?",
+      "assert": "stdout~^2 2 2$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 6"
+    },
+    {
+      "id": "mi-vista-previa",
+      "descripcion": "Sin -y, bin/mirror enseña lo que borraría y no toca el destino",
+      "cmd": "t=$(mktemp -d); mkdir $t/o; echo a > $t/o/a; mkdir $t/m; echo v > $t/m/viejo; s=$({proyecto}/bin/mirror $t/o $t/m 2>&1); echo \"$(echo \"$s\" | grep -cE \"^[*]deleting +viejo$\") $(ls $t/m)\"; rm -rf $t",
+      "assert": "stdout~^1 viejo$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 7"
+    },
+    {
+      "id": "mi-aplica",
+      "descripcion": "Con -y, bin/mirror deja el destino igual que el origen",
+      "cmd": "t=$(mktemp -d); mkdir $t/o; echo a > $t/o/a; mkdir $t/m; echo v > $t/m/viejo; {proyecto}/bin/mirror -y $t/o $t/m >/dev/null && diff -r $t/o $t/m && echo iguales; rm -rf $t",
+      "assert": "stdout~^iguales$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 7"
+    },
+    {
+      "id": "mi-usa-config",
+      "descripcion": "bin/mirror conecta con ssh -F config del kit",
+      "cmd": "f=$(mktemp -d); echo \"#!/bin/sh\" > $f/ssh; echo 'echo \"$@\" > \"$(dirname \"$0\")/args\"; exit 1' >> $f/ssh; chmod +x $f/ssh; mkdir $f/o; PATH=$f:$PATH {proyecto}/bin/mirror -y $f/o lab-server:web 2>/dev/null; cat $f/args; rm -rf $f",
+      "assert": "stdout~^-F /.+/config lab-server rsync --server",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 7"
+    },
+    {
+      "id": "mi-ssh-real",
+      "descripcion": "bin/mirror -y deja igual una carpeta remota por SSH",
+      "cmd": "d=$(mktemp -d -p ~); ssh-keygen -q -t ed25519 -N \"\" -f $d/hk; ssh-keygen -q -t ed25519 -N \"\" -f $d/k; echo \"[127.0.0.1]:2206 $(cat $d/hk.pub)\" > $d/kh; cp $d/k.pub $d/ak; /usr/sbin/sshd -f /dev/null -h $d/hk -p 2206 -o PidFile=$d/pid -o AuthorizedKeysFile=$d/ak; sleep 0.5; export RSYNC_RSH=\"ssh -F {proyecto}/config -o HostName=127.0.0.1 -o Port=2206 -o UserKnownHostsFile=$d/kh -o IdentityAgent=none -i $d/k -o BatchMode=yes -o ControlPath=none\"; mkdir -p $d/o $d/web; echo nuevo > $d/o/a; echo v > $d/web/viejo; {proyecto}/bin/mirror -y $d/o lab-server:$d/web >/dev/null 2>&1; diff -r $d/o $d/web && echo iguales; kill $(cat $d/pid); rm -rf $d",
+      "assert": "stdout~^iguales$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 7"
+    },
+    {
+      "id": "mi-peligro",
+      "descripcion": "bin/mirror rechaza como destino el home o la raíz (sale con 2 sin llamar a rsync)",
+      "cmd": "f=$(mktemp -d); echo \"#!/bin/sh\" > $f/rsync; echo 'echo llamado >> \"$(dirname \"$0\")/log\"; exit 0' >> $f/rsync; chmod +x $f/rsync; for x in lab-server: lab-server:/ \"lab-server:~\" \"lab-server:~/\" lab-server:. /; do PATH=$f:$PATH {proyecto}/bin/mirror -y $f \"$x\" 2>/dev/null; echo -n \"$? \"; done; cat $f/log 2>/dev/null | wc -l; rm -rf $f",
+      "assert": "stdout~^2 2 2 2 2 2 0$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 8"
+    },
+    {
+      "id": "config-hereda",
+      "descripcion": "config mantiene los valores de las semanas 02-05",
+      "cmd": "{proyecto}/bin/kit-link >/dev/null && ssh -G -F {proyecto}/config lab-server | grep -cE \"^(stricthostkeychecking true|identitiesonly yes|forwardagent no|controlmaster auto)$\"",
+      "assert": "stdout~^4$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 9"
+    },
+    {
+      "id": "kit-sigue-funcionando",
+      "descripcion": "Los scripts de semanas anteriores siguen respondiendo",
+      "cmd": "{proyecto}/bin/ak-line; a=$?; {proyecto}/bin/kh-add; b=$?; {proyecto}/bin/mux 2>/dev/null; c=$?; {proyecto}/bin/kit-link x 2>/dev/null; echo $a $b $c $?",
+      "assert": "stdout~^2 2 2 2$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 9"
+    },
+    {
+      "id": "kit-completo-y-limpio",
+      "descripcion": "Sin TODO en config, conf.d/ y bin/, y shellcheck sin avisos",
+      "cmd": "! grep -rn TODO {proyecto}/config {proyecto}/conf.d {proyecto}/bin && shellcheck {proyecto}/bin/*",
+      "assert": "exit0",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 9"
+    }
+  ]
+}

@@ -1,154 +1,33 @@
-# 💻 Prácticas - Semana 04
+# Labs — Semana 06: transferencia de archivos
 
-## Transferencia de Archivos: SCP, SFTP y rsync
+| # | Lab | Objetivo | Tiempo |
+|---|-----|----------|--------|
+| 1 | [lab-01-scp](lab-01-scp/) | Copiar en los dos sentidos y entre servidores; `-r`, `-p`, `-R` y el riesgo de `-O` | ~60 min |
+| 2 | [lab-02-sftp](lab-02-sftp/) | Sesión interactiva, lotes con `-b`, errores que paran el lote y `reput` | ~60 min |
+| 3 | [lab-03-rsync](lab-03-rsync/) | `rsync -a`, la barra final, `-n -i`, el algoritmo de diferencias y `-c` | ~60 min |
+| 4 | [lab-04-delete-y-exclude](lab-04-delete-y-exclude/) | `--delete` sin sustos, exclusiones y `--backup-dir` | ~60 min |
+| 5 | [lab-05-snapshots-con-link-dest](lab-05-snapshots-con-link-dest/) | Copias completas que comparten lo que no cambió, con enlaces duros | ~60 min |
+| 6 | [lab-06-llave-solo-para-rsync](lab-06-llave-solo-para-rsync/) | Una llave de copias con `rrsync -ro`: sin shell, sin escribir, sin salir de su carpeta | ~60 min |
+| 7 | [lab-07-transferencias-grandes](lab-07-transferencias-grandes/) | `--partial`, `--bwlimit`, progreso, multiplexing y `tar` por `ssh` | ~60 min |
 
-![Prácticas](https://img.shields.io/badge/Prácticas-3_ejercicios-orange?style=for-the-badge)
-![Duración](https://img.shields.io/badge/Duración-1.5_horas-blue?style=for-the-badge)
+**Total labs: 7 horas**
 
+## Antes de cada lab
+
+- **Paso 0** del [lab 01](lab-01-scp/README.md): `docker compose up -d --build --force-recreate server bastion` y `docker compose run --rm client` **en tu equipo**; `known_hosts`, llave y `cd ~/w` **en el cliente**.
+- Trabajas en `~/w`, dentro del contenedor: los archivos de prueba no ensucian el repositorio. El cliente es un contenedor nuevo cada vez: `~/.ssh` y `~/w` desaparecen con `exit`. Haz cada lab en una sola sesión.
+- `--force-recreate` deja `server` limpio: sin archivos ni llaves de labs anteriores.
+- Antes de cualquier `rsync` con `--delete`, ensaya con `-n -i`.
+- Usuario `alumno`, contraseña `alumno`. **Es una contraseña débil a propósito y solo existe en el laboratorio.** Los labs usan `sshpass` para no teclearla; fuera del laboratorio, nunca.
+- Las llaves de los labs no tienen frase de paso para no escribirla en cada paso: solo en el laboratorio. **Nunca subas una llave privada a git.**
+
+<!-- nav -->
 ---
 
-## 🎯 Objetivo
+## 🔗 Navegación
 
-Practicar las tres herramientas principales de transferencia de archivos sobre SSH, entendiendo cuándo usar cada una.
+| Anterior | Siguiente |
+|---|---|
+| ← [Teoría — Copias de seguridad por SSH y llaves que solo copian](../1-teoria/03-copias-de-seguridad-y-llaves-restringidas.md) | [Lab 01 — `scp`](lab-01-scp/README.md) → |
 
----
-
-## 📋 Lista de Prácticas
-
-| #   | Práctica                                            | Dificultad | Duración | Tema           |
-| --- | --------------------------------------------------- | ---------- | -------- | -------------- |
-| 01  | [Transferencias con SCP](practica-01-scp-basico.md) | ⭐         | 30 min   | Copia rápida   |
-| 02  | [Sesiones SFTP](practica-02-sftp-interactivo.md)    | ⭐⭐       | 30 min   | Interactivo    |
-| 03  | [Backups con rsync](practica-03-rsync-backups.md)   | ⭐⭐⭐     | 30 min   | Sincronización |
-
----
-
-## 📊 Progresión de Dificultad
-
-```
-Práctica 01: ⭐ Básico
-├── SCP local a remoto
-├── SCP remoto a local
-└── Opciones básicas (-r, -P, -p)
-
-Práctica 02: ⭐⭐ Intermedio
-├── Sesión SFTP interactiva
-├── Navegación y transferencias
-└── Modo batch automatizado
-
-Práctica 03: ⭐⭐⭐ Avanzado
-├── rsync sobre SSH
-├── Sincronización incremental
-└── Backups con --link-dest
-```
-
----
-
-## 🔧 Preparación del Entorno
-
-### Requisitos
-
-- [ ] Acceso SSH a un servidor remoto
-- [ ] Autenticación por llave configurada
-- [ ] Archivos de prueba preparados
-
-### Crear Archivos de Prueba
-
-```bash
-# Crear directorio de pruebas
-mkdir -p ~/ssh-lab/week-06-transferencia_archivos_scp_sftp_rsync/{archivos,backups,logs}
-
-# Crear archivos de diferentes tipos
-cd ~/ssh-lab/week-06-transferencia_archivos_scp_sftp_rsync/archivos
-
-# Archivos de texto
-echo "Archivo de configuración de prueba" > config.txt
-echo "Log de aplicación simulado" > app.log
-for i in {1..5}; do
-    echo "Documento $i contenido" > documento-$i.txt
-done
-
-# Crear subdirectorio
-mkdir -p proyecto/{src,config,docs}
-echo "<?php echo 'Hola'; ?>" > proyecto/src/index.php
-echo "server: localhost" > proyecto/config/app.yml
-echo "# Documentación" > proyecto/docs/README.md
-
-# Crear archivo más grande (1MB)
-dd if=/dev/urandom of=archivo-grande.bin bs=1M count=1 2>/dev/null
-
-# Verificar estructura
-tree ~/ssh-lab/week-06-transferencia_archivos_scp_sftp_rsync/ 2>/dev/null || ls -laR ~/ssh-lab/week-06-transferencia_archivos_scp_sftp_rsync/
-```
-
-### Verificar Conectividad
-
-```bash
-# Probar conexión SSH
-ssh tu-servidor "echo 'Conexión exitosa'"
-
-# Crear directorio de trabajo en remoto
-ssh tu-servidor "mkdir -p ~/lab-transferencias"
-```
-
----
-
-## ✅ Checklist de Completación
-
-### Práctica 01: SCP
-
-- [ ] Subir archivo individual con SCP
-- [ ] Descargar archivo del servidor
-- [ ] Copiar directorio recursivamente
-- [ ] Usar puerto no estándar
-
-### Práctica 02: SFTP
-
-- [ ] Conectar y navegar en sesión SFTP
-- [ ] Transferir archivos con get/put
-- [ ] Gestionar archivos remotos
-- [ ] Ejecutar comandos en modo batch
-
-### Práctica 03: rsync
-
-- [ ] Sincronizar directorio sobre SSH
-- [ ] Usar exclusiones
-- [ ] Ejecutar con --dry-run
-- [ ] Crear backup incremental
-
----
-
-## 💡 Tips para las Prácticas
-
-### General
-
-- Siempre verifica el resultado después de transferir
-- Usa `--dry-run` en rsync antes de ejecutar
-- Aprovecha tu `~/.ssh/config` para simplificar comandos
-
-### Debugging
-
-```bash
-# Ver lo que hace cada herramienta
-scp -v archivo servidor:/destino/
-sftp -v servidor
-rsync -avvz origen/ servidor:/destino/
-```
-
----
-
-## 🧭 Navegación
-
-| ⬅️ Anterior                     |         🏠 Índice         |                        Siguiente ➡️ |
-| :------------------------------ | :-----------------------: | ----------------------------------: |
-| [Teoría](../1-teoria/README.md) | [Semana 04](../README.md) | [Proyecto](../3-proyecto/README.md) |
-
----
-
-<div align="center">
-
-**💻 Prácticas - Semana 04**
-
-_Transferencia de Archivos_
-
-</div>
+[↑ Semana 06](../README.md)

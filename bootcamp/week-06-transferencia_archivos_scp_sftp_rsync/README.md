@@ -1,177 +1,81 @@
-# 📦 Semana 04: Transferencia de Archivos
+# Semana 06 — Transferencia de archivos: scp, sftp y rsync
 
-## SCP, SFTP y rsync sobre SSH
+## Descripción
 
-![SSH](https://img.shields.io/badge/SSH-OpenSSH-red?style=for-the-badge&logo=openssh)
-![Nivel](https://img.shields.io/badge/Nivel-Intermedio-yellow?style=for-the-badge)
-![Duración](https://img.shields.io/badge/Duración-4_horas-blue?style=for-the-badge)
+La conexión que ya sabes abrir, con tus alias, llaves y multiplexing, sirve también para mover archivos. Esta semana aprendes las tres herramientas y cuándo usar cada una: `scp` para copias puntuales (y por qué su protocolo antiguo deja que el servidor interprete los nombres), `sftp` para moverte por el servidor y automatizar lotes, y `rsync` para sincronizar enviando solo lo que cambió. Con `rsync` haces lo que más se usa en el día a día: espejos con `--delete` sin borrar lo que no debes, copias de seguridad completas que comparten lo que no cambió (`--link-dest`) y una llave de copias que, con `rrsync`, solo puede leer una carpeta. Tu kit gana `bin/backup` y `bin/mirror`.
 
----
+## Objetivos de aprendizaje
 
-## 📋 Descripción General
+Al terminar esta semana, podrás:
 
-Esta semana dominarás las **tres herramientas fundamentales** para transferir archivos de forma segura sobre SSH: **SCP** para copias rápidas, **SFTP** para sesiones interactivas, y **rsync** para sincronización inteligente e incremental.
+- Explicar qué piden al servidor `scp`, `sftp` y `rsync` (subsistema `sftp` o ejecutar un programa) y qué riesgo tiene `scp -O`
+- Copiar con `scp` en los dos sentidos y entre servidores, y automatizar `sftp` con lotes `-b` que fallan cuando deben
+- Sincronizar con `rsync -a`, usar bien la barra final del origen, leer `-n -i` y explicar la *quick check* y el algoritmo de diferencias
+- Usar `--delete`, filtros y `--backup-dir` ensayando siempre antes
+- Hacer copias con `--link-dest` y explicar los enlaces duros que comparten
+- Limitar una llave de copias con `command="rrsync -ro ..."` y `restrict`
+- Reanudar con `--partial`, limitar con `--bwlimit` y evitar el coste de muchas conexiones
+- Añadir a tu `ssh-infra-kit` `bin/backup` y `bin/mirror`
 
-Cada herramienta tiene su lugar en el arsenal de un administrador de sistemas. SCP es perfecto para copiar un archivo rápidamente, SFTP brilla cuando necesitas navegar y explorar antes de transferir, y rsync es imbatible para backups y sincronización de grandes volúmenes de datos.
+## Prerrequisitos
 
-Al finalizar esta semana, sabrás exactamente cuándo usar cada herramienta y cómo optimizar transferencias para diferentes escenarios.
+- [Semana 05](../week-05-configuracion_avanzada_cliente_ssh/README.md) completa: `conf.d/`, multiplexing y `bin/kit-link`
+- El laboratorio reconstruido y levantado: `docker compose up -d --build` (esta semana la imagen añade `python3`, que necesita `rrsync`)
 
----
+## Contenido
 
-## 🎯 Objetivos de Aprendizaje
+| # | Tipo | Tema | Tiempo |
+|---|------|------|--------|
+| — | Teoría | [01-scp-y-sftp.md](1-teoria/01-scp-y-sftp.md) · [02-rsync.md](1-teoria/02-rsync.md) · [03-copias-de-seguridad-y-llaves-restringidas.md](1-teoria/03-copias-de-seguridad-y-llaves-restringidas.md) | 1.5 h |
+| — | Conocimiento | [10 preguntas](rubrica-evaluacion.md#-conocimiento-30) | 30 min |
+| 1 | Lab | [lab-01-scp](2-practicas/lab-01-scp/) | 60 min |
+| 2 | Lab | [lab-02-sftp](2-practicas/lab-02-sftp/) | 60 min |
+| 3 | Lab | [lab-03-rsync](2-practicas/lab-03-rsync/) | 60 min |
+| 4 | Lab | [lab-04-delete-y-exclude](2-practicas/lab-04-delete-y-exclude/) | 60 min |
+| 5 | Lab | [lab-05-snapshots-con-link-dest](2-practicas/lab-05-snapshots-con-link-dest/) | 60 min |
+| 6 | Lab | [lab-06-llave-solo-para-rsync](2-practicas/lab-06-llave-solo-para-rsync/) | 60 min |
+| 7 | Lab | [lab-07-transferencias-grandes](2-practicas/lab-07-transferencias-grandes/) | 60 min |
+| — | Proyecto | [ssh-infra-kit: copias de seguridad y espejos con `rsync`](3-proyecto/) | 3 h |
 
-Al completar esta semana, serás capaz de:
+**Total: 12 horas**
 
-- [ ] Transferir archivos con SCP en ambas direcciones (local↔remoto)
-- [ ] Manejar sesiones interactivas SFTP con comandos avanzados
-- [ ] Sincronizar directorios con rsync de forma incremental
-- [ ] Usar rsync sobre SSH para backups seguros
-- [ ] Optimizar transferencias con compresión y límites de ancho de banda
-- [ ] Automatizar backups con scripts y cron
-- [ ] Elegir la herramienta correcta según el caso de uso
-
----
-
-## 📚 Contenido de la Semana
-
-### 1️⃣ Teoría (1 hora)
-
-| Módulo                                    | Tema                              | Duración |
-| ----------------------------------------- | --------------------------------- | -------- |
-| [01](1-teoria/01-scp-fundamentos.md)      | SCP: Secure Copy                  | 20 min   |
-| [02](1-teoria/02-sftp-sesiones.md)        | SFTP: Sesiones Interactivas       | 20 min   |
-| [03](1-teoria/03-rsync-sincronizacion.md) | rsync: Sincronización Inteligente | 20 min   |
-
-### 2️⃣ Prácticas (1.5 horas)
-
-| Práctica                                          | Descripción            | Dificultad | Duración |
-| ------------------------------------------------- | ---------------------- | ---------- | -------- |
-| [01](2-practicas/practica-01-scp-basico.md)       | Transferencias con SCP | ⭐         | 30 min   |
-| [02](2-practicas/practica-02-sftp-interactivo.md) | Sesiones SFTP          | ⭐⭐       | 30 min   |
-| [03](2-practicas/practica-03-rsync-backups.md)    | Backups con rsync      | ⭐⭐⭐     | 30 min   |
-
-### 3️⃣ Proyecto Semanal (1.5 horas)
-
-| Documento                                  | Descripción                    |
-| ------------------------------------------ | ------------------------------ |
-| [README](3-proyecto/README.md)             | Sistema de Backup Automatizado |
-| [Guía](3-proyecto/GUIA-IMPLEMENTACION.md)  | Implementación paso a paso     |
-| [Ejemplos](3-proyecto/EJEMPLOS-CONFIGS.md) | Scripts y configuraciones      |
-
-### 4️⃣ Recursos Adicionales
-
-| Recurso                                                           | Descripción            |
-| ----------------------------------------------------------------- | ---------------------- |
-| [Videos Conceptuales](4-recursos/videos/01-videos-conceptos.md)   | Teoría en video        |
-| [Videos Prácticos](4-recursos/videos/02-videos-practicos.md)      | Tutoriales paso a paso |
-| [Artículos](4-recursos/webgrafia/03-articulos-ssh.md)             | Lecturas recomendadas  |
-| [Documentación](4-recursos/webgrafia/04-documentacion-oficial.md) | Docs oficiales         |
-| [Herramientas](4-recursos/herramientas/05-herramientas-ssh.md)    | Software útil          |
-| [Playgrounds](4-recursos/webgrafia/06-playgrounds-online.md)      | Práctica online        |
-| [Comunidades](4-recursos/webgrafia/07-comunidades-sysadmin.md)    | Foros y grupos         |
-| [YouTube](4-recursos/webgrafia/08-canales-youtube.md)             | Canales recomendados   |
-
-### 5️⃣ Glosario
-
-| Documento                        | Descripción                               |
-| -------------------------------- | ----------------------------------------- |
-| [Glosario](5-glosario/README.md) | 35+ términos de transferencia de archivos |
-
----
-
-## 🗂️ Estructura de Archivos
+## Distribución del tiempo
 
 ```
-week-06-transferencia_archivos_scp_sftp_rsync/
-├── README.md
-├── RUBRICA-EVALUACION.md
-│
-├── 0-assets/
-│   ├── README.md
-│   ├── 01-comparativa-herramientas.svg
-│   ├── 02-flujo-rsync.svg
-│   └── 03-arquitectura-backup.svg
-│
-├── 1-teoria/
-│   ├── README.md
-│   ├── 01-scp-fundamentos.md
-│   ├── 02-sftp-sesiones.md
-│   └── 03-rsync-sincronizacion.md
-│
-├── 2-practicas/
-│   ├── README.md
-│   ├── practica-01-scp-basico.md
-│   ├── practica-02-sftp-interactivo.md
-│   └── practica-03-rsync-backups.md
-│
-├── 3-proyecto/
-│   ├── README.md
-│   ├── GUIA-IMPLEMENTACION.md
-│   └── EJEMPLOS-CONFIGS.md
-│
-├── 4-recursos/
-│   ├── README.md
-│   ├── videos/
-│   ├── webgrafia/
-│   ├── herramientas/
-│   ├── ebooks-free/
-│   └── videografia/
-│
-└── 5-glosario/
-    └── README.md
+[1.5 h]  Leer 1-teoria/ (scp y sftp, rsync, copias y llaves restringidas)
+[30 min] Responder las 10 preguntas de Conocimiento
+[60 min] lab-01 — scp: sentidos, -r, -p, entre servidores y el riesgo de -O
+[60 min] lab-02 — sftp: sesión, lotes -b, errores y reput
+[60 min] lab-03 — rsync -a, barra final, -n -i, diferencias y -c
+[60 min] lab-04 — --delete, exclusiones y --backup-dir
+[60 min] lab-05 — Copias con --link-dest y enlaces duros
+[60 min] lab-06 — Llave de copias con rrsync -ro y restrict
+[60 min] lab-07 — --partial, --bwlimit, multiplexing y tar por ssh
+[3 h]    Proyecto: bin/backup y bin/mirror
 ```
 
----
+## Verificación de completitud
 
-## 🔗 Prerequisitos
+Desde la raíz del repositorio, en tu equipo:
 
-Antes de iniciar esta semana, asegúrate de:
-
-- ✅ Haber completado [Semana 01: Fundamentos de SSH](../week-01-fundamentos_ssh_y_primera_conexion/README.md)
-- ✅ Haber completado [Semana 02: Autenticación con Llaves](../week-03-autenticacion_con_llaves_ssh/README.md)
-- ✅ Haber completado [Semana 03: Configuración Avanzada](../week-05-configuracion_avanzada_cliente_ssh/README.md)
-- ✅ Tener acceso a al menos un servidor remoto
-- ✅ Tener archivos de prueba para transferir
-
----
-
-## ⚖️ Comparativa de Herramientas
-
-| Característica        | SCP               | SFTP               | rsync          |
-| --------------------- | ----------------- | ------------------ | -------------- |
-| **Uso principal**     | Copia rápida      | Sesión interactiva | Sincronización |
-| **Incremental**       | ❌                | ❌                 | ✅             |
-| **Interactivo**       | ❌                | ✅                 | ❌             |
-| **Resume**            | ❌                | ✅                 | ✅             |
-| **Compresión**        | ❌                | ❌                 | ✅             |
-| **Preserva permisos** | ✅                | ✅                 | ✅             |
-| **Ideal para**        | Archivos pequeños | Exploración        | Backups        |
-
----
-
-## ⏱️ Distribución del Tiempo
-
-```
-Semana 04 (4 horas totales)
-├── Teoría ████████░░░░░░░░░░░░ 25% (1h)
-├── Prácticas ██████████████░░░░ 37.5% (1.5h)
-└── Proyecto ██████████████░░░░ 37.5% (1.5h)
+```bash
+./scripts/verificar-semana.sh 06
 ```
 
----
+Comprueba tu proyecto (`3-proyecto/starter/`) contra los 18 requisitos verificables de la semana; dos de ellos arrancan un `sshd` real dentro del cliente para copiar por SSH. Al terminar deben pasar todos, y dentro del cliente, con la llave del paso 5 del proyecto instalada, la segunda copia debe ocupar unos KB:
 
-## 🧭 Navegación
+```bash
+cd bootcamp/week-06-transferencia_archivos_scp_sftp_rsync/3-proyecto/starter
+bin/kit-link
+bin/backup lab-server:datos ~/backups/server; sleep 1
+bin/backup lab-server:datos ~/backups/server
+du -sh ~/backups/server/2*
+```
 
-| ⬅️ Anterior                                                 |          🏠 Inicio           |                                      Siguiente ➡️ |
-| :---------------------------------------------------------- | :--------------------------: | ------------------------------------------------: |
-| [Semana 03: Configuración Avanzada](../week-05-configuracion_avanzada_cliente_ssh/README.md) | [Bootcamp SSH](../README.md) | [Semana 05: Servidor SSH](../week-07-configuracion_servidor_ssh/README.md) |
+## 🔗 Navegación
 
----
+| Anterior | Actual | Siguiente |
+|---|---|---|
+| [← Semana 05 — Configuración avanzada del cliente](../week-05-configuracion_avanzada_cliente_ssh/README.md) | **Semana 06 — Transferencia de archivos** | Semana 07 — Servidor: `sshd_config` y hardening (próximamente) |
 
-<div align="center">
-
-**📦 Semana 04: Transferencia de Archivos**
-
-_Domina SCP, SFTP y rsync_
-
-</div>
+[← Volver al índice del bootcamp](../README.md)
