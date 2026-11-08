@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+#
+# agent-up — reutiliza tu ssh-agent o arranca uno en un socket fijo.
+#
+# Uso: eval "$(agent-up)"
+#
+# Escribe en stdout solo la línea `export SSH_AUTH_SOCK=...`, para eval;
+# los mensajes van a stderr. AGENT_SOCK cambia el socket
+# (~/.ssh/agent.sock por defecto) y AGENT_LIFETIME el tiempo máximo que
+# una llave vive en el agente (1h por defecto).
+#
+# Códigos de salida: 0 agente listo, 1 no se pudo arrancar, 2 uso incorrecto.
+
+set -euo pipefail
+
+if (( $# > 0 )); then
+  echo "uso: eval \"\$(agent-up)\"" >&2
+  exit 2
+fi
+
+sock="${AGENT_SOCK:-$HOME/.ssh/agent.sock}"
+
+# TODO 3: si "$sock" es un socket (-S) y hay un agente detrás, no arranques
+#   otro: avisa por stderr y salta al printf del final. Pista: ssh-add -l
+#   sale con 0 (hay llaves), 1 (agente vacío) o 2 (no hay agente).
+
+# TODO 4: si queda un "$sock" sin agente detrás, bórralo antes de arrancar:
+#   ssh-agent -a fallaría con "Address already in use".
+(umask 077; mkdir -p "$(dirname "$sock")")
+# TODO 5: que cada llave caduque en el agente pasado AGENT_LIFETIME
+#   (1h por defecto). Documéntalo con Qué / Para qué / Impacto.
+ssh-agent -a "$sock" >/dev/null || exit 1
+echo "agent-up: agente nuevo en $sock" >&2
+
+printf 'export SSH_AUTH_SOCK=%q\n' "$sock"

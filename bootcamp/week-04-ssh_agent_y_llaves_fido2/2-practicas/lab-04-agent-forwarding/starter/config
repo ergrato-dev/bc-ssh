@@ -1,0 +1,14 @@
+# Lab 04 — config del cliente para este lab. Uso: ssh -F starter/config server
+
+Host server
+    User alumno
+    IdentityFile ~/.ssh/lab
+    # TODO 1: reenvía el agente a este host, y solo a este.
+
+Host bastion
+    User alumno
+    IdentityFile ~/.ssh/lab
+
+Host *
+    IdentitiesOnly yes
+    # TODO 2: no reenvíes el agente a ningún otro host.

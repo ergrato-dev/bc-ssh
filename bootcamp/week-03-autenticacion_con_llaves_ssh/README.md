@@ -75,6 +75,6 @@ ssh -F config lab-server hostname
 
 | Anterior | Actual | Siguiente |
 |---|---|---|
-| [← Semana 02 — Protocolo por dentro: KEX, host keys y known_hosts](../week-02-protocolo_kex_y_known_hosts/README.md) | **Semana 03 — Autenticación con llaves** | Semana 04 — `ssh-agent`, agent forwarding y llaves FIDO2 (próximamente) |
+| [← Semana 02 — Protocolo por dentro: KEX, host keys y known_hosts](../week-02-protocolo_kex_y_known_hosts/README.md) | **Semana 03 — Autenticación con llaves** | [Semana 04 — `ssh-agent`, agent forwarding y llaves FIDO2 →](../week-04-ssh_agent_y_llaves_fido2/README.md) |
 
 [← Volver al índice del bootcamp](../README.md)

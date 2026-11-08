@@ -1,0 +1,7 @@
+# Lab 02 — config del cliente para este lab. Uso: ssh -F solucion/config server
+
+Host server
+    User alumno
+    IdentityFile ~/.ssh/id_ed25519
+    # Qué, para qué e impacto: teoría 01, "AddKeysToAgent: cargar al usar".
+    AddKeysToAgent 1h

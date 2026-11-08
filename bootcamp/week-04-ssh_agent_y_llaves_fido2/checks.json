@@ -1,0 +1,160 @@
+{
+  "semana": "04",
+  "titulo": "ssh-agent, agent forwarding y llaves FIDO2",
+  "checks": [
+    {
+      "id": "config-parsea",
+      "descripcion": "El config se lee sin errores",
+      "cmd": "ssh -G -F {proyecto}/config lab-server >/dev/null",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 1",
+      "assert": "exit0"
+    },
+    {
+      "id": "config-hereda-semana-03",
+      "descripcion": "Siguen las opciones de la semana 03 (IdentitiesOnly yes)",
+      "cmd": "ssh -G -F {proyecto}/config lab-server",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 1",
+      "assert": "stdout~^identitiesonly yes$"
+    },
+    {
+      "id": "config-addkeys",
+      "descripcion": "La primera conexión deja la llave en el agente durante 1 h",
+      "cmd": "ssh -G -F {proyecto}/config lab-server",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 1",
+      "assert": "stdout~^addkeystoagent 3600$"
+    },
+    {
+      "id": "config-forwardagent",
+      "descripcion": "ssh no reenvía el agente",
+      "cmd": "ssh -G -F {proyecto}/config lab-bastion",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 2",
+      "assert": "stdout~^forwardagent no$"
+    },
+    {
+      "id": "au-uso",
+      "descripcion": "agent-up con argumentos sale con 2",
+      "cmd": "{proyecto}/bin/agent-up x",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 3",
+      "assert": "exit=2"
+    },
+    {
+      "id": "au-arranca",
+      "descripcion": "agent-up crea un socket de agente con permisos 600",
+      "cmd": "d=$(mktemp -d -p ~); AGENT_SOCK=$d/a.sock {proyecto}/bin/agent-up >/dev/null 2>&1; stat -c %a $d/a.sock; r=$?; pkill -f \"ssh-agent -a $d\"; rm -rf $d; exit $r",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 3",
+      "assert": "stdout~^600$"
+    },
+    {
+      "id": "au-dir-700",
+      "descripcion": "El directorio nuevo del socket queda en 700",
+      "cmd": "d=$(mktemp -d -p ~); AGENT_SOCK=$d/sub/a.sock {proyecto}/bin/agent-up >/dev/null 2>&1; stat -c %a $d/sub; r=$?; pkill -f \"ssh-agent -a $d\"; rm -rf $d; exit $r",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 3",
+      "assert": "stdout~^700$"
+    },
+    {
+      "id": "au-eval",
+      "descripcion": "eval de su salida deja un agente vacío listo (ssh-add -l sale con 1)",
+      "cmd": "d=$(mktemp -d -p ~); eval \"$(AGENT_SOCK=$d/a.sock {proyecto}/bin/agent-up 2>/dev/null)\"; ssh-add -l; r=$?; pkill -f \"ssh-agent -a $d\"; rm -rf $d; exit $r",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 3",
+      "assert": "exit=1"
+    },
+    {
+      "id": "au-solo-export",
+      "descripcion": "stdout es solo la línea export SSH_AUTH_SOCK",
+      "cmd": "d=$(mktemp -d -p ~); AGENT_SOCK=$d/a.sock {proyecto}/bin/agent-up 2>/dev/null | wc -l; r=$?; pkill -f \"ssh-agent -a $d\"; rm -rf $d; exit $r",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 3",
+      "assert": "stdout~^1$"
+    },
+    {
+      "id": "au-reutiliza",
+      "descripcion": "Una segunda llamada sale con 0 y no arranca otro agente",
+      "cmd": "d=$(mktemp -d -p ~); AGENT_SOCK=$d/a.sock {proyecto}/bin/agent-up >/dev/null 2>&1; AGENT_SOCK=$d/a.sock {proyecto}/bin/agent-up >/dev/null 2>&1 || exit 1; pgrep -fc \"ssh-agent -a $d\"; r=$?; pkill -f \"ssh-agent -a $d\"; rm -rf $d; exit $r",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 4",
+      "assert": "stdout~^1$"
+    },
+    {
+      "id": "au-reutiliza-llaves",
+      "descripcion": "El agente reutilizado conserva sus llaves",
+      "cmd": "d=$(mktemp -d -p ~); ssh-keygen -q -t ed25519 -N \"\" -C reutilizada -f $d/k; eval \"$(AGENT_SOCK=$d/a.sock {proyecto}/bin/agent-up 2>/dev/null)\"; ssh-add -q $d/k; unset SSH_AUTH_SOCK; eval \"$(AGENT_SOCK=$d/a.sock {proyecto}/bin/agent-up 2>/dev/null)\"; ssh-add -l; r=$?; pkill -f \"ssh-agent -a $d\"; rm -rf $d; exit $r",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 4",
+      "assert": "stdout~reutilizada"
+    },
+    {
+      "id": "au-socket-muerto",
+      "descripcion": "Con un socket sin agente detrás, arranca uno nuevo",
+      "cmd": "d=$(mktemp -d -p ~); AGENT_SOCK=$d/a.sock {proyecto}/bin/agent-up >/dev/null 2>&1; pkill -9 -f \"ssh-agent -a $d\"; sleep 0.2; test -S $d/a.sock || exit 3; eval \"$(AGENT_SOCK=$d/a.sock {proyecto}/bin/agent-up 2>/dev/null)\"; ssh-add -l; r=$?; pkill -f \"ssh-agent -a $d\"; rm -rf $d; exit $r",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 5",
+      "assert": "exit=1"
+    },
+    {
+      "id": "au-caducidad",
+      "descripcion": "Las llaves caducan en el agente pasado AGENT_LIFETIME",
+      "cmd": "d=$(mktemp -d -p ~); ssh-keygen -q -t ed25519 -N \"\" -f $d/k; eval \"$(AGENT_SOCK=$d/a.sock AGENT_LIFETIME=1 {proyecto}/bin/agent-up 2>/dev/null)\"; ssh-add -q $d/k; sleep 2; ssh-add -l; r=$?; pkill -f \"ssh-agent -a $d\"; rm -rf $d; exit $r",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 6",
+      "assert": "exit=1"
+    },
+    {
+      "id": "kn-uso",
+      "descripcion": "key-new sin argumentos sale con 2",
+      "cmd": "{proyecto}/bin/key-new",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 7",
+      "assert": "exit=2"
+    },
+    {
+      "id": "kn-tipo-defecto",
+      "descripcion": "Sin KEY_TYPE, la llave es Ed25519",
+      "cmd": "d=$(mktemp -d); KEY_DIR=$d KEY_PASSPHRASE=x {proyecto}/bin/key-new k; r=$?; rm -rf $d; exit $r",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 7",
+      "assert": "stdout~[(]ED25519[)]$"
+    },
+    {
+      "id": "kn-tipo-invalido",
+      "descripcion": "key-new rechaza KEY_TYPE=rsa (sale con 2)",
+      "cmd": "d=$(mktemp -d); KEY_TYPE=rsa KEY_DIR=$d KEY_PASSPHRASE=x {proyecto}/bin/key-new k; r=$?; rm -rf $d; exit $r",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 7",
+      "assert": "exit=2"
+    },
+    {
+      "id": "kn-tipo-invalido-limpio",
+      "descripcion": "Con un tipo no admitido no crea ningún archivo",
+      "cmd": "d=$(mktemp -d); KEY_TYPE=rsa KEY_DIR=$d KEY_PASSPHRASE=x {proyecto}/bin/key-new k 2>/dev/null; ls -A $d | wc -l; rm -rf $d",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 7",
+      "assert": "stdout~^0$"
+    },
+    {
+      "id": "kn-sk-sin-dispositivo",
+      "descripcion": "Con ed25519-sk y sin llave FIDO2, sale con 1",
+      "cmd": "d=$(mktemp -d); KEY_TYPE=ed25519-sk KEY_DIR=$d KEY_PASSPHRASE= {proyecto}/bin/key-new k </dev/null; r=$?; rm -rf $d; exit $r",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 7",
+      "assert": "exit=1"
+    },
+    {
+      "id": "kn-sk-pista",
+      "descripcion": "Sin llave FIDO2, el error lo dice",
+      "cmd": "d=$(mktemp -d); KEY_TYPE=ed25519-sk KEY_DIR=$d KEY_PASSPHRASE= {proyecto}/bin/key-new k </dev/null 2>&1; rm -rf $d",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 7",
+      "assert": "stdout~FIDO2"
+    },
+    {
+      "id": "ag-sshd-addkeys",
+      "descripcion": "Con el config, la primera conexión a un sshd real deja la llave en el agente",
+      "cmd": "d=$(mktemp -d -p ~); ssh-keygen -q -t ed25519 -N \"\" -f $d/hk; KEY_DIR=$d KEY_PASSPHRASE=frase {proyecto}/bin/key-new k agente >/dev/null; echo \"[127.0.0.1]:2204 $(cat $d/hk.pub)\" > $d/kh; cp $d/k.pub $d/ak; echo \"echo frase\" > $d/ap; chmod +x $d/ap; /usr/sbin/sshd -f /dev/null -h $d/hk -p 2204 -o PidFile=$d/pid -o AuthorizedKeysFile=$d/ak; eval \"$(AGENT_SOCK=$d/a.sock {proyecto}/bin/agent-up 2>/dev/null)\"; sleep 0.5; SSH_ASKPASS=$d/ap SSH_ASKPASS_REQUIRE=force ssh -n -F {proyecto}/config -o HostName=127.0.0.1 -o Port=2204 -o UserKnownHostsFile=$d/kh -i $d/k lab-server true; ssh-add -l; r=$?; kill $(cat $d/pid); pkill -f \"ssh-agent -a $d\"; rm -rf $d; exit $r",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 8",
+      "assert": "stdout~ agente [(]ED25519[)]$"
+    },
+    {
+      "id": "kit-sigue-funcionando",
+      "descripcion": "ak-line y kh-add de semanas anteriores siguen en el kit",
+      "cmd": "{proyecto}/bin/ak-line; a=$?; {proyecto}/bin/kh-add; b=$?; echo $a $b",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 9",
+      "assert": "stdout~^2 2$"
+    },
+    {
+      "id": "bin-completo-y-limpio",
+      "descripcion": "Sin TODO y shellcheck sin avisos en bin/",
+      "cmd": "! grep -n TODO {proyecto}/bin/* && shellcheck {proyecto}/bin/*",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 9",
+      "assert": "exit0"
+    }
+  ]
+}

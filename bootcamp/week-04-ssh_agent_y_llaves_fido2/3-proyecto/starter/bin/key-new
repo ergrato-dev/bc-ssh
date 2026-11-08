@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+#
+# key-new — crea un par de llaves Ed25519 con valores seguros.
+#
+# Uso: key-new NOMBRE [COMENTARIO]
+#
+#   key-new lab
+#   ~/.ssh/lab creada
+#   256 SHA256:NeIPcKGncSTO0SdhjRLQziJgU9+crgpPZt7AcFMmhTw alumno@client-2026-11-08 (ED25519)
+#
+# Pide la frase de paso por teclado (dos veces). KEY_PASSPHRASE la da sin
+# preguntar, para scripts; KEY_DIR cambia el directorio (~/.ssh por defecto).
+#
+# Códigos de salida: 0 creada, 1 ya existe o ssh-keygen falló, 2 uso incorrecto.
+
+set -euo pipefail
+
+if (( $# < 1 || $# > 2 )); then
+  echo "uso: key-new NOMBRE [COMENTARIO]" >&2
+  exit 2
+fi
+
+nombre="$1"
+# Solo un nombre de archivo: así nadie escribe fuera de KEY_DIR con "../".
+if [[ ! "$nombre" =~ ^[A-Za-z0-9._-]+$ || "$nombre" == .* ]]; then
+  echo "key-new: nombre no válido: $nombre (usa letras, números, . _ -)" >&2
+  exit 2
+fi
+
+# TODO 6: lee KEY_TYPE (ed25519 por defecto). Admite solo ed25519 y
+#   ed25519-sk; con otro valor, error por stderr y exit 2. Usa el tipo en
+#   ssh-keygen -t y, si falla con ed25519-sk, sugiere conectar la llave FIDO2.
+
+dir="${KEY_DIR:-$HOME/.ssh}"
+llave="$dir/$nombre"
+# El comentario dice de quién es, desde qué equipo y desde cuándo: lo que
+# necesitas para decidir qué línea borrar de un authorized_keys.
+comentario="${2:-$(id -un)@$(hostname)-$(date +%F)}"
+
+if [[ -e "$llave" || -e "$llave.pub" ]]; then
+  echo "key-new: $llave ya existe; no se sobrescribe" >&2
+  exit 1
+fi
+
+(umask 077; mkdir -p "$dir")
+
+# -a 100: 100 rondas de bcrypt al cifrar con la frase de paso (24 por
+# defecto en 9.6). Descifrar tarda ~0.5 s: nada para ti, mucho para quien pruebe
+# millones de frases con el archivo robado.
+opciones=(-q -t ed25519 -a 100 -C "$comentario" -f "$llave")
+if [[ -v KEY_PASSPHRASE ]]; then
+  opciones+=(-N "$KEY_PASSPHRASE")
+  [[ -z "$KEY_PASSPHRASE" ]] && echo "key-new: aviso: llave sin frase de paso" >&2
+fi
+
+ssh-keygen "${opciones[@]}" || exit 1
+echo "$llave creada"
+ssh-keygen -lf "$llave.pub"

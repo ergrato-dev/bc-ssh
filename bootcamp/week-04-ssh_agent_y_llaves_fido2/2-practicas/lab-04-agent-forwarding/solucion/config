@@ -1,0 +1,17 @@
+# Lab 04 — config del cliente para este lab. Uso: ssh -F solucion/config server
+
+Host server
+    User alumno
+    IdentityFile ~/.ssh/lab
+    # Solo aquí: desde server saltas a bastion con tu llave. Riesgo y
+    # alternativas: teoría 02.
+    ForwardAgent yes
+
+Host bastion
+    User alumno
+    IdentityFile ~/.ssh/lab
+
+Host *
+    IdentitiesOnly yes
+    # ssh usa el primer valor que encuentra: server ya tiene el suyo.
+    ForwardAgent no

@@ -1,0 +1,6 @@
+# Lab 02 — config del cliente para este lab. Uso: ssh -F starter/config server
+
+Host server
+    User alumno
+    IdentityFile ~/.ssh/id_ed25519
+    # TODO: que la primera conexión deje la llave en el agente durante 1 h.
