@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+# kh-add — añade a known_hosts la host key de un servidor solo si su huella
+# coincide con la que obtuviste por un canal independiente.
+#
+# Uso: kh-add HOST[:PUERTO] HUELLA
+#   HUELLA: SHA256:... tal como la imprime `ssh-keygen -lf` en el servidor.
+#
+# Qué: ssh-keyscan, comparación de huellas y una línea hasheada en known_hosts.
+# Para qué: cambiar el "yes" a ciegas de la primera conexión por una
+#   comparación hecha por la máquina, que no se salta un carácter.
+# Impacto: con `StrictHostKeyChecking yes` en config, esta es la única puerta
+#   de entrada a known_hosts; un intermediario no la cruza.
+#
+# Variables: KH_FILE (por defecto ~/.ssh/known_hosts), KH_TYPE (por defecto ed25519).
+# Salida: 0 añadida o ya estaba, 1 huella distinta o conflicto, 2 uso incorrecto,
+#         3 no se pudo leer la host key.
+set -euo pipefail
+
+KH_FILE=${KH_FILE:-$HOME/.ssh/known_hosts}
+KH_TYPE=${KH_TYPE:-ed25519}
+
+uso() {
+  echo "uso: kh-add HOST[:PUERTO] HUELLA   (HUELLA = SHA256:...)" >&2
+  exit 2
+}
+
+[[ $# -eq 2 && $2 == SHA256:* ]] || uso
+destino=$1 esperada=$2
+host=${destino%%:*} puerto=22
+[[ $destino == *:* ]] && puerto=${destino#*:}
+[[ $puerto =~ ^[0-9]+$ ]] || uso
+
+# known_hosts escribe un puerto distinto de 22 como [host]:puerto.
+nombre=$host
+(( puerto == 22 )) || nombre="[$host]:$puerto"
+
+# -H: la línea sale ya con el nombre hasheado, igual que con HashKnownHosts yes.
+linea=$(ssh-keyscan -H -T 5 -p "$puerto" -t "$KH_TYPE" "$host" 2>/dev/null) || true
+[[ -n $linea ]] || { echo "$destino: no se pudo leer la host key" >&2; exit 3; }
+llave=${linea#* }   # "tipo base64", sin el nombre
+recibida=$(ssh-keygen -lf - <<<"$linea" | cut -d' ' -f2)
+
+if [[ $recibida != "$esperada" ]]; then
+  echo "$destino: HUELLA DISTINTA, esperada $esperada, recibida $recibida" >&2
+  exit 1
+fi
+
+# ssh-keygen -F encuentra el host también en líneas hasheadas.
+if conocidas=$(ssh-keygen -F "$nombre" -f "$KH_FILE" 2>/dev/null); then
+  if grep -qF "$llave" <<<"$conocidas"; then
+    echo "$destino ya estaba"
+    exit 0
+  fi
+  # Otra llave del mismo tipo para el mismo host: es el aviso de "host key
+  # cambiada". No se resuelve sobrescribiendo: lo decide una persona.
+  if grep -q " ${llave%% *} " <<<"$conocidas"; then
+    echo "$destino: known_hosts ya tiene otra llave ${llave%% *}; verifica y usa ssh-keygen -R $nombre" >&2
+    exit 1
+  fi
+fi
+
+# umask 077: ~/.ssh (y cualquier directorio que falte) se crea solo para ti.
+(umask 077; mkdir -p "$(dirname "$KH_FILE")")
+echo "$linea" >> "$KH_FILE"
+echo "$destino añadida $recibida"

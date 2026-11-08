@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600">
+  <defs>
+    <marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8b949e"/>
+    </marker>
+  </defs>
+  <rect width="900" height="600" fill="#0d1117"/>
+  <text x="450" y="34" font-family="sans-serif" font-size="20" font-weight="bold" fill="#c9d1d9" text-anchor="middle">Autenticación con llave pública (dentro del canal cifrado)</text>
+
+  <!-- Participantes -->
+  <rect x="60" y="55" width="240" height="56" rx="6" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+  <text x="180" y="78" font-family="sans-serif" font-size="15" font-weight="bold" fill="#c9d1d9" text-anchor="middle">Cliente</text>
+  <text x="180" y="98" font-family="sans-serif" font-size="12" fill="#8b949e" text-anchor="middle">tiene la llave privada</text>
+  <rect x="600" y="55" width="240" height="56" rx="6" fill="#161b22" stroke="#3fb950" stroke-width="2"/>
+  <text x="720" y="78" font-family="sans-serif" font-size="15" font-weight="bold" fill="#c9d1d9" text-anchor="middle">Servidor</text>
+  <text x="720" y="98" font-family="sans-serif" font-size="12" fill="#8b949e" text-anchor="middle">tiene la pública en authorized_keys</text>
+  <line x1="180" y1="111" x2="180" y2="540" stroke="#30363d" stroke-width="2" stroke-dasharray="6,4"/>
+  <line x1="720" y1="111" x2="720" y2="540" stroke="#30363d" stroke-width="2" stroke-dasharray="6,4"/>
+
+  <!-- 1 -->
+  <line x1="182" y1="150" x2="716" y2="150" stroke="#8b949e" stroke-width="1.5" marker-end="url(#fa)"/>
+  <text x="450" y="142" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">1. USERAUTH_REQUEST: publickey, llave pública, sin firma</text>
+  <text x="450" y="168" font-family="monospace" font-size="11" fill="#58a6ff" text-anchor="middle">Offering public key: ...</text>
+
+  <!-- 2 -->
+  <rect x="560" y="185" width="320" height="34" rx="6" fill="#161b22" stroke="#d29922" stroke-width="1.5"/>
+  <text x="720" y="207" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">¿Está esa llave en authorized_keys?</text>
+  <line x1="718" y1="250" x2="184" y2="250" stroke="#8b949e" stroke-width="1.5" marker-end="url(#fa)"/>
+  <text x="450" y="242" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">2. USERAUTH_PK_OK (60): "esa me vale"</text>
+  <text x="450" y="268" font-family="monospace" font-size="11" fill="#58a6ff" text-anchor="middle">Server accepts key: ...</text>
+  <text x="450" y="290" font-family="sans-serif" font-size="12" fill="#f85149" text-anchor="middle">Si no está: USERAUTH_FAILURE (51) y el cliente prueba su siguiente llave</text>
+
+  <!-- 3 -->
+  <rect x="20" y="310" width="320" height="52" rx="6" fill="#161b22" stroke="#d29922" stroke-width="1.5"/>
+  <text x="180" y="331" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">Abre la privada (pide la frase de paso)</text>
+  <text x="180" y="351" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">y firma: id de sesión + petición</text>
+  <line x1="182" y1="395" x2="716" y2="395" stroke="#8b949e" stroke-width="1.5" marker-end="url(#fa)"/>
+  <text x="450" y="387" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">3. USERAUTH_REQUEST: publickey, llave pública + firma</text>
+
+  <!-- 4 -->
+  <rect x="560" y="412" width="320" height="34" rx="6" fill="#161b22" stroke="#d29922" stroke-width="1.5"/>
+  <text x="720" y="434" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">Verifica la firma con la pública</text>
+  <line x1="718" y1="478" x2="184" y2="478" stroke="#3fb950" stroke-width="1.5" marker-end="url(#fa)"/>
+  <text x="450" y="470" font-family="sans-serif" font-size="13" fill="#3fb950" text-anchor="middle">4. USERAUTH_SUCCESS (52)</text>
+  <text x="450" y="496" font-family="monospace" font-size="11" fill="#58a6ff" text-anchor="middle">Authenticated to server ... using "publickey".</text>
+
+  <!-- Nota -->
+  <rect x="60" y="540" width="780" height="44" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+  <text x="450" y="560" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">La privada nunca sale del cliente. La firma cubre el id de sesión de esta conexión:</text>
+  <text x="450" y="577" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">no sirve en otra, ni a un servidor malicioso ni a un intermediario.</text>
+</svg>

@@ -1,425 +1,50 @@
-# 📖 Glosario - Semana 02: Autenticación con Llaves SSH
-
-![Glosario](https://img.shields.io/badge/Glosario-40_términos-purple?style=for-the-badge)
-![SSH](https://img.shields.io/badge/SSH-Llaves-red?style=for-the-badge)
-
-## 📋 Términos Técnicos
-
-Este glosario contiene los términos técnicos más importantes relacionados con la autenticación SSH mediante llaves.
-
----
-
-## A
-
-### AES (Advanced Encryption Standard)
-
-Algoritmo de cifrado simétrico usado para proteger llaves privadas con passphrase.
-
-```bash
-# Las llaves con passphrase usan AES-256-CTR
-ssh-keygen -t ed25519  # La passphrase cifra con AES
-```
-
-### Agent (SSH Agent)
-
-Programa que mantiene las llaves privadas descifradas en memoria para evitar escribir la passphrase repetidamente.
-
-```bash
-eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_ed25519
-```
-
-### Agent Forwarding
-
-Técnica que permite usar las llaves del agente local en servidores remotos.
-
-```bash
-ssh -A usuario@servidor  # Habilita agent forwarding
-```
-
-### Algoritmo de Llave
-
-Método criptográfico usado para generar el par de llaves. Ejemplos: Ed25519, RSA, ECDSA.
-
-### Authorized Keys
-
-Archivo en el servidor (`~/.ssh/authorized_keys`) que contiene las llaves públicas autorizadas para conectarse.
-
----
-
-## B
-
-### Base64
-
-Codificación usada para representar la llave pública en texto legible.
-
-```
-ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... (Base64)
-```
-
-### Bit Length
-
-Longitud en bits de una llave. RSA usa 2048-4096 bits; Ed25519 usa 256 bits con seguridad equivalente.
-
-### Brute Force
-
-Ataque que prueba sistemáticamente todas las combinaciones posibles de contraseñas.
-
----
-
-## C
-
-### Challenge-Response
-
-Mecanismo de autenticación donde el servidor envía un desafío que solo puede resolver quien posee la llave privada.
-
-### Cipher
-
-Algoritmo de cifrado. SSH soporta múltiples ciphers como chacha20-poly1305, aes256-gcm.
-
-### Comentario (Key Comment)
-
-Texto identificativo al final de la llave pública.
-
-```bash
-ssh-keygen -t ed25519 -C "usuario@laptop"  # -C define el comentario
-```
-
-### Criptografía Asimétrica
-
-Sistema criptográfico que usa un par de llaves (pública y privada) matemáticamente relacionadas.
-
-### Curva Elíptica
-
-Base matemática de algoritmos modernos como Ed25519 y ECDSA.
-
----
-
-## D
-
-### DSA (Digital Signature Algorithm)
-
-Algoritmo de firma digital obsoleto. **No usar** - deprecado por OpenSSH.
-
----
-
-## E
-
-### ECDSA (Elliptic Curve DSA)
-
-Algoritmo de curva elíptica. Válido pero Ed25519 es preferido.
-
-```bash
-ssh-keygen -t ecdsa -b 521  # Genera llave ECDSA
-```
-
-### Ed25519
-
-Algoritmo de curva elíptica moderno, recomendado para nuevas llaves.
-
-```bash
-ssh-keygen -t ed25519 -C "email@ejemplo.com"
-```
-
-### Entropía
-
-Aleatoriedad usada para generar llaves criptográficas. Mayor entropía = llave más segura.
-
----
-
-## F
-
-### Fingerprint
-
-Huella digital única de una llave, usada para verificar su autenticidad.
-
-```bash
-ssh-keygen -lf ~/.ssh/id_ed25519.pub
-# 256 SHA256:ABC123... email@ejemplo.com (ED25519)
-```
-
-### Forward Agent
-
-Ver [Agent Forwarding](#agent-forwarding).
-
----
-
-## G
-
-### Generación de Llaves
-
-Proceso de crear un par de llaves usando `ssh-keygen`.
-
----
-
-## H
-
-### Hash
-
-Función que convierte datos en un valor fijo. SHA256 se usa para fingerprints.
-
-### Host Key
-
-Llave del servidor que identifica al host. Se almacena en `known_hosts`.
-
----
-
-## I
-
-### IdentityFile
-
-Opción en `~/.ssh/config` para especificar qué llave usar.
-
-```bash
-Host github.com
-    IdentityFile ~/.ssh/id_github
-```
-
-### IdentitiesOnly
-
-Opción para usar SOLO las llaves especificadas, ignorando las del agente.
-
-```bash
-Host servidor
-    IdentitiesOnly yes
-    IdentityFile ~/.ssh/id_servidor
-```
-
----
-
-## K
-
-### KDF (Key Derivation Function)
-
-Función que deriva la clave de cifrado a partir de la passphrase.
-
-```bash
-ssh-keygen -t ed25519 -a 100  # -a aumenta rondas KDF
-```
-
-### Keychain
-
-Herramienta para gestionar ssh-agent entre sesiones en Linux.
-
-### Known Hosts
-
-Archivo (`~/.ssh/known_hosts`) que almacena fingerprints de servidores conocidos.
-
----
-
-## L
-
-### Llave Privada
-
-Archivo secreto que NUNCA debe compartirse. Usada para firmar y descifrar.
-
-```
-~/.ssh/id_ed25519  # Permisos: 600
-```
-
-### Llave Pública
-
-Archivo que se comparte libremente y se coloca en servidores para autorizar acceso.
-
-```
-~/.ssh/id_ed25519.pub  # Permisos: 644
-```
-
----
-
-## M
-
-### MAC (Message Authentication Code)
-
-Código que verifica la integridad de los datos transmitidos.
-
-### Multiplexing
-
-Reutilización de una conexión SSH para múltiples sesiones.
-
-```bash
-Host *
-    ControlMaster auto
-    ControlPath ~/.ssh/sockets/%r@%h-%p
-```
-
----
-
-## O
-
-### OpenSSH
-
-Implementación open source más usada del protocolo SSH.
-
----
-
-## P
-
-### Passphrase
-
-Contraseña que protege la llave privada. A diferencia de password, puede ser una frase larga.
-
-### PEM (Privacy Enhanced Mail)
-
-Formato de archivo para llaves y certificados (usado por llaves RSA antiguas).
-
-### Permisos
-
-Configuración de acceso a archivos SSH.
-
-```bash
-chmod 700 ~/.ssh
-chmod 600 ~/.ssh/id_ed25519      # Privada: solo propietario
-chmod 644 ~/.ssh/id_ed25519.pub  # Pública: lectura todos
-```
-
-### PKCS#8
-
-Formato estándar para almacenar llaves privadas.
-
-### ProxyJump
-
-Opción para conectar a través de un servidor intermedio (bastion).
-
-```bash
-ssh -J bastion@jump.com usuario@destino.interno
-```
-
-### Public Key Authentication
-
-Método de autenticación que usa criptografía asimétrica en lugar de contraseñas.
-
----
-
-## R
-
-### Randomart
-
-Representación visual ASCII del fingerprint de una llave.
-
-```
-+--[ED25519 256]--+
-|     .+B=o.      |
-|    . +oB..      |
-+----[SHA256]-----+
-```
-
-### RSA (Rivest-Shamir-Adleman)
-
-Algoritmo clásico de criptografía asimétrica. Usar mínimo 4096 bits.
-
-```bash
-ssh-keygen -t rsa -b 4096
-```
-
-### Rotación de Llaves
-
-Práctica de reemplazar llaves periódicamente por seguridad.
-
----
-
-## S
-
-### SHA256
-
-Algoritmo hash usado para generar fingerprints de llaves.
-
-### ssh-add
-
-Comando para añadir llaves al agente SSH.
-
-```bash
-ssh-add ~/.ssh/id_ed25519
-ssh-add -l  # Listar llaves cargadas
-```
-
-### ssh-agent
-
-Programa que almacena llaves descifradas en memoria.
-
-### ssh-copy-id
-
-Comando para copiar la llave pública a un servidor.
-
-```bash
-ssh-copy-id -i ~/.ssh/id_ed25519.pub usuario@servidor
-```
-
-### ssh-keygen
-
-Comando para generar, gestionar e inspeccionar llaves SSH.
-
-```bash
-ssh-keygen -t ed25519 -C "email"  # Generar
-ssh-keygen -lf llave.pub          # Ver fingerprint
-ssh-keygen -p -f llave            # Cambiar passphrase
-```
-
-### ssh-keyscan
-
-Comando para obtener llaves públicas de hosts.
-
-```bash
-ssh-keyscan github.com >> ~/.ssh/known_hosts
-```
-
-### StrictHostKeyChecking
-
-Opción que controla la verificación de llaves de host.
-
-```bash
-Host *
-    StrictHostKeyChecking ask  # Preguntar para hosts nuevos
-```
-
----
-
-## T
-
-### Two-Factor Authentication (2FA)
-
-Autenticación que requiere dos factores: algo que tienes (llave) + algo que sabes (passphrase).
-
----
-
-## V
-
-### Verificación de Host
-
-Proceso de confirmar que el servidor es quien dice ser usando su fingerprint.
-
----
-
-## 🔤 Resumen por Categoría
-
-### Algoritmos
-
-Ed25519, RSA, ECDSA, DSA, AES, SHA256
-
-### Archivos
-
-id_ed25519, id_ed25519.pub, authorized_keys, known_hosts, config
-
-### Comandos
-
-ssh-keygen, ssh-add, ssh-agent, ssh-copy-id, ssh-keyscan
-
-### Conceptos
-
-Challenge-Response, Fingerprint, Passphrase, Public Key Authentication, Agent Forwarding
-
+# Glosario — Semana 03
+
+| Término | Definición |
+|---|---|
+| **Autenticación con llave pública** | Método `publickey`: el usuario demuestra que tiene una llave privada firmando un dato de la sesión; el servidor lo comprueba con la pública ([teoría 01](../1-teoria/01-autenticacion-con-llave-publica.md)) |
+| **Llave privada** | Mitad secreta del par. Firma. Vive solo en tu equipo, con permisos 600 |
+| **Llave pública** | Mitad que se reparte. Verifica firmas y no permite calcular la privada. Archivo `.pub` |
+| **Par de llaves** | Privada y pública generadas juntas con `ssh-keygen` |
+| **Firma** | Valor que solo la privada puede producir sobre un dato y que cualquiera con la pública puede comprobar |
+| **Identificador de sesión** | Hash del primer intercambio de llaves de una conexión. La firma de usuario lo incluye, por eso no vale en otra conexión |
+| **`USERAUTH_PK_OK`** | Mensaje 60: el servidor dice que aceptaría la llave ofrecida, antes de que el cliente firme |
+| **`PreferredAuthentications`** | Orden en que el cliente prueba los métodos de autenticación; `publickey` va antes que `password` |
+| **Ed25519** | Tipo de llave de curva elíptica, 256 bits, por defecto desde OpenSSH 9.5. El recomendado |
+| **RSA** | Tipo de llave clásico. Vigente con 3072 bits o más; solo para sistemas sin Ed25519 |
+| **ECDSA** | Tipo de llave sobre curvas NIST. Depende de un buen aleatorio al firmar |
+| **DSA** | Tipo de llave obsoleto: rechazado por defecto desde OpenSSH 7.0 y eliminado en 10.0 |
+| **`id_ed25519`** | Nombre por defecto de una llave Ed25519; uno de los que `ssh` prueba sin configuración |
+| **Comentario de llave** | Tercer campo de la `.pub`. Texto libre para saber de quién es y para qué; no interviene en la autenticación |
+| **Huella** | Resumen corto de una llave pública (`SHA256:...`) con `ssh-keygen -l`. Identifica la llave en `ssh -v` y en los logs |
+| **`openssh-key-v1`** | Formato del archivo de llave privada de OpenSSH. Indica cifrado, derivación y contiene también la pública |
+| **Frase de paso** | Contraseña que cifra la privada en tu disco. Nunca viaja al servidor |
+| **bcrypt** | Función que convierte la frase de paso en la llave de cifrado del archivo, a propósito lenta |
+| **Rondas (`-a`)** | Repeticiones de bcrypt (24 por defecto en 9.6). Más rondas, más caro cada intento de adivinar la frase |
+| **`ssh-keygen -y`** | Imprime la pública a partir de la privada |
+| **`ssh-keygen -p`** | Cambia, pone o quita la frase de paso sin cambiar la llave |
+| **`ssh-copy-id`** | Instala una pública en el `authorized_keys` de un servidor sin duplicarla |
+| **`authorized_keys`** | Archivo `~/.ssh/authorized_keys` de una cuenta del servidor: una línea por llave que puede entrar ([teoría 03](../1-teoria/03-authorized_keys-y-opciones.md)) |
+| **`AuthorizedKeysFile`** | Opción de `sshd_config` con la ruta de `authorized_keys` |
+| **`StrictModes`** | Comprobación de `sshd`: ignora `authorized_keys` si la carpeta personal, `~/.ssh` o el archivo pueden ser modificados por otros |
+| **`BatchMode`** | Opción del cliente que prohíbe preguntar nada (contraseña, frase, huella). Para scripts y pruebas |
+| **`IdentityFile`** | Opción del cliente con la ruta de una llave privada a usar; `-i` en la línea de comandos |
+| **`IdentitiesOnly`** | Opción del cliente: ofrecer solo las llaves de `IdentityFile`, aunque el agente tenga más |
+| **`MaxAuthTries`** | Intentos de autenticación por conexión que admite `sshd` (6 por defecto). Cada llave rechazada cuenta |
+| **`restrict`** | Opción de `authorized_keys` que desactiva terminal, reenvíos y `~/.ssh/rc`, incluido lo que añadan versiones futuras |
+| **`command=`** | Opción de `authorized_keys`: comando que se ejecuta siempre, pida lo que pida el cliente |
+| **`SSH_ORIGINAL_COMMAND`** | Variable con el comando que pidió el cliente cuando hay un comando forzado |
+| **`from=`** | Opción de `authorized_keys`: la llave solo vale desde esas IP, redes o nombres |
+| **`expiry-time=`** | Opción de `authorized_keys`: fecha a partir de la cual la llave deja de valer |
+| **Rotación de llaves** | Sustituir una llave por otra: añadir la nueva, probarla y solo después quitar la vieja |
+
+<!-- nav -->
 ---
 
 ## 🔗 Navegación
 
-| ← Anterior                            | Actual         | Siguiente →                            |
-| ------------------------------------- | -------------- | -------------------------------------- |
-| [4-Recursos](../4-recursos/README.md) | **5-Glosario** | [Semana 03](../../week-05-configuracion_avanzada_cliente_ssh/README.md) |
+| Anterior | Siguiente |
+|---|---|
+| ← [Recursos — web](../4-recursos/webgrafia/README.md) | — |
 
----
-
-<div align="center">
-
-[🏠 Volver al inicio de Semana 02](../README.md)
-
-</div>
+[↑ Semana 03](../README.md)

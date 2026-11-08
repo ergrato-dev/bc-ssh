@@ -1,0 +1,188 @@
+{
+  "semana": "03",
+  "titulo": "Autenticación con llaves",
+  "checks": [
+    {
+      "id": "config-parsea",
+      "descripcion": "El config se lee sin errores",
+      "cmd": "ssh -G -F {proyecto}/config lab-server >/dev/null",
+      "assert": "exit0",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 1"
+    },
+    {
+      "id": "config-hereda-semana-02",
+      "descripcion": "Siguen las opciones de la semana 02 (StrictHostKeyChecking yes)",
+      "cmd": "ssh -G -F {proyecto}/config lab-server",
+      "assert": "stdout~^stricthostkeychecking true$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 1"
+    },
+    {
+      "id": "config-identityfile",
+      "descripcion": "lab-server usa la llave ~/.ssh/lab",
+      "cmd": "ssh -G -F {proyecto}/config lab-server",
+      "assert": "stdout~^identityfile ~/.ssh/lab$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 1"
+    },
+    {
+      "id": "config-identityfile-bastion",
+      "descripcion": "lab-bastion usa la llave ~/.ssh/lab",
+      "cmd": "ssh -G -F {proyecto}/config lab-bastion",
+      "assert": "stdout~^identityfile ~/.ssh/lab$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 1"
+    },
+    {
+      "id": "config-identitiesonly",
+      "descripcion": "Todos los hosts ofrecen solo sus IdentityFile",
+      "cmd": "ssh -G -F {proyecto}/config host-cualquiera",
+      "assert": "stdout~^identitiesonly yes$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 2"
+    },
+    {
+      "id": "kn-uso",
+      "descripcion": "key-new sin argumentos sale con 2",
+      "cmd": "{proyecto}/bin/key-new",
+      "assert": "exit=2",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 3"
+    },
+    {
+      "id": "kn-nombre-invalido",
+      "descripcion": "key-new rechaza un nombre con ../",
+      "cmd": "KEY_DIR=/tmp/bc-kn-x KEY_PASSPHRASE=x {proyecto}/bin/key-new ../fuera",
+      "assert": "exit=2",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 3"
+    },
+    {
+      "id": "kn-no-sobrescribe",
+      "descripcion": "key-new no pisa una llave existente (sale con 1)",
+      "cmd": "d=$(mktemp -d); KEY_DIR=$d KEY_PASSPHRASE=x {proyecto}/bin/key-new prueba >/dev/null; KEY_DIR=$d KEY_PASSPHRASE=x {proyecto}/bin/key-new prueba",
+      "assert": "exit=1",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 4"
+    },
+    {
+      "id": "kn-crea",
+      "descripcion": "key-new crea la llave e imprime su huella",
+      "cmd": "d=$(mktemp -d); KEY_DIR=$d KEY_PASSPHRASE=x {proyecto}/bin/key-new prueba",
+      "assert": "stdout~^256 SHA256:.* [(]ED25519[)]$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 5"
+    },
+    {
+      "id": "kn-tipo-ed25519",
+      "descripcion": "La llave creada es Ed25519",
+      "cmd": "d=$(mktemp -d); KEY_DIR=$d KEY_PASSPHRASE=x {proyecto}/bin/key-new prueba >/dev/null; ssh-keygen -lf $d/prueba.pub",
+      "assert": "stdout~[(]ED25519[)]$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 5"
+    },
+    {
+      "id": "kn-permisos",
+      "descripcion": "Privada 600 y directorio 700",
+      "cmd": "d=$(mktemp -d); KEY_DIR=$d/sub KEY_PASSPHRASE=x {proyecto}/bin/key-new prueba >/dev/null; echo $(stat -c %a $d/sub $d/sub/prueba)",
+      "assert": "stdout~^700 600$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 5"
+    },
+    {
+      "id": "kn-con-frase",
+      "descripcion": "Con frase de paso, la privada no se abre sin ella",
+      "cmd": "d=$(mktemp -d); KEY_DIR=$d KEY_PASSPHRASE=frase-lab {proyecto}/bin/key-new prueba >/dev/null; ssh-keygen -y -P \"\" -f $d/prueba",
+      "assert": "exit!=0",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 5"
+    },
+    {
+      "id": "kn-frase-correcta",
+      "descripcion": "Con la frase correcta, la privada se abre",
+      "cmd": "d=$(mktemp -d); KEY_DIR=$d KEY_PASSPHRASE=frase-lab {proyecto}/bin/key-new prueba >/dev/null; ssh-keygen -y -P frase-lab -f $d/prueba",
+      "assert": "stdout~^ssh-ed25519 ",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 5"
+    },
+    {
+      "id": "kn-comentario",
+      "descripcion": "El comentario por defecto es usuario@equipo-fecha",
+      "cmd": "d=$(mktemp -d); KEY_DIR=$d KEY_PASSPHRASE=x {proyecto}/bin/key-new prueba >/dev/null; cut -d\" \" -f3 $d/prueba.pub",
+      "assert": "stdout~^alumno@client-[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 5"
+    },
+    {
+      "id": "ak-uso",
+      "descripcion": "ak-line sin argumentos sale con 2",
+      "cmd": "{proyecto}/bin/ak-line",
+      "assert": "exit=2",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 7"
+    },
+    {
+      "id": "ak-restrict",
+      "descripcion": "Sin opciones, la línea empieza por restrict",
+      "cmd": "d=$(mktemp -d); ssh-keygen -q -t ed25519 -N \"\" -C c -f $d/k; {proyecto}/bin/ak-line $d/k.pub",
+      "assert": "stdout~^restrict ssh-ed25519 AAAA[^ ]+ c$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 7"
+    },
+    {
+      "id": "ak-opciones",
+      "descripcion": "-t -f -c -e se escriben como pty, from, command y expiry-time",
+      "cmd": "d=$(mktemp -d); ssh-keygen -q -t ed25519 -N \"\" -C c -f $d/k; {proyecto}/bin/ak-line -t -f 172.16.0.0/12 -c hostname -e 20991231 $d/k.pub",
+      "assert": "stdout~^restrict,pty,from=\"172.16.0.0/12\",command=\"hostname\",expiry-time=\"20991231\" ssh-ed25519 ",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 7"
+    },
+    {
+      "id": "ak-comillas",
+      "descripcion": "ak-line rechaza comillas en un valor (sale con 2)",
+      "cmd": "d=$(mktemp -d); ssh-keygen -q -t ed25519 -N \"\" -f $d/k; {proyecto}/bin/ak-line -c 'echo \"x\"' $d/k.pub",
+      "assert": "exit=2",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 7"
+    },
+    {
+      "id": "ak-fecha-mal",
+      "descripcion": "ak-line rechaza una fecha que no es AAAAMMDD",
+      "cmd": "d=$(mktemp -d); ssh-keygen -q -t ed25519 -N \"\" -f $d/k; {proyecto}/bin/ak-line -e 2099-12-31 $d/k.pub",
+      "assert": "exit=2",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 7"
+    },
+    {
+      "id": "ak-privada",
+      "descripcion": "ak-line rechaza una llave privada (sale con 1)",
+      "cmd": "d=$(mktemp -d); ssh-keygen -q -t ed25519 -N \"\" -f $d/k; {proyecto}/bin/ak-line $d/k",
+      "assert": "exit=1",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 8"
+    },
+    {
+      "id": "ak-no-llave",
+      "descripcion": "ak-line rechaza un archivo que no es una llave",
+      "cmd": "{proyecto}/bin/ak-line /etc/hostname",
+      "assert": "exit=1",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 8"
+    },
+    {
+      "id": "ak-sshd-comando",
+      "descripcion": "Un sshd real ejecuta el comando forzado, pidas lo que pidas",
+      "cmd": "d=$(mktemp -d -p ~); ssh-keygen -q -t ed25519 -N \"\" -f $d/hk; ssh-keygen -q -t ed25519 -N \"\" -f $d/k; echo \"[127.0.0.1]:2203 $(cat $d/hk.pub)\" > $d/kh; {proyecto}/bin/ak-line -c hostname $d/k.pub > $d/ak; /usr/sbin/sshd -f /dev/null -h $d/hk -p 2203 -o PidFile=$d/pid -o AuthorizedKeysFile=$d/ak; sleep 0.5; ssh -F /dev/null -o BatchMode=yes -o IdentitiesOnly=yes -o UserKnownHostsFile=$d/kh -i $d/k -p 2203 127.0.0.1 whoami; r=$?; kill $(cat $d/pid); rm -rf $d; exit $r",
+      "assert": "stdout~^client$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 9"
+    },
+    {
+      "id": "ak-sshd-sin-pty",
+      "descripcion": "Sin -t, sshd niega la terminal",
+      "cmd": "d=$(mktemp -d -p ~); ssh-keygen -q -t ed25519 -N \"\" -f $d/hk; ssh-keygen -q -t ed25519 -N \"\" -f $d/k; echo \"[127.0.0.1]:2203 $(cat $d/hk.pub)\" > $d/kh; {proyecto}/bin/ak-line $d/k.pub > $d/ak; /usr/sbin/sshd -f /dev/null -h $d/hk -p 2203 -o PidFile=$d/pid -o AuthorizedKeysFile=$d/ak; sleep 0.5; ssh -tt -F /dev/null -o BatchMode=yes -o IdentitiesOnly=yes -o UserKnownHostsFile=$d/kh -i $d/k -p 2203 127.0.0.1 true 2>&1; r=$?; kill $(cat $d/pid); rm -rf $d; exit $r",
+      "assert": "stdout~PTY allocation request failed",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 9"
+    },
+    {
+      "id": "ak-sshd-from",
+      "descripcion": "Con -f de otra red, sshd rechaza la llave",
+      "cmd": "d=$(mktemp -d -p ~); ssh-keygen -q -t ed25519 -N \"\" -f $d/hk; ssh-keygen -q -t ed25519 -N \"\" -f $d/k; echo \"[127.0.0.1]:2203 $(cat $d/hk.pub)\" > $d/kh; {proyecto}/bin/ak-line -f 10.0.0.0/8 $d/k.pub > $d/ak; /usr/sbin/sshd -f /dev/null -h $d/hk -p 2203 -o PidFile=$d/pid -o AuthorizedKeysFile=$d/ak; sleep 0.5; ssh -F /dev/null -o BatchMode=yes -o IdentitiesOnly=yes -o UserKnownHostsFile=$d/kh -i $d/k -p 2203 127.0.0.1 true; r=$?; kill $(cat $d/pid); rm -rf $d; exit $r",
+      "assert": "exit=255",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 9"
+    },
+    {
+      "id": "kh-sigue-funcionando",
+      "descripcion": "kh-add de la semana 02 sigue en el kit",
+      "cmd": "{proyecto}/bin/kh-add",
+      "assert": "exit=2",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 10"
+    },
+    {
+      "id": "bin-completo-y-limpio",
+      "descripcion": "Sin TODO y shellcheck sin avisos en bin/",
+      "cmd": "! grep -n TODO {proyecto}/bin/* && shellcheck {proyecto}/bin/*",
+      "assert": "exit0",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 10"
+    }
+  ]
+}

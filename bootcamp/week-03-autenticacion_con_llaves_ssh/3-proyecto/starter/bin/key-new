@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+#
+# key-new — crea un par de llaves Ed25519 con valores seguros.
+#
+# Uso: key-new NOMBRE [COMENTARIO]
+#
+#   key-new lab
+#   ~/.ssh/lab creada
+#   256 SHA256:NeIPcKGncSTO0SdhjRLQziJgU9+crgpPZt7AcFMmhTw alumno@client-2026-11-08 (ED25519)
+#
+# Pide la frase de paso por teclado (dos veces). KEY_PASSPHRASE la da sin
+# preguntar, para scripts; KEY_DIR cambia el directorio (~/.ssh por defecto).
+#
+# Códigos de salida: 0 creada, 1 ya existe o ssh-keygen falló, 2 uso incorrecto.
+
+set -euo pipefail
+
+nombre="${1:-}"
+# TODO 3: con 0 o más de 2 argumentos, imprime el uso por stderr y sal con 2.
+#   Si el nombre no cumple ^[A-Za-z0-9._-]+$ o empieza por ".", sal con 2.
+
+dir="${KEY_DIR:-$HOME/.ssh}"
+llave="$dir/$nombre"
+# El comentario dice de quién es, desde qué equipo y desde cuándo: lo que
+# necesitas para decidir qué línea borrar de un authorized_keys.
+comentario="${2:-$(id -un)@$(hostname)-$(date +%F)}"
+
+# TODO 4: si ya existe "$llave" o "$llave.pub", avisa por stderr y sal con 1.
+
+(umask 077; mkdir -p "$dir")
+
+# TODO 5: llena opciones con lo que necesita ssh-keygen: silencioso, tipo
+#   ed25519, 100 rondas de bcrypt, el comentario y el archivo. Si KEY_PASSPHRASE
+#   está definida ([[ -v KEY_PASSPHRASE ]]), añade -N con su valor y avisa por
+#   stderr si está vacía.
+opciones=()
+
+ssh-keygen "${opciones[@]}" || exit 1
+echo "$llave creada"
+ssh-keygen -lf "$llave.pub"

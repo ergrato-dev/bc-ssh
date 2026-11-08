@@ -1,0 +1,19 @@
+# Lab 05 — una llave por host.
+# Pruébalo con: ssh -F solucion/config lab
+
+Host lab
+    HostName server
+    User alumno
+    IdentityFile ~/.ssh/lab
+
+Host trabajo
+    HostName bastion
+    User alumno
+    IdentityFile ~/.ssh/trabajo
+
+Host *
+    # Qué: ofrecer solo las llaves de IdentityFile, aunque el agente tenga más.
+    # Para qué: no gastar los 6 intentos de sshd con llaves ajenas ni enseñar
+    #   a cada servidor todas tus llaves.
+    # Impacto: un host sin IdentityFile propio solo prueba las llaves por defecto.
+    IdentitiesOnly yes

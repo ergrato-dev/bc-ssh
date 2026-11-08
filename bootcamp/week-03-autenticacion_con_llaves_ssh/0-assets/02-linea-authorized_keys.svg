@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 400">
+  <rect width="900" height="400" fill="#0d1117"/>
+  <text x="450" y="34" font-family="sans-serif" font-size="20" font-weight="bold" fill="#c9d1d9" text-anchor="middle">Una línea de authorized_keys</text>
+
+  <!-- Línea -->
+  <rect x="20" y="60" width="860" height="44" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+  <text x="34" y="88" font-family="monospace" font-size="13" fill="#d29922">restrict,from="172.16.0.0/12",command="uptime"</text>
+  <text x="430" y="88" font-family="monospace" font-size="13" fill="#58a6ff">ssh-ed25519</text>
+  <text x="530" y="88" font-family="monospace" font-size="13" fill="#3fb950">AAAAC3NzaC1lZDI1NTE5...</text>
+  <text x="756" y="88" font-family="monospace" font-size="12" fill="#8b949e">monitor@grafana</text>
+
+  <!-- Llaves de campo -->
+  <line x1="34" y1="112" x2="416" y2="112" stroke="#d29922" stroke-width="2"/>
+  <line x1="430" y1="112" x2="516" y2="112" stroke="#58a6ff" stroke-width="2"/>
+  <line x1="530" y1="112" x2="716" y2="112" stroke="#3fb950" stroke-width="2"/>
+  <line x1="756" y1="112" x2="868" y2="112" stroke="#8b949e" stroke-width="2"/>
+
+  <!-- Cajas -->
+  <rect x="20" y="135" width="400" height="245" rx="6" fill="#161b22" stroke="#d29922" stroke-width="2"/>
+  <text x="220" y="160" font-family="sans-serif" font-size="15" font-weight="bold" fill="#d29922" text-anchor="middle">1. Opciones (opcional)</text>
+  <text x="36" y="188" font-family="sans-serif" font-size="13" fill="#c9d1d9">Separadas por comas, sin espacios;</text>
+  <text x="36" y="207" font-family="sans-serif" font-size="13" fill="#c9d1d9">los valores entre comillas dobles.</text>
+  <text x="36" y="236" font-family="monospace" font-size="12" fill="#c9d1d9">restrict</text>
+  <text x="170" y="236" font-family="sans-serif" font-size="12" fill="#8b949e">sin pty ni reenvíos</text>
+  <text x="36" y="258" font-family="monospace" font-size="12" fill="#c9d1d9">from="..."</text>
+  <text x="170" y="258" font-family="sans-serif" font-size="12" fill="#8b949e">solo desde esas IP o redes</text>
+  <text x="36" y="280" font-family="monospace" font-size="12" fill="#c9d1d9">command="..."</text>
+  <text x="170" y="280" font-family="sans-serif" font-size="12" fill="#8b949e">ejecuta siempre ese comando</text>
+  <text x="36" y="302" font-family="monospace" font-size="12" fill="#c9d1d9">expiry-time="..."</text>
+  <text x="170" y="302" font-family="sans-serif" font-size="12" fill="#8b949e">caduca ese día</text>
+  <text x="36" y="335" font-family="sans-serif" font-size="12" fill="#f85149">Una opción mal escrita invalida la línea:</text>
+  <text x="36" y="353" font-family="sans-serif" font-size="12" fill="#f85149">la llave no entra (Refused by key options).</text>
+
+  <rect x="430" y="135" width="140" height="120" rx="6" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+  <text x="500" y="160" font-family="sans-serif" font-size="15" font-weight="bold" fill="#58a6ff" text-anchor="middle">2. Tipo</text>
+  <text x="500" y="188" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">ssh-ed25519,</text>
+  <text x="500" y="206" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">ssh-rsa,</text>
+  <text x="500" y="224" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">ecdsa-sha2-...</text>
+
+  <rect x="580" y="135" width="160" height="120" rx="6" fill="#161b22" stroke="#3fb950" stroke-width="2"/>
+  <text x="660" y="160" font-family="sans-serif" font-size="15" font-weight="bold" fill="#3fb950" text-anchor="middle">3. Llave</text>
+  <text x="660" y="188" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">La pública en base64,</text>
+  <text x="660" y="206" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">igual que en el .pub</text>
+
+  <rect x="750" y="135" width="130" height="120" rx="6" fill="#161b22" stroke="#8b949e" stroke-width="2"/>
+  <text x="815" y="160" font-family="sans-serif" font-size="13" font-weight="bold" fill="#8b949e" text-anchor="middle">4. Comentario</text>
+  <text x="815" y="188" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">Texto libre:</text>
+  <text x="815" y="206" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">de quién es</text>
+  <text x="815" y="224" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">y para qué</text>
+
+  <rect x="430" y="270" width="450" height="110" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+  <text x="655" y="296" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">2, 3 y 4 son la línea del .pub, copiada tal cual.</text>
+  <text x="655" y="320" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">Solo las opciones se escriben en el servidor.</text>
+  <text x="655" y="350" font-family="monospace" font-size="12" fill="#58a6ff" text-anchor="middle">ssh-keygen -lf ~/.ssh/authorized_keys</text>
+  <text x="655" y="368" font-family="sans-serif" font-size="12" fill="#8b949e" text-anchor="middle">huella y comentario de cada línea</text>
+</svg>

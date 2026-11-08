@@ -1,0 +1,45 @@
+# ssh-infra-kit — configuración de cliente SSH
+#
+# Qué: alias para los hosts del laboratorio.
+# Para qué: escribir `ssh -F config lab-server` en lugar de `ssh alumno@server`
+#   y no repetir opciones en cada comando.
+# Impacto: todo `ssh`, `scp` y `sftp` que lea este archivo usa estos valores.
+#
+# ssh usa el PRIMER valor que encuentra para cada opción: los bloques
+# concretos van arriba y `Host *` al final, como valor por defecto.
+# Pruébalo sin conectar: ssh -G -F config lab-server
+
+# Qué: la llave que prueba ssh con los hosts del laboratorio (bin/key-new lab).
+# Para qué: entrar sin contraseña y saber siempre qué llave usa cada host.
+# Impacto: si el archivo no existe, ssh lo ignora y pasa a la contraseña.
+Host lab-server
+    HostName server
+    User alumno
+    IdentityFile ~/.ssh/lab
+
+Host lab-bastion
+    HostName bastion
+    User alumno
+    IdentityFile ~/.ssh/lab
+
+Host *
+    # Sin esto, un host que no responde deja la terminal colgada ~2 min
+    # (el timeout de TCP del sistema). Con 5 s, el fallo llega enseguida.
+    ConnectTimeout 5
+    # Qué: ssh nunca acepta por su cuenta una host key desconocida o cambiada.
+    # Para qué: que las llaves entren en known_hosts solo verificadas, con
+    #   bin/kh-add, y no con un "yes" escrito de memoria.
+    # Impacto: el primer ssh a un host nuevo falla con "No ED25519 host key
+    #   is known" hasta que lo añades; un cambio de llave corta siempre.
+    StrictHostKeyChecking yes
+    # Nombres de host cifrados en known_hosts: quien copie el archivo no
+    # obtiene la lista de servidores a los que entras.
+    HashKnownHosts yes
+    # Qué: ssh ofrece solo las llaves de IdentityFile (y no todas las de
+    #   ~/.ssh ni todas las del agente).
+    # Para qué: no gastar intentos del servidor en llaves que no son suyas
+    #   (sshd corta tras 6: "Too many authentication failures") ni mostrar
+    #   a cada servidor todas tus llaves públicas.
+    # Impacto: un host sin IdentityFile propio solo prueba las llaves por
+    #   defecto (~/.ssh/id_ed25519, id_rsa...).
+    IdentitiesOnly yes

@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+#
+# ak-line — escribe la línea de authorized_keys de una llave, restringida.
+#
+# Uso: ak-line [-t] [-f ORIGEN] [-c COMANDO] [-e AAAAMMDD] LLAVE.pub
+#
+#   -t  permite terminal (pty); sin -t solo se ejecutan comandos
+#   -f  solo desde esas IP o redes, p. ej. 172.16.0.0/12,10.0.0.5
+#   -c  ejecuta siempre ese comando, pida lo que pida el cliente
+#   -e  la llave deja de valer ese día
+#
+#   ak-line -c uptime ~/.ssh/backup.pub
+#   restrict,command="uptime" ssh-ed25519 AAAAC3Nz... alumno@client-2026-11-08
+#
+# Parte siempre de "restrict" (sin reenvíos ni pty) y añade solo lo pedido.
+# Códigos de salida: 0 ok, 1 el archivo no es una llave pública, 2 uso incorrecto.
+
+set -euo pipefail
+
+uso() {
+  echo "uso: ak-line [-t] [-f ORIGEN] [-c COMANDO] [-e AAAAMMDD] LLAVE.pub" >&2
+  exit 2
+}
+
+opciones=restrict
+while getopts ':tf:c:e:' op; do
+  # Un " dentro de un valor cerraría las comillas de authorized_keys antes
+  # de tiempo y el resto se leería como otra opción.
+  [[ "${OPTARG:-}" == *'"'* ]] && { echo "ak-line: el valor de -$op no puede tener comillas" >&2; uso; }
+  case "$op" in
+    # TODO 6: t añade ",pty"; f, c y e añaden ,from="...", ,command="..." y
+    #   ,expiry-time="..." con $OPTARG. Para e, comprueba antes que son 8
+    #   cifras (^[0-9]{8}$) y, si no, avisa y llama a uso.
+    *) uso ;;
+  esac
+done
+shift $(( OPTIND - 1 ))
+(( $# == 1 )) || uso
+archivo="$1"
+
+# TODO 7: si el archivo contiene "PRIVATE KEY", avisa por stderr de que es
+#   una llave privada y sal con 1 (ssh-keygen -l la aceptaría).
+
+if ! ssh-keygen -lf "$archivo" >/dev/null 2>&1; then
+  echo "ak-line: $archivo no es una llave pública" >&2
+  exit 1
+fi
+
+echo "$opciones $(head -n 1 "$archivo")"

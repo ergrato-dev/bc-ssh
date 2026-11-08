@@ -1,146 +1,80 @@
-# 🔑 Semana 02: Autenticación con Llaves SSH
+# Semana 03 — Autenticación con llaves
 
-![SSH](https://img.shields.io/badge/SSH-Llaves_Públicas-blue?style=for-the-badge&logo=openssh)
-![Nivel](https://img.shields.io/badge/Nivel-Principiante--Intermedio-yellow?style=for-the-badge)
-![Duración](https://img.shields.io/badge/Duración-4_horas-green?style=for-the-badge)
+## Descripción
 
----
+Dejas de escribir la contraseña. Verás por qué una llave es más segura que una contraseña aunque las dos viajen cifradas: el servidor recibe una firma que solo vale para esa conexión, nunca un secreto reutilizable. Generarás llaves Ed25519, las protegerás con una frase de paso, las instalarás en el servidor y diagnosticarás los fallos más comunes (permisos, demasiadas llaves) leyendo el log del servidor. La segunda mitad trata del lado del servidor: `authorized_keys` y sus opciones para limitar lo que puede hacer una llave, y cómo rotar una llave sin quedarte fuera. Tu kit pasa a entrar con llave y a crear llaves y líneas restringidas siempre bien hechas.
 
-## 📋 Descripción
+## Objetivos de aprendizaje
 
-Esta semana dominarás el sistema de **autenticación con llaves públicas/privadas**, el método más seguro y práctico para conectarte a servidores SSH. Aprenderás a generar, gestionar y desplegar llaves SSH, eliminando la necesidad de escribir contraseñas.
+Al terminar esta semana, podrás:
 
-La autenticación por llaves es **el estándar de la industria** y un requisito fundamental para trabajar con servicios como GitHub, GitLab, AWS, DigitalOcean y cualquier infraestructura profesional.
+- Explicar qué recibe el servidor con contraseña y con llave, y por qué una firma no se puede reutilizar
+- Seguir en `ssh -v` y en el log del servidor los cuatro pasos de la autenticación con llave
+- Generar llaves Ed25519 con frase de paso y elegir el tipo adecuado cuando Ed25519 no está disponible
+- Diagnosticar fallos de permisos en el cliente y de `StrictModes` en el servidor
+- Usar una llave por host con `IdentityFile` e `IdentitiesOnly`
+- Limitar una llave con `restrict`, `command=`, `from=` y `expiry-time=`
+- Rotar una llave sin perder el acceso
+- Añadir a tu `ssh-infra-kit` `bin/key-new` y `bin/ak-line`
 
----
+## Prerrequisitos
 
-## 🎯 Objetivos de Aprendizaje
+- [Semana 02](../week-02-protocolo_kex_y_known_hosts/README.md) completa: `known_hosts` verificado con `bin/kh-add` e identificador de sesión (hash del intercambio)
+- El laboratorio levantado: `docker compose up -d`
 
-Al finalizar esta semana, serás capaz de:
+## Contenido
 
-- [ ] Explicar la diferencia entre autenticación por contraseña y por llaves
-- [ ] Generar pares de llaves SSH con diferentes algoritmos (Ed25519, RSA)
-- [ ] Comprender la anatomía de una llave pública y privada
-- [ ] Usar `ssh-copy-id` para desplegar llaves en servidores
-- [ ] Configurar `authorized_keys` manualmente
-- [ ] Proteger llaves privadas con passphrase
-- [ ] Gestionar múltiples llaves para diferentes servicios
+| # | Tipo | Tema | Tiempo |
+|---|------|------|--------|
+| — | Teoría | [01-autenticacion-con-llave-publica.md](1-teoria/01-autenticacion-con-llave-publica.md) · [02-tipos-de-llave-y-frase-de-paso.md](1-teoria/02-tipos-de-llave-y-frase-de-paso.md) · [03-authorized_keys-y-opciones.md](1-teoria/03-authorized_keys-y-opciones.md) | 1.5 h |
+| — | Conocimiento | [10 preguntas](rubrica-evaluacion.md#-conocimiento-30) | 30 min |
+| 1 | Lab | [lab-01-tu-primer-par-de-llaves](2-practicas/lab-01-tu-primer-par-de-llaves/) | 60 min |
+| 2 | Lab | [lab-02-entrar-sin-contrasena](2-practicas/lab-02-entrar-sin-contrasena/) | 60 min |
+| 3 | Lab | [lab-03-frase-de-paso](2-practicas/lab-03-frase-de-paso/) | 60 min |
+| 4 | Lab | [lab-04-permisos-y-strictmodes](2-practicas/lab-04-permisos-y-strictmodes/) | 60 min |
+| 5 | Lab | [lab-05-varias-llaves](2-practicas/lab-05-varias-llaves/) | 60 min |
+| 6 | Lab | [lab-06-opciones-de-authorized-keys](2-practicas/lab-06-opciones-de-authorized-keys/) | 60 min |
+| 7 | Lab | [lab-07-rotar-una-llave](2-practicas/lab-07-rotar-una-llave/) | 60 min |
+| — | Proyecto | [ssh-infra-kit: llaves propias y authorized_keys restringido](3-proyecto/) | 3 h |
 
----
+**Total: 12 horas**
 
-## 📚 Contenido
-
-### 📖 Teoría (1 hora)
-
-| #   | Módulo                                                      | Duración | Descripción                        |
-| --- | ----------------------------------------------------------- | -------- | ---------------------------------- |
-| 01  | [Contraseña vs Llaves](1-teoria/01-contrasena-vs-llaves.md) | 20 min   | Por qué las llaves son superiores  |
-| 02  | [Algoritmos de Llaves](1-teoria/02-algoritmos-llaves.md)    | 20 min   | RSA, Ed25519, ECDSA - cuál elegir  |
-| 03  | [Anatomía de las Llaves](1-teoria/03-anatomia-llaves.md)    | 20 min   | Estructura y formato de llaves SSH |
-
-### 💻 Prácticas (1.5 horas)
-
-| #   | Práctica                                                             | Dificultad | Duración | Descripción                                |
-| --- | -------------------------------------------------------------------- | ---------- | -------- | ------------------------------------------ |
-| 01  | [Generación de Llaves](2-practicas/practica-01-generacion-llaves.md) | ⭐         | 30 min   | Crear tu primer par de llaves              |
-| 02  | [Despliegue con ssh-copy-id](2-practicas/practica-02-ssh-copy-id.md) | ⭐⭐       | 30 min   | Copiar llaves a servidores                 |
-| 03  | [Múltiples Llaves](2-practicas/practica-03-multiples-llaves.md)      | ⭐⭐⭐     | 30 min   | Gestionar llaves para diferentes servicios |
-
-### 🔨 Proyecto (1.5 horas)
-
-| Documento                                                   | Descripción                         |
-| ----------------------------------------------------------- | ----------------------------------- |
-| [README del Proyecto](3-proyecto/README.md)                 | Configuración SSH para GitHub + VPS |
-| [Guía de Implementación](3-proyecto/GUIA-IMPLEMENTACION.md) | Pasos detallados                    |
-| [Ejemplos de Configuración](3-proyecto/EJEMPLOS-CONFIGS.md) | Archivos de referencia              |
-
----
-
-## 📊 Distribución del Tiempo
+## Distribución del tiempo
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    SEMANA 02 (4 horas)                      │
-├─────────────────────────────────────────────────────────────┤
-│  Teoría    │████████████░░░░░░░░░░░░░░░░░░░░│ 1.0h  (25%)  │
-│  Prácticas │██████████████████░░░░░░░░░░░░░░│ 1.5h  (37.5%)│
-│  Proyecto  │██████████████████░░░░░░░░░░░░░░│ 1.5h  (37.5%)│
-└─────────────────────────────────────────────────────────────┘
+[1.5 h]  Leer 1-teoria/ (llave pública, tipos y frase de paso, authorized_keys)
+[30 min] Responder las 10 preguntas de Conocimiento
+[60 min] lab-01 — ssh-keygen, archivos, permisos y huellas
+[60 min] lab-02 — ssh-copy-id, ssh -v y el log del servidor
+[60 min] lab-03 — Frase de paso, openssh-key-v1 y rondas de bcrypt
+[60 min] lab-04 — Permisos en el cliente y StrictModes en el servidor
+[60 min] lab-05 — Una llave por host y Too many authentication failures
+[60 min] lab-06 — restrict, command=, from= y expiry-time=
+[60 min] lab-07 — Rotar una llave sin quedarte fuera
+[3 h]    Proyecto: IdentityFile/IdentitiesOnly, bin/key-new y bin/ak-line
 ```
 
----
+## Verificación de completitud
 
-## 🛠️ Requisitos Previos
-
-### Conocimientos
-
-- ✅ Completar [Semana 01](../week-01-fundamentos_ssh_y_primera_conexion/README.md)
-- ✅ Entender arquitectura cliente-servidor SSH
-- ✅ Conceptos básicos de criptografía (simétrica/asimétrica)
-
-### Software
-
-- Cliente SSH instalado (OpenSSH)
-- Acceso a un servidor para pruebas (VPS, VM o contenedor)
-- Cuenta en GitHub (para el proyecto)
-
-### Archivos de la Semana Anterior
+Desde la raíz del repositorio, en tu equipo:
 
 ```bash
-# Deberías tener estos archivos de la semana 01:
-~/.ssh/config          # Configuración básica del cliente
-~/.ssh/known_hosts     # Servidores conocidos
+./scripts/verificar-semana.sh 03
 ```
 
----
+Comprueba tu proyecto (`3-proyecto/starter/`) contra los 26 requisitos verificables de la semana; tres de ellos arrancan un `sshd` real dentro del cliente para probar tus líneas de `authorized_keys`. Al terminar deben pasar todos, y esto debe funcionar dentro del cliente sin pedir la contraseña del servidor (solo la frase de tu llave):
 
-## 📁 Estructura de la Semana
-
+```bash
+cd bootcamp/week-03-autenticacion_con_llaves_ssh/3-proyecto/starter
+bin/key-new lab
+ssh-copy-id -F config -i ~/.ssh/lab.pub lab-server
+ssh -F config lab-server hostname
 ```
-week-03-autenticacion_con_llaves_ssh/
-├── README.md                      # Este archivo
-├── RUBRICA-EVALUACION.md          # Criterios de evaluación
-├── 0-assets/                      # Diagramas SVG
-│   ├── 01-flujo-autenticacion-llaves.svg
-│   ├── 02-generacion-llaves.svg
-│   └── 03-estructura-authorized-keys.svg
-├── 1-teoria/                      # Módulos teóricos
-│   ├── README.md
-│   ├── 01-contrasena-vs-llaves.md
-│   ├── 02-algoritmos-llaves.md
-│   └── 03-anatomia-llaves.md
-├── 2-practicas/                   # Ejercicios prácticos
-│   ├── README.md
-│   ├── practica-01-generacion-llaves.md
-│   ├── practica-02-ssh-copy-id.md
-│   └── practica-03-multiples-llaves.md
-├── 3-proyecto/                    # Proyecto integrador
-│   ├── README.md
-│   ├── GUIA-IMPLEMENTACION.md
-│   └── EJEMPLOS-CONFIGS.md
-├── 4-recursos/                    # Material complementario
-│   ├── README.md
-│   ├── videos/
-│   ├── herramientas/
-│   └── webgrafia/
-└── 5-glosario/                    # Términos de la semana
-    └── README.md
-```
-
----
 
 ## 🔗 Navegación
 
-| ⬅️ Anterior                                      | 🏠 Inicio                | Siguiente ➡️                                         |
-| ------------------------------------------------ | ------------------------ | ---------------------------------------------------- |
-| [Semana 01: Fundamentos](../week-01-fundamentos_ssh_y_primera_conexion/README.md) | [Bootcamp](../README.md) | [Semana 03: Config Avanzada](../week-05-configuracion_avanzada_cliente_ssh/README.md) |
+| Anterior | Actual | Siguiente |
+|---|---|---|
+| [← Semana 02 — Protocolo por dentro: KEX, host keys y known_hosts](../week-02-protocolo_kex_y_known_hosts/README.md) | **Semana 03 — Autenticación con llaves** | Semana 04 — `ssh-agent`, agent forwarding y llaves FIDO2 (próximamente) |
 
----
-
-<div align="center">
-
-**🔑 Semana 02: Autenticación con Llaves SSH**
-
-_Deja de escribir contraseñas. Usa llaves._
-
-</div>
+[← Volver al índice del bootcamp](../README.md)

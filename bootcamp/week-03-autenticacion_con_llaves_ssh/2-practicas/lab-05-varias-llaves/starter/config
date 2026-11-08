@@ -1,0 +1,16 @@
+# Lab 05 — una llave por host.
+# Pruébalo con: ssh -F starter/config lab
+
+Host lab
+    HostName server
+    User alumno
+    IdentityFile ~/.ssh/lab
+
+Host trabajo
+    HostName bastion
+    User alumno
+    IdentityFile ~/.ssh/trabajo
+
+Host *
+    # TODO: que ssh ofrezca solo las llaves de IdentityFile, con un comentario
+    #   Qué / Para qué / Impacto.

@@ -6,7 +6,7 @@ Estado de cada semana. ✅ = migrada a la estructura de `CLAUDE.md` (labs con st
 |---|---|---|---|
 | [01](week-01-fundamentos_ssh_y_primera_conexion/README.md) | Fundamentos de SSH y primera conexión | Fundamentos | ✅ |
 | [02](week-02-protocolo_kex_y_known_hosts/README.md) | Protocolo por dentro: transporte, KEX, host keys y `known_hosts` | Fundamentos | ✅ |
-| [03](week-03-autenticacion_con_llaves_ssh/README.md) | Autenticación con llaves | Fundamentos | 🟡 |
+| [03](week-03-autenticacion_con_llaves_ssh/README.md) | Autenticación con llaves | Fundamentos | ✅ |
 | 04 | `ssh-agent`, agent forwarding y llaves FIDO2 | Fundamentos | ⬜ |
 | [05](week-05-configuracion_avanzada_cliente_ssh/README.md) | Configuración avanzada del cliente | Cliente | 🟡 |
 | [06](week-06-transferencia_archivos_scp_sftp_rsync/README.md) | Transferencia de archivos: scp, sftp, rsync y sshfs | Cliente | 🟡 |
