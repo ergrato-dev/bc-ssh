@@ -1,0 +1,16 @@
+# Config de práctica del lab-07. Úsalo siempre con -F: ssh -G -F config srv
+#
+# TODO 1: este archivo tiene un error de orden. Ejecuta
+#         ssh -G -F config srv | grep -E '^(user|connecttimeout) '
+#         y explica por qué el usuario es "nadie". Después corrígelo.
+
+Host *
+    User nadie
+    ConnectTimeout 10
+
+Host srv
+    HostName server
+    User alumno
+    ConnectTimeout 3
+
+# TODO 2: añade el alias bas para el host bastion con el usuario alumno.

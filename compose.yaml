@@ -1,0 +1,47 @@
+# Laboratorio de bc-ssh. Uso: docs/setup-entorno.md
+#   docker compose up -d --build        # levanta los servidores
+#   docker compose run --rm client      # shell del estudiante (cliente SSH)
+#   ./scripts/verificar-semana.sh NN    # autograding dentro de client
+#
+# Topología:
+#   client ── red publica ── server
+#                         └─ bastion ── red privada ── interno
+# interno no es alcanzable desde client: solo a través de bastion (semana 09).
+x-servidor: &servidor
+  build: lab
+  image: bc-ssh-lab:24.04
+  command: start-sshd
+
+services:
+  server:
+    <<: *servidor
+    hostname: server
+    networks: [publica]
+
+  bastion:
+    <<: *servidor
+    hostname: bastion
+    networks: [publica, privada]
+
+  interno:
+    <<: *servidor
+    hostname: interno
+    networks: [privada]
+
+  client:
+    build: lab
+    image: bc-ssh-lab:24.04
+    hostname: client
+    user: alumno
+    tty: true
+    stdin_open: true
+    working_dir: /bc-ssh
+    volumes:
+      - .:/bc-ssh
+    networks: [publica]
+    depends_on: [server, bastion, interno]
+
+networks:
+  publica:
+  privada:
+    internal: true

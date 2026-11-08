@@ -1,0 +1,13 @@
+# ssh-infra-kit — configuración de cliente SSH
+#
+# Qué: alias para los hosts del laboratorio.
+# Para qué: escribir `ssh -F config lab-server` en lugar de `ssh alumno@server`.
+# Impacto: todo `ssh`, `scp` y `sftp` que lea este archivo usa estos valores.
+#
+# Pruébalo sin conectar: ssh -G -F config lab-server
+
+# TODO 1: bloque `Host lab-server` con HostName server y User alumno.
+
+# TODO 2: bloque `Host lab-bastion` con HostName bastion y User alumno.
+
+# TODO 3: bloque `Host *` con ConnectTimeout 5. ¿Por qué tiene que ir al final?

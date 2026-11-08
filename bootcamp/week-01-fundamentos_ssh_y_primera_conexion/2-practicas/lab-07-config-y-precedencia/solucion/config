@@ -1,0 +1,17 @@
+# Config de práctica del lab-07. Úsalo siempre con -F: ssh -G -F config srv
+#
+# ssh usa el primer valor que encuentra para cada opción: los bloques
+# concretos van arriba y `Host *` al final, como valor por defecto.
+
+Host srv
+    HostName server
+    User alumno
+    ConnectTimeout 3
+
+Host bas
+    HostName bastion
+    User alumno
+
+Host *
+    User nadie
+    ConnectTimeout 10

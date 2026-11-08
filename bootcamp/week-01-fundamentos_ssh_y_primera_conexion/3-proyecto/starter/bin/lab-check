@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+#
+# lab-check — dice si cada host acepta conexiones SSH, sin autenticarse.
+#
+# Uso: lab-check HOST[:PUERTO]...
+#
+# Por cada destino imprime una línea:
+#   server ok SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.20
+#   interno fallo dns       el nombre no resuelve
+#   server:2222 fallo tcp   nadie escucha en ese puerto
+#   web:80 fallo banner     el puerto responde, pero no es un servidor SSH
+#
+# Códigos de salida: 0 todos ok, 1 falló al menos uno, 2 uso incorrecto.
+# LAB_CHECK_TIMEOUT cambia la espera por paso (3 s por defecto).
+
+set -euo pipefail
+
+TIMEOUT="${LAB_CHECK_TIMEOUT:-3}"
+
+# TODO 1: sin argumentos, mensaje de uso por stderr y exit 2.
+
+# Lee la primera línea que envía el servidor. Un servidor SSH la manda nada
+# más aceptar la conexión, antes de cualquier autenticación (RFC 4253, 4.2).
+leer_banner() {
+  # timeout necesita un programa, y /dev/tcp solo existe dentro de bash: por
+  # eso un bash hijo. Las comillas simples son a propósito: $1 y $2 los
+  # expande ese bash hijo, no este.
+  # shellcheck disable=SC2016
+  timeout "$TIMEOUT" bash -c 'exec 3<>"/dev/tcp/$1/$2" && IFS= read -r l <&3 && printf "%s" "$l"' _ "$1" "$2"
+}
+
+fallos=0
+for destino in "$@"; do
+  host="${destino%%:*}"
+  puerto=22
+  [[ "$destino" == *:* ]] && puerto="${destino##*:}"
+
+  # TODO 2: si "$host" no resuelve (getent hosts), imprime "$destino fallo dns".
+  # TODO 3: si no hay nadie en el puerto (nc -z -w), imprime "$destino fallo tcp".
+  # TODO 4: lee el banner con leer_banner. Si empieza por SSH-2.0-, imprime
+  #         "$destino ok BANNER" (sin el \r final); si no, "$destino fallo banner".
+  # TODO 5: cuenta los fallos en $fallos.
+  echo "$destino ?"
+done
+
+# TODO 6: sustituye `exit 1` por una línea que salga con 0 si no hubo fallos
+#         y con 1 si hubo alguno.
+exit 1

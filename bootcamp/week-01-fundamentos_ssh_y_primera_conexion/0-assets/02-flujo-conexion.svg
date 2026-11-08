@@ -1,90 +1,67 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 550">
-  <!-- Background -->
-  <rect width="900" height="550" fill="#0d1117"/>
-  
-  <!-- Title -->
-  <text x="450" y="35" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#58a6ff" text-anchor="middle">Flujo de Establecimiento de Conexión SSH</text>
-  
-  <!-- Client Column -->
-  <rect x="50" y="60" width="150" height="30" rx="5" fill="#238636"/>
-  <text x="125" y="80" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="middle">🖥️ CLIENTE</text>
-  
-  <!-- Server Column -->
-  <rect x="700" y="60" width="150" height="30" rx="5" fill="#1f6feb"/>
-  <text x="775" y="80" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="middle">🖧 SERVIDOR</text>
-  
-  <!-- Vertical lines -->
-  <line x1="125" y1="95" x2="125" y2="520" stroke="#30363d" stroke-width="2"/>
-  <line x1="775" y1="95" x2="775" y2="520" stroke="#30363d" stroke-width="2"/>
-  
-  <!-- Arrow definitions -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 640">
+  <rect width="900" height="640" fill="#0d1117"/>
   <defs>
-    <marker id="arrow-right" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#58a6ff"/>
-    </marker>
-    <marker id="arrow-left" markerWidth="10" markerHeight="7" refX="1" refY="3.5" orient="auto">
-      <polygon points="10 0, 0 3.5, 10 7" fill="#58a6ff"/>
-    </marker>
+    <marker id="ar58a6ff" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#58a6ff"/></marker>
+    <marker id="al58a6ff" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#58a6ff"/></marker>
+    <marker id="ar3fb950" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#3fb950"/></marker>
+    <marker id="al3fb950" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#3fb950"/></marker>
+    <marker id="ard29922" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#d29922"/></marker>
+    <marker id="ald29922" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#d29922"/></marker>
+    <marker id="arf85149" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#f85149"/></marker>
+    <marker id="alf85149" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#f85149"/></marker>
   </defs>
-  
-  <!-- Step 1: TCP Connection -->
-  <rect x="20" y="110" width="20" height="20" rx="10" fill="#f0883e"/>
-  <text x="30" y="125" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#0d1117" text-anchor="middle">1</text>
-  <line x1="135" y1="120" x2="765" y2="120" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow-right)"/>
-  <rect x="350" y="105" width="200" height="30" rx="5" fill="#161b22" stroke="#30363d"/>
-  <text x="450" y="125" font-family="Arial, sans-serif" font-size="11" fill="#c9d1d9" text-anchor="middle">Conexión TCP puerto 22</text>
-  
-  <!-- Step 2: Version Exchange -->
-  <rect x="20" y="160" width="20" height="20" rx="10" fill="#f0883e"/>
-  <text x="30" y="175" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#0d1117" text-anchor="middle">2</text>
-  <line x1="765" y1="170" x2="135" y2="170" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow-left)"/>
-  <rect x="300" y="155" width="300" height="30" rx="5" fill="#161b22" stroke="#30363d"/>
-  <text x="450" y="175" font-family="Arial, sans-serif" font-size="11" fill="#c9d1d9" text-anchor="middle">SSH-2.0-OpenSSH_8.9p1 (intercambio versión)</text>
-  
-  <!-- Step 3: Algorithm Negotiation -->
-  <rect x="20" y="210" width="20" height="20" rx="10" fill="#f0883e"/>
-  <text x="30" y="225" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#0d1117" text-anchor="middle">3</text>
-  <line x1="135" y1="230" x2="765" y2="220" stroke="#8957e5" stroke-width="2" marker-end="url(#arrow-right)"/>
-  <line x1="765" y1="240" x2="135" y2="250" stroke="#8957e5" stroke-width="2" marker-end="url(#arrow-left)"/>
-  <rect x="300" y="220" width="300" height="30" rx="5" fill="#161b22" stroke="#8957e5"/>
-  <text x="450" y="240" font-family="Arial, sans-serif" font-size="11" fill="#a371f7" text-anchor="middle">🔐 Negociación de algoritmos</text>
-  
-  <!-- Step 4: Key Exchange (Diffie-Hellman) -->
-  <rect x="20" y="280" width="20" height="20" rx="10" fill="#f0883e"/>
-  <text x="30" y="295" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#0d1117" text-anchor="middle">4</text>
-  <line x1="135" y1="300" x2="765" y2="290" stroke="#238636" stroke-width="2" marker-end="url(#arrow-right)"/>
-  <line x1="765" y1="310" x2="135" y2="320" stroke="#238636" stroke-width="2" marker-end="url(#arrow-left)"/>
-  <rect x="280" y="290" width="340" height="30" rx="5" fill="#161b22" stroke="#238636"/>
-  <text x="450" y="310" font-family="Arial, sans-serif" font-size="11" fill="#3fb950" text-anchor="middle">🔑 Diffie-Hellman Key Exchange</text>
-  
-  <!-- Encrypted from here -->
-  <rect x="100" y="345" width="700" height="165" rx="8" fill="none" stroke="#58a6ff" stroke-width="2" stroke-dasharray="8,4"/>
-  <text x="450" y="365" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#58a6ff" text-anchor="middle">🔒 COMUNICACIÓN CIFRADA A PARTIR DE AQUÍ</text>
-  
-  <!-- Step 5: Server Authentication -->
-  <rect x="20" y="375" width="20" height="20" rx="10" fill="#f0883e"/>
-  <text x="30" y="390" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#0d1117" text-anchor="middle">5</text>
-  <line x1="765" y1="385" x2="135" y2="385" stroke="#da3633" stroke-width="2" marker-end="url(#arrow-left)"/>
-  <rect x="300" y="370" width="300" height="30" rx="5" fill="#161b22" stroke="#da3633"/>
-  <text x="450" y="390" font-family="Arial, sans-serif" font-size="11" fill="#f85149" text-anchor="middle">🔍 Host key (verificar fingerprint)</text>
-  
-  <!-- Step 6: User Authentication -->
-  <rect x="20" y="420" width="20" height="20" rx="10" fill="#f0883e"/>
-  <text x="30" y="435" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#0d1117" text-anchor="middle">6</text>
-  <line x1="135" y1="430" x2="765" y2="430" stroke="#f0883e" stroke-width="2" marker-end="url(#arrow-right)"/>
-  <rect x="280" y="415" width="340" height="30" rx="5" fill="#161b22" stroke="#f0883e"/>
-  <text x="450" y="435" font-family="Arial, sans-serif" font-size="11" fill="#f0883e" text-anchor="middle">👤 Autenticación (llave o contraseña)</text>
-  
-  <!-- Step 7: Session Established -->
-  <rect x="20" y="465" width="20" height="20" rx="10" fill="#f0883e"/>
-  <text x="30" y="480" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#0d1117" text-anchor="middle">7</text>
-  <line x1="765" y1="475" x2="135" y2="475" stroke="#238636" stroke-width="2" marker-end="url(#arrow-left)"/>
-  <rect x="320" y="460" width="260" height="30" rx="5" fill="#238636" stroke="#3fb950"/>
-  <text x="450" y="480" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">✅ SESIÓN ESTABLECIDA</text>
-  
-  <!-- Legend -->
-  <rect x="50" y="515" width="800" height="30" rx="5" fill="#161b22" stroke="#30363d"/>
-  <text x="100" y="535" font-family="Arial, sans-serif" font-size="10" fill="#8b949e">Pasos 1-4: Establecimiento de canal seguro</text>
-  <text x="350" y="535" font-family="Arial, sans-serif" font-size="10" fill="#8b949e">Paso 5: Verificación del servidor</text>
-  <text x="550" y="535" font-family="Arial, sans-serif" font-size="10" fill="#8b949e">Pasos 6-7: Autenticación del usuario</text>
+  <text x="450" y="34" font-family="sans-serif" font-size="20" font-weight="bold" fill="#c9d1d9" text-anchor="middle">Qué pasa al conectar: ssh alumno@server</text>
+  <rect x="50" y="55" width="150" height="30" rx="5" fill="#161b22" stroke="#58a6ff"/>
+  <text x="125" y="75" font-family="sans-serif" font-size="13" font-weight="bold" fill="#58a6ff" text-anchor="middle">CLIENTE (ssh)</text>
+  <rect x="700" y="55" width="150" height="30" rx="5" fill="#161b22" stroke="#58a6ff"/>
+  <text x="775" y="75" font-family="sans-serif" font-size="13" font-weight="bold" fill="#58a6ff" text-anchor="middle">SERVIDOR (sshd)</text>
+  <line x1="125" y1="90" x2="125" y2="590" stroke="#30363d" stroke-width="2"/>
+  <line x1="775" y1="90" x2="775" y2="590" stroke="#30363d" stroke-width="2"/>
+  <circle cx="30" cy="120" r="11" fill="#58a6ff"/>
+  <text x="30" y="124" font-family="sans-serif" font-size="12" font-weight="bold" fill="#0d1117" text-anchor="middle">1</text>
+  <line x1="135" y1="120" x2="765" y2="120" stroke="#58a6ff" stroke-width="2" marker-end="url(#ar58a6ff)"/>
+  <rect x="250" y="98" width="400" height="28" rx="5" fill="#161b22" stroke="#58a6ff"/>
+  <text x="450" y="116" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">Conexión TCP al puerto 22</text>
+  <circle cx="30" cy="175" r="11" fill="#58a6ff"/>
+  <text x="30" y="179" font-family="sans-serif" font-size="12" font-weight="bold" fill="#0d1117" text-anchor="middle">2</text>
+  <line x1="765" y1="175" x2="135" y2="175" stroke="#58a6ff" stroke-width="2" marker-end="url(#al58a6ff)"/>
+  <rect x="250" y="153" width="400" height="40" rx="5" fill="#161b22" stroke="#58a6ff"/>
+  <text x="450" y="171" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">Banners: cada lado anuncia su versión</text>
+  <text x="450" y="187" font-family="monospace" font-size="11" fill="#8b949e" text-anchor="middle">SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.20</text>
+  <circle cx="30" cy="235" r="11" fill="#d29922"/>
+  <text x="30" y="239" font-family="sans-serif" font-size="12" font-weight="bold" fill="#0d1117" text-anchor="middle">3</text>
+  <line x1="135" y1="235" x2="765" y2="235" stroke="#d29922" stroke-width="2" marker-end="url(#ard29922)"/>
+  <rect x="250" y="213" width="400" height="40" rx="5" fill="#161b22" stroke="#d29922"/>
+  <text x="450" y="231" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">KEXINIT: listas de algoritmos, se elige uno de cada</text>
+  <text x="450" y="247" font-family="sans-serif" font-size="11" fill="#8b949e" text-anchor="middle">kex · host key · cifrado · MAC</text>
+  <circle cx="30" cy="295" r="11" fill="#d29922"/>
+  <text x="30" y="299" font-family="sans-serif" font-size="12" font-weight="bold" fill="#0d1117" text-anchor="middle">4</text>
+  <line x1="765" y1="295" x2="135" y2="295" stroke="#d29922" stroke-width="2" marker-end="url(#ald29922)"/>
+  <rect x="250" y="273" width="400" height="40" rx="5" fill="#161b22" stroke="#d29922"/>
+  <text x="450" y="291" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">Intercambio de llaves + host key + firma</text>
+  <text x="450" y="307" font-family="monospace" font-size="11" fill="#8b949e" text-anchor="middle">sntrup761x25519-sha512@openssh.com</text>
+  <rect x="140" y="330" width="360" height="40" rx="5" fill="#161b22" stroke="#f85149"/>
+  <circle cx="30" cy="350" r="11" fill="#f85149"/>
+  <text x="30" y="354" font-family="sans-serif" font-size="12" font-weight="bold" fill="#0d1117" text-anchor="middle">5</text>
+  <text x="320" y="346" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">El cliente compara la host key con known_hosts</text>
+  <text x="320" y="362" font-family="sans-serif" font-size="11" fill="#8b949e" text-anchor="middle">y comprueba la firma. Si falla, corta aquí.</text>
+  <rect x="45" y="385" width="810" height="200" rx="8" fill="none" stroke="#3fb950" stroke-width="2" stroke-dasharray="8,4"/>
+  <text x="450" y="404" font-family="sans-serif" font-size="12" font-weight="bold" fill="#3fb950" text-anchor="middle">CIFRADO A PARTIR DE AQUÍ (llave de sesión acordada en el paso 4)</text>
+  <circle cx="30" cy="440" r="11" fill="#3fb950"/>
+  <text x="30" y="444" font-family="sans-serif" font-size="12" font-weight="bold" fill="#0d1117" text-anchor="middle">6</text>
+  <line x1="135" y1="440" x2="765" y2="440" stroke="#3fb950" stroke-width="2" marker-end="url(#ar3fb950)"/>
+  <rect x="250" y="418" width="400" height="28" rx="5" fill="#161b22" stroke="#3fb950"/>
+  <text x="450" y="436" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">NEWKEYS: ambos activan la llave de sesión</text>
+  <circle cx="30" cy="495" r="11" fill="#3fb950"/>
+  <text x="30" y="499" font-family="sans-serif" font-size="12" font-weight="bold" fill="#0d1117" text-anchor="middle">7</text>
+  <line x1="135" y1="495" x2="765" y2="495" stroke="#3fb950" stroke-width="2" marker-end="url(#ar3fb950)"/>
+  <rect x="250" y="473" width="400" height="40" rx="5" fill="#161b22" stroke="#3fb950"/>
+  <text x="450" y="491" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">Autenticación del usuario</text>
+  <text x="450" y="507" font-family="sans-serif" font-size="11" fill="#8b949e" text-anchor="middle">password · publickey (semana 03)</text>
+  <circle cx="30" cy="555" r="11" fill="#3fb950"/>
+  <text x="30" y="559" font-family="sans-serif" font-size="12" font-weight="bold" fill="#0d1117" text-anchor="middle">8</text>
+  <line x1="765" y1="555" x2="135" y2="555" stroke="#3fb950" stroke-width="2" marker-end="url(#al3fb950)"/>
+  <rect x="250" y="533" width="400" height="28" rx="5" fill="#161b22" stroke="#3fb950"/>
+  <text x="450" y="551" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">Canal de sesión: shell interactiva o un comando</text>
+  <text x="450" y="620" font-family="sans-serif" font-size="12" fill="#8b949e" text-anchor="middle">Pasos 1-2 en claro · 3-5 negociación y verificación del servidor · 6-8 todo viaja cifrado. Míralo con ssh -v (lab-05).</text>
 </svg>

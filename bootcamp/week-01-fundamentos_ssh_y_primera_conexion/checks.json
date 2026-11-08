@@ -1,0 +1,118 @@
+{
+  "semana": "01",
+  "titulo": "Fundamentos de SSH y primera conexión",
+  "checks": [
+    {
+      "id": "config-parsea",
+      "descripcion": "config carga sin errores con ssh -G",
+      "cmd": "ssh -G -F {proyecto}/config lab-server >/dev/null",
+      "assert": "exit0",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 1"
+    },
+    {
+      "id": "config-server-hostname",
+      "descripcion": "El alias lab-server apunta al host server",
+      "cmd": "ssh -G -F {proyecto}/config lab-server",
+      "assert": "stdout~^hostname server$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 2"
+    },
+    {
+      "id": "config-server-user",
+      "descripcion": "El bloque lab-server fija User alumno",
+      "cmd": "awk 'tolower($1)==\"host\"{b=($2==\"lab-server\")} b && tolower($1)==\"user\"{print $2}' {proyecto}/config",
+      "assert": "stdout~^alumno$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 2"
+    },
+    {
+      "id": "config-bastion-hostname",
+      "descripcion": "El alias lab-bastion apunta al host bastion",
+      "cmd": "ssh -G -F {proyecto}/config lab-bastion",
+      "assert": "stdout~^hostname bastion$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 3"
+    },
+    {
+      "id": "config-timeout-global",
+      "descripcion": "ConnectTimeout 5 aplica a cualquier host, también a uno sin alias",
+      "cmd": "ssh -G -F {proyecto}/config host-cualquiera",
+      "assert": "stdout~^connecttimeout 5$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 4"
+    },
+    {
+      "id": "config-no-desactiva-verificacion",
+      "descripcion": "config no desactiva la verificación de host keys",
+      "cmd": "grep -inE '^[^#]*(stricthostkeychecking +no|userknownhostsfile +/dev/null)' {proyecto}/config",
+      "assert": "exit!=0",
+      "pista": "1-teoria/02-cliente-servidor-y-laboratorio.md, sección known_hosts"
+    },
+    {
+      "id": "config-conecta",
+      "descripcion": "ssh lab-server con este config entra en server",
+      "cmd": "SSHPASS=alumno sshpass -e ssh -F {proyecto}/config -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/tmp/bc-check-known_hosts lab-server hostname",
+      "assert": "stdout~^server$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 5"
+    },
+    {
+      "id": "lc-sin-argumentos",
+      "descripcion": "lab-check sin argumentos sale con 2",
+      "cmd": "{proyecto}/bin/lab-check",
+      "assert": "exit=2",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 6"
+    },
+    {
+      "id": "lc-host-ok",
+      "descripcion": "lab-check server sale con 0",
+      "cmd": "{proyecto}/bin/lab-check server",
+      "assert": "exit0",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 9"
+    },
+    {
+      "id": "lc-muestra-banner",
+      "descripcion": "Para un host sano, lab-check imprime ok y el banner del servidor",
+      "cmd": "{proyecto}/bin/lab-check server",
+      "assert": "stdout~^server ok SSH-2.0-OpenSSH_",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 9"
+    },
+    {
+      "id": "lc-fallo-dns",
+      "descripcion": "Un host que no resuelve se informa como fallo dns",
+      "cmd": "{proyecto}/bin/lab-check interno",
+      "assert": "stdout~^interno fallo dns$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 7"
+    },
+    {
+      "id": "lc-fallo-tcp",
+      "descripcion": "Un puerto cerrado se informa como fallo tcp",
+      "cmd": "{proyecto}/bin/lab-check server:2222",
+      "assert": "stdout~^server:2222 fallo tcp$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 8"
+    },
+    {
+      "id": "lc-fallo-banner",
+      "descripcion": "Un puerto abierto que no habla SSH se informa como fallo banner",
+      "cmd": "timeout 8 bash -c 'for i in 1 2; do echo hola | nc -l -N 127.0.0.1 2200; done' >/dev/null 2>&1 & sleep 0.5; {proyecto}/bin/lab-check 127.0.0.1:2200",
+      "assert": "stdout~^127.0.0.1:2200 fallo banner$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 9"
+    },
+    {
+      "id": "lc-sale-1-si-falla-uno",
+      "descripcion": "lab-check sale con 1 si falla al menos un host",
+      "cmd": "{proyecto}/bin/lab-check server interno",
+      "assert": "exit=1",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 10"
+    },
+    {
+      "id": "lc-sigue-tras-fallo",
+      "descripcion": "lab-check revisa todos los hosts aunque uno falle",
+      "cmd": "{proyecto}/bin/lab-check interno server bastion | grep -cE '^(interno|server|bastion) '",
+      "assert": "stdout~^3$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 10"
+    },
+    {
+      "id": "bin-completo-y-limpio",
+      "descripcion": "Los scripts de bin/ no tienen TODOs y pasan shellcheck",
+      "cmd": "! grep -n TODO {proyecto}/bin/* && shellcheck {proyecto}/bin/*",
+      "assert": "exit0",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 11"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500">
+  <rect width="900" height="500" fill="#0d1117"/>
+  <text x="450" y="34" font-family="sans-serif" font-size="20" font-weight="bold" fill="#c9d1d9" text-anchor="middle">El laboratorio: compose.yaml</text>
+
+  <!-- Tu equipo -->
+  <rect x="20" y="55" width="860" height="430" rx="10" fill="none" stroke="#30363d" stroke-width="2"/>
+  <text x="40" y="78" font-family="sans-serif" font-size="13" fill="#8b949e">Tu equipo: Docker. Desde aquí: docker compose up -d · run --rm client · exec server ...</text>
+
+  <!-- Red publica -->
+  <rect x="45" y="95" width="520" height="335" rx="8" fill="none" stroke="#58a6ff" stroke-width="2" stroke-dasharray="8,4"/>
+  <text x="60" y="118" font-family="sans-serif" font-size="13" font-weight="bold" fill="#58a6ff">red publica</text>
+
+  <!-- Red privada -->
+  <rect x="400" y="235" width="470" height="185" rx="8" fill="none" stroke="#d29922" stroke-width="2" stroke-dasharray="8,4"/>
+  <text x="855" y="258" font-family="sans-serif" font-size="13" font-weight="bold" fill="#d29922" text-anchor="end">red privada (internal)</text>
+
+  <!-- client -->
+  <rect x="70" y="140" width="190" height="120" rx="6" fill="#161b22" stroke="#3fb950" stroke-width="2"/>
+  <text x="165" y="165" font-family="sans-serif" font-size="15" font-weight="bold" fill="#3fb950" text-anchor="middle">client</text>
+  <text x="165" y="188" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">tu shell: alumno@client</text>
+  <text x="165" y="208" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">cliente ssh, sin sshd</text>
+  <text x="165" y="232" font-family="monospace" font-size="11" fill="#8b949e" text-anchor="middle">/bc-ssh = el repositorio</text>
+
+  <!-- server -->
+  <rect x="340" y="130" width="190" height="80" rx="6" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+  <text x="435" y="157" font-family="sans-serif" font-size="15" font-weight="bold" fill="#58a6ff" text-anchor="middle">server</text>
+  <text x="435" y="180" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">sshd en el puerto 22</text>
+  <text x="435" y="198" font-family="sans-serif" font-size="11" fill="#8b949e" text-anchor="middle">semanas 01-08</text>
+
+  <!-- bastion -->
+  <rect x="340" y="300" width="190" height="80" rx="6" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+  <text x="435" y="327" font-family="sans-serif" font-size="15" font-weight="bold" fill="#58a6ff" text-anchor="middle">bastion</text>
+  <text x="435" y="350" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">sshd · en las dos redes</text>
+  <text x="435" y="368" font-family="sans-serif" font-size="11" fill="#8b949e" text-anchor="middle">puerta de entrada (semana 09)</text>
+
+  <!-- interno -->
+  <rect x="650" y="300" width="190" height="80" rx="6" fill="#161b22" stroke="#d29922" stroke-width="2"/>
+  <text x="745" y="327" font-family="sans-serif" font-size="15" font-weight="bold" fill="#d29922" text-anchor="middle">interno</text>
+  <text x="745" y="350" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">sshd · solo red privada</text>
+  <text x="745" y="368" font-family="sans-serif" font-size="11" fill="#8b949e" text-anchor="middle">no resuelve desde client</text>
+
+  <!-- conexiones -->
+  <line x1="260" y1="185" x2="340" y2="170" stroke="#3fb950" stroke-width="2"/>
+  <line x1="260" y1="230" x2="340" y2="335" stroke="#3fb950" stroke-width="2"/>
+  <line x1="530" y1="340" x2="650" y2="340" stroke="#d29922" stroke-width="2"/>
+  <polyline points="165,260 165,410 745,410 745,380" fill="none" stroke="#f85149" stroke-width="2" stroke-dasharray="5,5"/>
+  <text x="180" y="402" font-family="sans-serif" font-size="12" fill="#f85149">client → interno: no hay ruta</text>
+
+  <text x="450" y="468" font-family="sans-serif" font-size="12" fill="#8b949e" text-anchor="middle">Usuario alumno, contraseña alumno en todos los servidores (solo laboratorio). Host keys nuevas en cada contenedor.</text>
+</svg>

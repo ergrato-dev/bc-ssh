@@ -1,0 +1,34 @@
+name: Verificar contenido
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Principio de mínimo privilegio: solo lectura
+permissions:
+  contents: read
+
+jobs:
+  verificar:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Estructura, enlaces, reglas de estilo y configs starter
+        run: ./scripts/verificar-enlaces.sh
+
+      - name: shellcheck de scripts/
+        run: shellcheck -S warning scripts/*.sh
+
+      - name: Construir el laboratorio
+        run: docker compose build
+
+      # Cada solución de referencia tiene que pasar el autograding de su semana.
+      - name: Las soluciones pasan su checks.json
+        run: |
+          shopt -s nullglob
+          for f in bootcamp/week-*/checks.json; do
+            semana=$(basename "$(dirname "$f")" | cut -d- -f2)
+            ENTREGA=solucion ./scripts/verificar-semana.sh "$semana"
+          done
