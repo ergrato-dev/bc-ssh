@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+#
+# kit-link — prepara ~/.ssh para usar este kit.
+#
+# Uso: kit-link
+#
+# - Enlaza ~/.ssh/kit a la carpeta del kit: el `Include kit/conf.d/*.conf`
+#   de config se busca desde ~/.ssh, no desde la carpeta de config.
+# - Crea ~/.ssh/cm, con permisos 700, para los sockets de multiplexing.
+#
+# Repetirlo no cambia nada, y sirve para apuntar ~/.ssh/kit a otra copia.
+# Códigos de salida: 0 listo, 1 ~/.ssh/kit existe y no es un enlace,
+# 2 uso incorrecto.
+
+set -euo pipefail
+
+if (( $# > 0 )); then
+  echo "uso: kit-link" >&2
+  exit 2
+fi
+
+kit="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+enlace="$HOME/.ssh/kit"
+
+# TODO 4: si ~/.ssh/kit existe y no es un enlace, avisa por stderr y sal
+#   con 1 sin tocarlo (3-proyecto/README.md, paso 3).
+
+# TODO 5: crea ~/.ssh/cm y deja ~/.ssh y ~/.ssh/cm con permisos 700, aunque
+#   ya existieran (3-proyecto/README.md, paso 4).
+mkdir -p "$HOME/.ssh"
+
+# -n: si ~/.ssh/kit ya es un enlace a una carpeta, lo reemplaza en lugar de
+# crear el enlace dentro de esa carpeta.
+ln -sfn "$kit" "$enlace"
+echo "kit-link: $enlace -> $kit"

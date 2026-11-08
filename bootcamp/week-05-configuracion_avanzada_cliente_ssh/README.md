@@ -1,159 +1,80 @@
-# 🔧 Semana 03: Configuración Avanzada del Cliente SSH
+# Semana 05 — Configuración avanzada del cliente
 
-![SSH](https://img.shields.io/badge/SSH-OpenSSH-red?style=for-the-badge&logo=openssh)
-![Nivel](https://img.shields.io/badge/Nivel-Intermedio-yellow?style=for-the-badge)
-![Duración](https://img.shields.io/badge/Duración-4_horas-blue?style=for-the-badge)
+## Descripción
 
-## 📋 Descripción General
+Tu `config` crece cada semana, y con él los errores difíciles de ver: un valor que no se aplica, un alias que deja de resolver, una opción que gana a otra sin que sepas por qué. Esta semana entiendes exactamente cómo lee `ssh` su configuración (de dónde, en qué orden y por qué gana el **primer** valor) y lo compruebas con `ssh -G` sin conectar. Partes la configuración en archivos con `Include`, aplicas opciones según condiciones con `Match`, eliges perfiles al conectar con `ssh -P`, y reutilizas una conexión autenticada para todas las siguientes con el **multiplexing**, sabiendo qué decide ese master y cuándo saltártelo. Tu kit pasa a tener los hosts en `conf.d/`, multiplexing, un perfil `sinmux` y dos scripts nuevos: `bin/kit-link` y `bin/mux`.
 
-Esta semana nos sumergimos en el **archivo de configuración del cliente SSH** (`~/.ssh/config`), una herramienta fundamental que transformará tu experiencia con SSH. Aprenderás a crear aliases para tus servidores, configurar saltos a través de bastiones con **ProxyJump**, y optimizar conexiones con **multiplexing**.
+## Objetivos de aprendizaje
 
-El archivo `~/.ssh/config` es donde los administradores de sistemas profesionales guardan su productividad. En lugar de recordar IPs, puertos, usuarios y opciones para cada servidor, defines todo una vez y conectas con un simple `ssh nombre-servidor`.
+Al terminar esta semana, podrás:
 
-Al finalizar esta semana, tendrás un archivo de configuración SSH profesional que te ahorrará horas de trabajo y reducirá errores de conexión.
+- Explicar de qué archivos y en qué orden lee `ssh` su configuración, y qué cambia `-F`
+- Aplicar la regla del primer valor y encontrar con `ssh -G` por qué una opción no se aplica
+- Agrupar hosts con patrones (`*`, `?`, `!`) y usar tokens en `HostName`, `IdentityFile` y `ControlPath`
+- Partir la configuración con `Include` y resolver las rutas relativas a `~/.ssh`
+- Usar `Match` (`host`, `originalhost`, `user`, `exec`, `tagged`) y perfiles con `ssh -P`
+- Activar el multiplexing, controlarlo con `ssh -O` y explicar qué decide un master abierto
+- Añadir a tu `ssh-infra-kit` `conf.d/`, multiplexing, el perfil `sinmux`, `bin/kit-link` y `bin/mux`
 
----
+## Prerrequisitos
 
-## 🎯 Objetivos de Aprendizaje
+- [Semana 04](../week-04-ssh_agent_y_llaves_fido2/README.md) completa: agente, `ForwardAgent no` y `ssh-add -h`
+- El laboratorio levantado: `docker compose up -d`
 
-Al completar esta semana, serás capaz de:
+## Contenido
 
-- [ ] Dominar la sintaxis y estructura del archivo `~/.ssh/config`
-- [ ] Crear aliases y configuraciones personalizadas por host
-- [ ] Implementar conexiones a través de servidores intermedios (ProxyJump)
-- [ ] Configurar multiplexing para reutilizar conexiones SSH
-- [ ] Usar wildcards y patrones para configuraciones grupales
-- [ ] Optimizar timeouts y keep-alives para conexiones estables
-- [ ] Gestionar múltiples identidades (llaves) por servidor
+| # | Tipo | Tema | Tiempo |
+|---|------|------|--------|
+| — | Teoría | [01-como-lee-ssh-su-configuracion.md](1-teoria/01-como-lee-ssh-su-configuracion.md) · [02-include-match-y-perfiles.md](1-teoria/02-include-match-y-perfiles.md) · [03-multiplexing.md](1-teoria/03-multiplexing.md) | 1.5 h |
+| — | Conocimiento | [10 preguntas](rubrica-evaluacion.md#-conocimiento-30) | 30 min |
+| 1 | Lab | [lab-01-el-primer-valor-gana](2-practicas/lab-01-el-primer-valor-gana/) | 60 min |
+| 2 | Lab | [lab-02-patrones-y-tokens](2-practicas/lab-02-patrones-y-tokens/) | 60 min |
+| 3 | Lab | [lab-03-include-y-conf-d](2-practicas/lab-03-include-y-conf-d/) | 60 min |
+| 4 | Lab | [lab-04-match](2-practicas/lab-04-match/) | 60 min |
+| 5 | Lab | [lab-05-perfiles-con-tag](2-practicas/lab-05-perfiles-con-tag/) | 60 min |
+| 6 | Lab | [lab-06-multiplexing](2-practicas/lab-06-multiplexing/) | 60 min |
+| 7 | Lab | [lab-07-lo-que-decide-el-master](2-practicas/lab-07-lo-que-decide-el-master/) | 60 min |
+| — | Proyecto | [ssh-infra-kit: `conf.d/`, perfiles y multiplexing](3-proyecto/) | 3 h |
 
----
+**Total: 12 horas**
 
-## 📚 Contenido de la Semana
-
-### 1️⃣ Teoría (1 hora)
-
-| Módulo                                         | Tema                        | Duración |
-| ---------------------------------------------- | --------------------------- | -------- |
-| [01](1-teoria/01-archivo-ssh-config.md)        | El Archivo ~/.ssh/config    | 20 min   |
-| [02](1-teoria/02-proxyjump-proxycommand.md)    | ProxyJump y ProxyCommand    | 20 min   |
-| [03](1-teoria/03-multiplexing-optimizacion.md) | Multiplexing y Optimización | 20 min   |
-
-### 2️⃣ Prácticas (1.5 horas)
-
-| Práctica                                         | Descripción                    | Dificultad | Duración |
-| ------------------------------------------------ | ------------------------------ | ---------- | -------- |
-| [01](2-practicas/practica-01-aliases-basicos.md) | Aliases y Configuración Básica | ⭐         | 30 min   |
-| [02](2-practicas/practica-02-proxyjump.md)       | Conexiones con ProxyJump       | ⭐⭐       | 30 min   |
-| [03](2-practicas/practica-03-multiplexing.md)    | Multiplexing y Control Master  | ⭐⭐⭐     | 30 min   |
-
-### 3️⃣ Proyecto Semanal (1.5 horas)
-
-| Documento                                  | Descripción                     |
-| ------------------------------------------ | ------------------------------- |
-| [README](3-proyecto/README.md)             | Configuración SSH Multi-Entorno |
-| [Guía](3-proyecto/GUIA-IMPLEMENTACION.md)  | Implementación paso a paso      |
-| [Ejemplos](3-proyecto/EJEMPLOS-CONFIGS.md) | Configuraciones de referencia   |
-
-### 4️⃣ Recursos Adicionales
-
-| Recurso                                                           | Descripción            |
-| ----------------------------------------------------------------- | ---------------------- |
-| [Videos Conceptuales](4-recursos/videos/01-videos-conceptos.md)   | Teoría en video        |
-| [Videos Prácticos](4-recursos/videos/02-videos-practicos.md)      | Tutoriales paso a paso |
-| [Artículos](4-recursos/webgrafia/03-articulos-ssh.md)             | Lecturas recomendadas  |
-| [Documentación](4-recursos/webgrafia/04-documentacion-oficial.md) | Docs oficiales         |
-| [Herramientas](4-recursos/herramientas/05-herramientas-ssh.md)    | Software útil          |
-| [Playgrounds](4-recursos/webgrafia/06-playgrounds-online.md)      | Práctica online        |
-| [Comunidades](4-recursos/webgrafia/07-comunidades-sysadmin.md)    | Foros y grupos         |
-| [YouTube](4-recursos/webgrafia/08-canales-youtube.md)             | Canales recomendados   |
-
-### 5️⃣ Glosario
-
-| Documento                        | Descripción                       |
-| -------------------------------- | --------------------------------- |
-| [Glosario](5-glosario/README.md) | 30+ términos de configuración SSH |
-
----
-
-## 🗂️ Estructura de Archivos
+## Distribución del tiempo
 
 ```
-week-05-configuracion_avanzada_cliente_ssh/
-├── README.md                          # Este archivo
-├── RUBRICA-EVALUACION.md              # Criterios de evaluación
-│
-├── 0-assets/                          # Diagramas y recursos visuales
-│   ├── README.md
-│   ├── 01-estructura-ssh-config.svg
-│   ├── 02-flujo-proxyjump.svg
-│   └── 03-multiplexing-diagram.svg
-│
-├── 1-teoria/                          # Módulos teóricos
-│   ├── README.md
-│   ├── 01-archivo-ssh-config.md
-│   ├── 02-proxyjump-proxycommand.md
-│   └── 03-multiplexing-optimizacion.md
-│
-├── 2-practicas/                       # Ejercicios prácticos
-│   ├── README.md
-│   ├── practica-01-aliases-basicos.md
-│   ├── practica-02-proxyjump.md
-│   └── practica-03-multiplexing.md
-│
-├── 3-proyecto/                        # Proyecto integrador
-│   ├── README.md
-│   ├── GUIA-IMPLEMENTACION.md
-│   └── EJEMPLOS-CONFIGS.md
-│
-├── 4-recursos/                        # Material complementario
-│   ├── README.md
-│   ├── videos/
-│   ├── webgrafia/
-│   ├── herramientas/
-│   ├── ebooks-free/
-│   └── videografia/
-│
-└── 5-glosario/                        # Terminología
-    └── README.md
+[1.5 h]  Leer 1-teoria/ (orden de lectura, Include/Match/perfiles, multiplexing)
+[30 min] Responder las 10 preguntas de Conocimiento
+[60 min] lab-01 — Fuentes, -F, ssh -G y un Host * mal colocado
+[60 min] lab-02 — Host lab-*, * !lab-bastion y tokens
+[60 min] lab-03 — ~/.ssh/conf.d/, orden alfabético, Include vacío y -F
+[60 min] lab-04 — Match host, originalhost, user y exec
+[60 min] lab-05 — Perfiles con -P, Tag y Match tagged
+[60 min] lab-06 — ControlMaster, ControlPath, ControlPersist y ssh -O
+[60 min] lab-07 — Revocación, -A y permisos con un master abierto
+[3 h]    Proyecto: conf.d/, multiplexing, sinmux, bin/kit-link y bin/mux
 ```
 
----
+## Verificación de completitud
 
-## 🔗 Prerequisitos
+Desde la raíz del repositorio, en tu equipo:
 
-Antes de iniciar esta semana, asegúrate de:
-
-- ✅ Haber completado [Semana 01: Fundamentos de SSH](../week-01-fundamentos_ssh_y_primera_conexion/README.md)
-- ✅ Haber completado [Semana 02: Autenticación con Llaves](../week-03-autenticacion_con_llaves_ssh/README.md)
-- ✅ Tener al menos un par de llaves SSH generadas
-- ✅ Tener acceso a al menos un servidor remoto (o VM/contenedor)
-- ✅ Conocer los comandos básicos de SSH
-
----
-
-## ⏱️ Distribución del Tiempo
-
-```
-Semana 03 (4 horas totales)
-├── Teoría ████████░░░░░░░░░░░░ 25% (1h)
-├── Prácticas ██████████████░░░░ 37.5% (1.5h)
-└── Proyecto ██████████████░░░░ 37.5% (1.5h)
+```bash
+./scripts/verificar-semana.sh 05
 ```
 
----
+Comprueba tu proyecto (`3-proyecto/starter/`) contra los 22 requisitos verificables de la semana; tres de ellos arrancan un `sshd` real dentro del cliente para comprobar el master. Al terminar deben pasar todos, y dentro del cliente, con la llave del paso 5 del proyecto instalada, esto debe decir `hostname server`, `server` y `Master running`:
 
-## 🧭 Navegación
+```bash
+cd bootcamp/week-05-configuracion_avanzada_cliente_ssh/3-proyecto/starter
+bin/kit-link
+ssh -G -F config lab-server | grep '^hostname '
+ssh -F config lab-server hostname
+ssh -F config -O check lab-server
+```
 
-| ⬅️ Anterior                                                   |          🏠 Inicio           |                                                   Siguiente ➡️ |
-| :------------------------------------------------------------ | :--------------------------: | -------------------------------------------------------------: |
-| [Semana 02: Autenticación con Llaves](../week-03-autenticacion_con_llaves_ssh/README.md) | [Bootcamp SSH](../README.md) | [Semana 04: Transferencia de Archivos](../week-06-transferencia_archivos_scp_sftp_rsync/README.md) |
+## 🔗 Navegación
 
----
+| Anterior | Actual | Siguiente |
+|---|---|---|
+| [← Semana 04 — `ssh-agent`, agent forwarding y llaves FIDO2](../week-04-ssh_agent_y_llaves_fido2/README.md) | **Semana 05 — Configuración avanzada del cliente** | [Semana 06 — Transferencia de archivos →](../week-06-transferencia_archivos_scp_sftp_rsync/README.md) |
 
-<div align="center">
-
-**🔧 Semana 03: Configuración Avanzada del Cliente SSH**
-
-_Transforma tu productividad con ~/.ssh/config_
-
-</div>
+[← Volver al índice del bootcamp](../README.md)

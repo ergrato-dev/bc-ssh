@@ -1,0 +1,160 @@
+{
+  "semana": "05",
+  "titulo": "Configuración avanzada del cliente: Include, Match y multiplexing",
+  "checks": [
+    {
+      "id": "kl-uso",
+      "descripcion": "bin/kit-link rechaza argumentos (sale con 2)",
+      "cmd": "{proyecto}/bin/kit-link x",
+      "assert": "exit=2",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 2"
+    },
+    {
+      "id": "kl-enlaza",
+      "descripcion": "bin/kit-link enlaza ~/.ssh/kit a la carpeta del kit",
+      "cmd": "{proyecto}/bin/kit-link >/dev/null && [ \"$(readlink ~/.ssh/kit)\" = \"$(cd {proyecto} && pwd)\" ]",
+      "assert": "exit0",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 2"
+    },
+    {
+      "id": "kl-repite",
+      "descripcion": "bin/kit-link se puede repetir sin crear enlaces dentro del kit",
+      "cmd": "{proyecto}/bin/kit-link >/dev/null && {proyecto}/bin/kit-link >/dev/null && [ ! -L {proyecto}/$(basename {proyecto}) ]",
+      "assert": "exit0",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 2"
+    },
+    {
+      "id": "kl-no-pisa",
+      "descripcion": "bin/kit-link no borra una carpeta ~/.ssh/kit que no es un enlace (sale con 1)",
+      "cmd": "h=$(mktemp -d); mkdir -p $h/.ssh/kit; touch $h/.ssh/kit/notas; HOME=$h {proyecto}/bin/kit-link 2>/dev/null; r=$?; echo \"$r $(ls $h/.ssh/kit)\"; rm -rf $h",
+      "assert": "stdout~^1 notas$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 3"
+    },
+    {
+      "id": "kl-cm-700",
+      "descripcion": "bin/kit-link deja ~/.ssh/cm con permisos 700, aunque ya existiera",
+      "cmd": "mkdir -p ~/.ssh/cm; chmod 755 ~/.ssh/cm; {proyecto}/bin/kit-link >/dev/null && stat -c %a ~/.ssh/cm",
+      "assert": "stdout~^700$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 4"
+    },
+    {
+      "id": "config-sin-hosts",
+      "descripcion": "config ya no define hosts: viven en conf.d/",
+      "cmd": "grep -c '^Host lab-' {proyecto}/config || true",
+      "assert": "stdout~^0$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 1"
+    },
+    {
+      "id": "conf-lab",
+      "descripcion": "conf.d/10-lab.conf define lab-server y lab-bastion",
+      "cmd": "for h in lab-server lab-bastion; do ssh -G -F {proyecto}/conf.d/10-lab.conf $h | grep '^hostname '; done | paste -sd' '",
+      "assert": "stdout~^hostname server hostname bastion$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 1"
+    },
+    {
+      "id": "config-include",
+      "descripcion": "config incluye conf.d/ a través de ~/.ssh/kit",
+      "cmd": "{proyecto}/bin/kit-link >/dev/null && ssh -G -F {proyecto}/config lab-server | grep '^hostname '",
+      "assert": "stdout~^hostname server$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 1"
+    },
+    {
+      "id": "config-hereda",
+      "descripcion": "config mantiene los valores de las semanas 02-04",
+      "cmd": "{proyecto}/bin/kit-link >/dev/null && ssh -G -F {proyecto}/config lab-server | grep -cE '^(stricthostkeychecking true|hashknownhosts yes|identitiesonly yes|addkeystoagent 3600|forwardagent no)$'",
+      "assert": "stdout~^5$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 1"
+    },
+    {
+      "id": "config-controlmaster",
+      "descripcion": "config activa el multiplexing (ControlMaster auto)",
+      "cmd": "{proyecto}/bin/kit-link >/dev/null && ssh -G -F {proyecto}/config lab-server | grep '^controlmaster '",
+      "assert": "stdout~^controlmaster auto$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 5"
+    },
+    {
+      "id": "config-controlpath",
+      "descripcion": "Los sockets van a ~/.ssh/cm/%C",
+      "cmd": "{proyecto}/bin/kit-link >/dev/null && ssh -G -F {proyecto}/config lab-server | grep '^controlpath '",
+      "assert": "stdout~^controlpath /.+/[.]ssh/cm/[0-9a-f]{40}$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 5"
+    },
+    {
+      "id": "config-controlpersist",
+      "descripcion": "El master sigue 10 min tras la última sesión",
+      "cmd": "{proyecto}/bin/kit-link >/dev/null && ssh -G -F {proyecto}/config lab-server | grep '^controlpersist '",
+      "assert": "stdout~^controlpersist 600$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 5"
+    },
+    {
+      "id": "perfil-sinmux",
+      "descripcion": "ssh -P sinmux desactiva el multiplexing que config activa",
+      "cmd": "{proyecto}/bin/kit-link >/dev/null && echo \"$(ssh -G -F {proyecto}/config lab-server | grep '^controlmaster ') / $(ssh -G -F {proyecto}/config lab-server -P sinmux | grep -E '^control(master|path) ' | paste -sd' ')\"",
+      "assert": "stdout~^controlmaster auto / controlmaster false$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 6"
+    },
+    {
+      "id": "mux-real",
+      "descripcion": "La segunda conexión viaja por el master: entra aunque la llave ya no esté en authorized_keys",
+      "cmd": "{proyecto}/bin/kit-link >/dev/null && d=$(mktemp -d -p ~); ssh-keygen -q -t ed25519 -N \"\" -f $d/hk; ssh-keygen -q -t ed25519 -N \"\" -f $d/k; echo \"[127.0.0.1]:2205 $(cat $d/hk.pub)\" > $d/kh; cp $d/k.pub $d/ak; /usr/sbin/sshd -f /dev/null -h $d/hk -p 2205 -o PidFile=$d/pid -o AuthorizedKeysFile=$d/ak; sleep 0.5; c() { ssh -n -F {proyecto}/config -o HostName=127.0.0.1 -o Port=2205 -o UserKnownHostsFile=$d/kh -o IdentityAgent=none -i $d/k -o BatchMode=yes lab-server \"$@\"; }; c true 2>/dev/null; : > $d/ak; c echo por-el-master 2>&1; ssh -F {proyecto}/config -O exit -o HostName=127.0.0.1 -o Port=2205 lab-server 2>/dev/null; kill $(cat $d/pid); rm -rf $d",
+      "assert": "stdout~^por-el-master$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 5"
+    },
+    {
+      "id": "sinmux-real",
+      "descripcion": "Con -P sinmux, la conexión no usa el master: se autentica de nuevo y falla",
+      "cmd": "{proyecto}/bin/kit-link >/dev/null && d=$(mktemp -d -p ~); ssh-keygen -q -t ed25519 -N \"\" -f $d/hk; ssh-keygen -q -t ed25519 -N \"\" -f $d/k; echo \"[127.0.0.1]:2205 $(cat $d/hk.pub)\" > $d/kh; cp $d/k.pub $d/ak; /usr/sbin/sshd -f /dev/null -h $d/hk -p 2205 -o PidFile=$d/pid -o AuthorizedKeysFile=$d/ak; sleep 0.5; c() { ssh -n -F {proyecto}/config -o HostName=127.0.0.1 -o Port=2205 -o UserKnownHostsFile=$d/kh -o IdentityAgent=none -i $d/k -o BatchMode=yes lab-server \"$@\"; }; c true 2>/dev/null; : > $d/ak; x=$(c echo m 2>/dev/null); c -P sinmux true 2>/dev/null; echo \"$x $?\"; ssh -F {proyecto}/config -O exit -o HostName=127.0.0.1 -o Port=2205 lab-server 2>/dev/null; kill $(cat $d/pid); rm -rf $d",
+      "assert": "stdout~^m 255$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 6"
+    },
+    {
+      "id": "mux-uso",
+      "descripcion": "bin/mux rechaza una orden desconocida (sale con 2)",
+      "cmd": "{proyecto}/bin/mux; a=$?; {proyecto}/bin/mux borrar; echo $a $?",
+      "assert": "stdout~^2 2$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 7"
+    },
+    {
+      "id": "mux-vacio",
+      "descripcion": "bin/mux list sin sockets no escribe nada",
+      "cmd": "MUX_DIR=$(mktemp -d) {proyecto}/bin/mux list | wc -l",
+      "assert": "stdout~^0$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 7"
+    },
+    {
+      "id": "mux-list-huerfano",
+      "descripcion": "bin/mux list marca un socket sin master como huérfano",
+      "cmd": "d=$(mktemp -d); ssh-agent -a $d/s >/dev/null; pkill -9 -f \"ssh-agent -a $d/s\"; sleep 0.2; MUX_DIR=$d {proyecto}/bin/mux list; rm -rf $d",
+      "assert": "stdout~^huérfano +/.+/s$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 7"
+    },
+    {
+      "id": "mux-stop-huerfano",
+      "descripcion": "bin/mux stop borra los sockets huérfanos",
+      "cmd": "d=$(mktemp -d); ssh-agent -a $d/s >/dev/null; pkill -9 -f \"ssh-agent -a $d/s\"; sleep 0.2; MUX_DIR=$d {proyecto}/bin/mux stop >/dev/null; ls $d | wc -l; rm -rf $d",
+      "assert": "stdout~^0$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 7"
+    },
+    {
+      "id": "mux-stop-real",
+      "descripcion": "bin/mux list ve el master y bin/mux stop lo cierra",
+      "cmd": "{proyecto}/bin/kit-link >/dev/null && d=$(mktemp -d -p ~); ssh-keygen -q -t ed25519 -N \"\" -f $d/hk; ssh-keygen -q -t ed25519 -N \"\" -f $d/k; echo \"[127.0.0.1]:2205 $(cat $d/hk.pub)\" > $d/kh; cp $d/k.pub $d/ak; /usr/sbin/sshd -f /dev/null -h $d/hk -p 2205 -o PidFile=$d/pid -o AuthorizedKeysFile=$d/ak; sleep 0.5; c() { ssh -n -F {proyecto}/config -o HostName=127.0.0.1 -o Port=2205 -o UserKnownHostsFile=$d/kh -o IdentityAgent=none -i $d/k -o BatchMode=yes lab-server \"$@\"; }; c true 2>/dev/null; a=$({proyecto}/bin/mux list | grep -cE \"^activo +pid=[0-9]+ +/.+/cm/[0-9a-f]{40}$\"); b=$({proyecto}/bin/mux stop | cut -c1-7); sleep 0.3; echo \"$a $b $(ls ~/.ssh/cm | wc -l)\"; kill $(cat $d/pid); rm -rf $d",
+      "assert": "stdout~^1 cerrado 0$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 7"
+    },
+    {
+      "id": "kit-sigue-funcionando",
+      "descripcion": "Los scripts de semanas anteriores siguen respondiendo",
+      "cmd": "{proyecto}/bin/ak-line; a=$?; {proyecto}/bin/kh-add; b=$?; {proyecto}/bin/agent-up x 2>/dev/null; echo $a $b $?",
+      "assert": "stdout~^2 2 2$",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 8"
+    },
+    {
+      "id": "kit-completo-y-limpio",
+      "descripcion": "Sin TODO en config, conf.d/ y bin/, y shellcheck sin avisos",
+      "cmd": "! grep -rn TODO {proyecto}/config {proyecto}/conf.d {proyecto}/bin && shellcheck {proyecto}/bin/*",
+      "assert": "exit0",
+      "pista": "3-proyecto/README.md, Paso a paso, paso 8"
+    }
+  ]
+}

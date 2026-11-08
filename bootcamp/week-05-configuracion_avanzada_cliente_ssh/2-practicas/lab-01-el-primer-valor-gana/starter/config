@@ -1,0 +1,10 @@
+# Lab 01 — este archivo tiene un error de orden: encuéntralo con ssh -G.
+
+Host *
+    User nadie
+    ConnectTimeout 5
+
+Host lab-server
+    HostName server
+    User alumno
+    IdentityFile ~/.ssh/lab

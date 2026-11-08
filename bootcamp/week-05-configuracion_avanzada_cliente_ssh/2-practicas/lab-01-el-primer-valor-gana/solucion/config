@@ -1,0 +1,10 @@
+# Lab 01 — solución: lo concreto arriba, Host * al final.
+
+Host lab-server
+    HostName server
+    User alumno
+    IdentityFile ~/.ssh/lab
+
+Host *
+    User nadie
+    ConnectTimeout 5

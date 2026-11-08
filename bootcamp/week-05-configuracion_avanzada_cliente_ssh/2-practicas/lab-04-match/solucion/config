@@ -1,0 +1,21 @@
+# Lab 04 — solución.
+
+Host lab-server
+    HostName server
+
+Host lab-bastion
+    HostName bastion
+
+# `host` mira el HostName que ya se haya leído: va DESPUÉS de los alias.
+# Sin User en ningún bloque, el usuario remoto es tu usuario local.
+Match host server,bastion user alumno
+    IdentityFile ~/.ssh/lab
+    IdentitiesOnly yes
+
+# Antes que Host *: si no, el ConnectTimeout 5 de abajo ganaría.
+Match exec "test -f ~/.ssh/modo-viaje"
+    ConnectTimeout 30
+    ServerAliveInterval 15
+
+Host *
+    ConnectTimeout 5

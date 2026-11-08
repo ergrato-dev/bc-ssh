@@ -1,0 +1,17 @@
+# Lab 04 — Match.
+
+Host lab-server
+    HostName server
+
+Host lab-bastion
+    HostName bastion
+
+# TODO 1: con `ssh server` o `ssh lab-server` (el host final es server o
+#   bastion), y solo si el usuario remoto es alumno: IdentityFile ~/.ssh/lab
+#   e IdentitiesOnly yes.
+
+# TODO 2: si existe ~/.ssh/modo-viaje: ConnectTimeout 30 y
+#   ServerAliveInterval 15.
+
+Host *
+    ConnectTimeout 5

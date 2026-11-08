@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+#
+# agent-up — reutiliza tu ssh-agent o arranca uno en un socket fijo.
+#
+# Uso: eval "$(agent-up)"
+#
+# Escribe en stdout solo la línea `export SSH_AUTH_SOCK=...`, para eval;
+# los mensajes van a stderr. AGENT_SOCK cambia el socket
+# (~/.ssh/agent.sock por defecto) y AGENT_LIFETIME el tiempo máximo que
+# una llave vive en el agente (1h por defecto).
+#
+# Códigos de salida: 0 agente listo, 1 no se pudo arrancar, 2 uso incorrecto.
+
+set -euo pipefail
+
+if (( $# > 0 )); then
+  echo "uso: eval \"\$(agent-up)\"" >&2
+  exit 2
+fi
+
+sock="${AGENT_SOCK:-$HOME/.ssh/agent.sock}"
+
+# ssh-add -l sale con 0 (hay llaves), 1 (agente vacío) o 2 (no hay agente).
+vivo() {
+  local rc=0
+  SSH_AUTH_SOCK="$1" ssh-add -l >/dev/null 2>&1 || rc=$?
+  (( rc != 2 ))
+}
+
+if [[ -S "$sock" ]] && vivo "$sock"; then
+  echo "agent-up: reutilizo el agente de $sock" >&2
+else
+  # Un socket sin agente detrás (el agente murió, el equipo se reinició)
+  # haría fallar a ssh-agent -a con "Address already in use".
+  [[ -e "$sock" ]] && rm -f "$sock"
+  (umask 077; mkdir -p "$(dirname "$sock")")
+  # Qué: -t pone caducidad a cada llave que se añada al agente.
+  # Para qué: una llave olvidada en el agente deja de servir sola.
+  # Impacto: pasado ese tiempo, la próxima conexión vuelve a pedir la frase.
+  ssh-agent -a "$sock" -t "${AGENT_LIFETIME:-1h}" >/dev/null || exit 1
+  echo "agent-up: agente nuevo en $sock" >&2
+fi
+
+printf 'export SSH_AUTH_SOCK=%q\n' "$sock"

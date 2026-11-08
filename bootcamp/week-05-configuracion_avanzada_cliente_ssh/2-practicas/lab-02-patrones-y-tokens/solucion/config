@@ -1,0 +1,16 @@
+# Lab 02 — solución.
+
+Host lab-server
+    HostName server
+
+Host lab-bastion
+    HostName bastion
+
+# Lo común a todos los alias lab-*: se combina con el bloque de cada uno.
+Host lab-*
+    User alumno
+    IdentityFile ~/.ssh/lab
+
+# `*` y después `!lab-bastion`: todos, excepto ese.
+Host * !lab-bastion
+    ConnectTimeout 3

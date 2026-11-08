@@ -75,6 +75,6 @@ ssh -F config lab-server hostname
 
 | Anterior | Actual | Siguiente |
 |---|---|---|
-| [← Semana 03 — Autenticación con llaves](../week-03-autenticacion_con_llaves_ssh/README.md) | **Semana 04 — `ssh-agent`, agent forwarding y llaves FIDO2** | [Semana 05 — 🔧 Semana 03: Configuración Avanzada del Cliente SSH →](../week-05-configuracion_avanzada_cliente_ssh/README.md) |
+| [← Semana 03 — Autenticación con llaves](../week-03-autenticacion_con_llaves_ssh/README.md) | **Semana 04 — `ssh-agent`, agent forwarding y llaves FIDO2** | [Semana 05 — Configuración avanzada del cliente →](../week-05-configuracion_avanzada_cliente_ssh/README.md) |
 
 [← Volver al índice del bootcamp](../README.md)

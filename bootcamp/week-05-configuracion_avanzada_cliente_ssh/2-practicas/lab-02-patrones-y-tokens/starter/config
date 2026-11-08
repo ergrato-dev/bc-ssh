@@ -1,0 +1,12 @@
+# Lab 02 — un bloque por host solo para lo que cambia; lo común, en un patrón.
+
+Host lab-server
+    HostName server
+
+Host lab-bastion
+    HostName bastion
+
+# TODO 1: un solo bloque para todos los alias que empiezan por lab-, con
+#   User alumno e IdentityFile ~/.ssh/lab.
+
+# TODO 2: ConnectTimeout 3 para todos los hosts menos lab-bastion.

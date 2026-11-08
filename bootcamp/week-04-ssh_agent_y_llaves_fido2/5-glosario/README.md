@@ -41,6 +41,6 @@
 
 | Anterior | Siguiente |
 |---|---|
-| ← [Recursos — web](../4-recursos/webgrafia/README.md) | [🔧 Semana 03: Configuración Avanzada del Cliente SSH](../../week-05-configuracion_avanzada_cliente_ssh/README.md) → |
+| ← [Recursos — web](../4-recursos/webgrafia/README.md) | [Semana 05 — Configuración avanzada del cliente](../../week-05-configuracion_avanzada_cliente_ssh/README.md) → |
 
 [↑ Semana 04](../README.md)

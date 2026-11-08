@@ -1,0 +1,13 @@
+# Lab 06 — solución.
+
+Host lab-server
+    HostName server
+    User alumno
+    IdentityFile ~/.ssh/lab
+    IdentitiesOnly yes
+
+Host *
+    ConnectTimeout 5
+    ControlMaster auto
+    ControlPath ~/.ssh/cm/%C
+    ControlPersist 10m

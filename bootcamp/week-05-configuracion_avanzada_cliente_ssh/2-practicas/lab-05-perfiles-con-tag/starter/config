@@ -1,0 +1,22 @@
+# Lab 05 — perfiles que eliges con ssh -P NOMBRE.
+
+# TODO 3: que lab-bastion use el perfil viaje aunque no escribas -P
+#   (Tag viaje). Piensa dónde tiene que ir la línea.
+
+# TODO 1: perfil `depurar`: LogLevel DEBUG1.
+
+# TODO 2: perfil `viaje`: ConnectTimeout 30, ServerAliveInterval 15 y
+#   Compression yes.
+
+Host lab-server
+    HostName server
+    User alumno
+    IdentityFile ~/.ssh/lab
+
+Host lab-bastion
+    HostName bastion
+    User alumno
+    IdentityFile ~/.ssh/lab
+
+Host *
+    ConnectTimeout 5

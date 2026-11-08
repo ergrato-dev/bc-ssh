@@ -1,0 +1,11 @@
+# Lab 06 — multiplexing.
+
+Host lab-server
+    HostName server
+    User alumno
+    IdentityFile ~/.ssh/lab
+    IdentitiesOnly yes
+
+Host *
+    ConnectTimeout 5
+    # TODO: ControlMaster auto, ControlPath ~/.ssh/cm/%C y ControlPersist 10m.

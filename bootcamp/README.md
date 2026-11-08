@@ -8,7 +8,7 @@ Estado de cada semana. ✅ = migrada a la estructura de `CLAUDE.md` (labs con st
 | [02](week-02-protocolo_kex_y_known_hosts/README.md) | Protocolo por dentro: transporte, KEX, host keys y `known_hosts` | Fundamentos | ✅ |
 | [03](week-03-autenticacion_con_llaves_ssh/README.md) | Autenticación con llaves | Fundamentos | ✅ |
 | [04](week-04-ssh_agent_y_llaves_fido2/README.md) | `ssh-agent`, agent forwarding y llaves FIDO2 | Fundamentos | ✅ |
-| [05](week-05-configuracion_avanzada_cliente_ssh/README.md) | Configuración avanzada del cliente | Cliente | 🟡 |
+| [05](week-05-configuracion_avanzada_cliente_ssh/README.md) | Configuración avanzada del cliente | Cliente | ✅ |
 | [06](week-06-transferencia_archivos_scp_sftp_rsync/README.md) | Transferencia de archivos: scp, sftp, rsync y sshfs | Cliente | 🟡 |
 | 07 | Servidor: `sshd_config`, `Match`, chroot SFTP y hardening | Servidor | ⬜ |
 | 08 | Port forwarding, SOCKS y túneles | Redes | ⬜ |

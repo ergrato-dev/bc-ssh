@@ -1,0 +1,28 @@
+# Lab 05 — solución. Los perfiles van arriba: el primer valor gana.
+
+# La etiqueta tiene que existir cuando ssh llega a los Match de abajo: este
+# bloque va el primero. Un `ssh -P otro lab-bastion` sigue mandando, porque
+# la línea de comandos se lee antes.
+Host lab-bastion
+    Tag viaje
+
+Match tagged depurar
+    LogLevel DEBUG1
+
+Match tagged viaje
+    ConnectTimeout 30
+    ServerAliveInterval 15
+    Compression yes
+
+Host lab-server
+    HostName server
+    User alumno
+    IdentityFile ~/.ssh/lab
+
+Host lab-bastion
+    HostName bastion
+    User alumno
+    IdentityFile ~/.ssh/lab
+
+Host *
+    ConnectTimeout 5
