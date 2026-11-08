@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 420">
+  <defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8b949e"/></marker></defs>
+  <rect width="900" height="420" fill="#0d1117"/>
+  <text x="450" y="34" font-family="sans-serif" font-size="20" font-weight="bold" fill="#c9d1d9" text-anchor="middle">bin/sshd-deploy: aplicar con vuelta atrás automática</text>
+  <text x="200" y="70" font-family="sans-serif" font-size="16" font-weight="bold" fill="#58a6ff" text-anchor="middle">Tu equipo (bin/sshd-deploy)</text>
+  <text x="680" y="70" font-family="sans-serif" font-size="16" font-weight="bold" fill="#58a6ff" text-anchor="middle">Servidor (sudo sshd-apply)</text>
+  <line x1="440" y1="60" x2="440" y2="400" stroke="#30363d" stroke-width="2" stroke-dasharray="6 4"/>
+  <g font-family="sans-serif" font-size="14">
+    <rect x="40" y="90" width="320" height="50" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+    <text x="60" y="120" fill="#c9d1d9">tar de server/ por la conexión 1</text>
+    <rect x="520" y="90" width="340" height="50" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+    <text x="540" y="120" fill="#c9d1d9">copia la carpeta actual a .anterior</text>
+    <rect x="520" y="155" width="340" height="50" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+    <text x="540" y="185" fill="#c9d1d9" font-family="monospace" font-size="14">sshd -t</text>
+    <text x="620" y="185" fill="#f85149">falla: restaura, sale con 1</text>
+    <rect x="520" y="220" width="340" height="50" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+    <text x="540" y="250" fill="#c9d1d9">recarga y programa la vuelta atrás</text>
+    <rect x="520" y="285" width="340" height="100" rx="8" fill="#161b22" stroke="#d29922" stroke-width="2"/>
+    <text x="540" y="312" fill="#d29922">en segundo plano: espera 60 s</text>
+    <text x="540" y="336" fill="#3fb950">existe confirmado: no hace nada</text>
+    <text x="540" y="360" fill="#f85149">no existe: restaura y recarga</text>
+    <rect x="40" y="285" width="320" height="100" rx="8" fill="#161b22" stroke="#3fb950" stroke-width="2"/>
+    <text x="60" y="312" fill="#c9d1d9">conexión 2, NUEVA y sin master:</text>
+    <text x="60" y="336" fill="#c9d1d9" font-family="monospace" font-size="13">ssh -o ControlPath=none HOST \</text>
+    <text x="60" y="356" fill="#c9d1d9" font-family="monospace" font-size="13">    touch …/confirmado</text>
+    <text x="60" y="376" fill="#8b949e" font-size="12">si no entra: sale con 1</text>
+  </g>
+  <g stroke="#8b949e" stroke-width="2">
+    <line x1="360" y1="115" x2="516" y2="115" marker-end="url(#fa)"/>
+    <line x1="690" y1="140" x2="690" y2="153" marker-end="url(#fa)"/>
+    <line x1="690" y1="205" x2="690" y2="218" marker-end="url(#fa)"/>
+    <line x1="690" y1="270" x2="690" y2="283" marker-end="url(#fa)"/>
+    <line x1="516" y1="245" x2="200" y2="245"/>
+    <line x1="200" y1="245" x2="200" y2="281" marker-end="url(#fa)"/>
+    <line x1="360" y1="335" x2="516" y2="335" stroke="#3fb950" marker-end="url(#fa)"/>
+  </g>
+</svg>

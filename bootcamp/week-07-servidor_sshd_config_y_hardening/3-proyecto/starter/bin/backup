@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+#
+# backup — copia ORIGEN en una carpeta nueva de DESTINO, con fecha y hora,
+# sin duplicar en disco lo que no cambió desde la copia anterior.
+#
+# Uso: backup ORIGEN DESTINO
+#
+#   ORIGEN   carpeta local o remota (lab-server:datos). Se copia su
+#            contenido, con o sin barra final.
+#   DESTINO  carpeta local donde viven las copias:
+#              DESTINO/2026-11-08T101500/   una copia completa
+#              DESTINO/latest -> 2026-11-08T101500
+#
+# Cada copia se ve completa, pero los archivos que no cambiaron son enlaces
+# duros a los de la copia anterior (rsync --link-dest): ocupan una sola vez.
+# Se guardan las BACKUP_KEEP copias más recientes (7 por defecto).
+# Conecta con `ssh -F config` del kit; RSYNC_RSH lo cambia.
+#
+# Códigos de salida: 0 copia hecha, 1 rsync falló o ya hay una copia de
+# este segundo, 2 uso incorrecto.
+
+set -euo pipefail
+
+if [[ $# -ne 2 ]]; then
+  echo "uso: backup ORIGEN DESTINO" >&2
+  exit 2
+fi
+keep="${BACKUP_KEEP:-7}"
+if [[ ! "$keep" =~ ^[1-9][0-9]*$ ]]; then
+  echo "backup: BACKUP_KEEP debe ser un entero mayor que 0" >&2
+  exit 2
+fi
+
+kit="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# rsync abre la conexión con RSYNC_RSH: el config del kit trae alias,
+# known_hosts estricto y multiplexing.
+export RSYNC_RSH="${RSYNC_RSH:-ssh -F $kit/config}"
+
+# Con barra final, rsync copia el contenido y no la carpeta. "host:" ya
+# es el contenido del home: con barra sería la raíz (/) del servidor.
+case "$1" in
+  */ | *:) origen="$1" ;;
+  *)       origen="$1/" ;;
+esac
+mkdir -p "$2"
+destino="$(cd "$2" && pwd)"
+nombre="$(date +%Y-%m-%dT%H%M%S)"
+
+if [[ -e "$destino/$nombre" ]]; then
+  echo "backup: ya existe $destino/$nombre; espera un segundo y repite" >&2
+  exit 1
+fi
+
+# Qué: rsync escribe en .parcial-NOMBRE y solo al terminar la renombra.
+# Para qué: una copia cortada (red, disco lleno, Ctrl+C) nunca parece buena.
+# Impacto: latest apunta siempre a una copia completa.
+parcial="$destino/.parcial-$nombre"
+
+# --link-dest: lo que no cambió respecto a latest se enlaza, no se copia.
+# Ruta absoluta: una relativa se busca desde la carpeta de destino.
+# --delete no hace falta: la carpeta de destino empieza vacía.
+opciones=(-a)
+[[ -d "$destino/latest" ]] && opciones+=("--link-dest=$destino/latest")
+
+if ! rsync "${opciones[@]}" "$origen" "$parcial/"; then
+  rm -rf "$parcial"
+  echo "backup: rsync falló; latest sigue en la copia anterior" >&2
+  exit 1
+fi
+
+mv "$parcial" "$destino/$nombre"
+ln -sfn "$nombre" "$destino/latest"
+echo "backup: $destino/$nombre"
+
+# Las copias se ordenan solas: el nombre es la fecha. Se borran todas menos
+# las $keep últimas; un enlace duro compartido no libera espacio hasta que
+# se borra su última copia.
+shopt -s nullglob
+copias=("$destino"/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9][0-9][0-9][0-9][0-9])
+for (( i = 0; i < ${#copias[@]} - keep; i++ )); do
+  rm -rf "${copias[$i]}"
+  echo "backup: borrada ${copias[$i]}"
+done

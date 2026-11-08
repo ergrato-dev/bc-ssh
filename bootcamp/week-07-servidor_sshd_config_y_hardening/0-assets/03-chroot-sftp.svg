@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 400">
+  <defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8b949e"/></marker></defs>
+  <rect width="900" height="400" fill="#0d1117"/>
+  <text x="450" y="34" font-family="sans-serif" font-size="20" font-weight="bold" fill="#c9d1d9" text-anchor="middle">ChrootDirectory /srv/sftp/%u: lo que hay y lo que ve proveedor</text>
+  <rect x="40" y="60" width="430" height="310" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="60" y="90" font-family="sans-serif" font-size="16" font-weight="bold" fill="#c9d1d9">En el disco del servidor</text>
+  <g font-family="monospace" font-size="14">
+    <text x="60" y="124" fill="#8b949e">/</text><text x="300" y="124" fill="#8b949e">root 755</text>
+    <text x="60" y="150" fill="#8b949e">├── etc/  home/  usr/ …</text>
+    <text x="60" y="176" fill="#8b949e">└── srv/</text><text x="300" y="176" fill="#8b949e">root 755</text>
+    <text x="60" y="202" fill="#8b949e">    └── sftp/</text><text x="300" y="202" fill="#8b949e">root 755</text>
+    <text x="60" y="228" fill="#58a6ff">        └── proveedor/</text><text x="300" y="228" fill="#3fb950">root 755</text>
+    <text x="60" y="254" fill="#58a6ff">            └── subidas/</text><text x="300" y="254" fill="#d29922">proveedor</text>
+  </g>
+  <text x="60" y="296" font-family="sans-serif" font-size="13" fill="#3fb950">De root y sin escritura para nadie más, hasta /.</text>
+  <text x="60" y="318" font-family="sans-serif" font-size="13" fill="#f85149">Si no: bad ownership or modes for chroot directory</text>
+  <text x="60" y="344" font-family="sans-serif" font-size="13" fill="#d29922">El usuario solo escribe en subidas/.</text>
+  <rect x="520" y="60" width="340" height="200" rx="8" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+  <text x="540" y="90" font-family="sans-serif" font-size="16" font-weight="bold" fill="#58a6ff">Lo que ve proveedor con sftp</text>
+  <g font-family="monospace" font-size="14" fill="#c9d1d9">
+    <text x="540" y="124">/</text>
+    <text x="540" y="150">└── subidas/   ← empieza aquí</text>
+    <text x="540" y="186" fill="#8b949e">sftp&gt; cd /etc</text>
+    <text x="540" y="208" fill="#f85149">No such file or directory</text>
+    <text x="540" y="240" fill="#8b949e">ls -l: 1001 1002 (sin /etc/passwd)</text>
+  </g>
+  <line x1="300" y1="228" x2="516" y2="124" stroke="#8b949e" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#fa)"/>
+  <rect x="520" y="280" width="340" height="90" rx="8" fill="#161b22" stroke="#d29922" stroke-width="2"/>
+  <text x="540" y="308" font-family="sans-serif" font-size="14" fill="#d29922">El chroot encierra archivos, no la red:</text>
+  <text x="540" y="332" font-family="monospace" font-size="13" fill="#c9d1d9">ssh -L … proveedor@server</text>
+  <text x="540" y="354" font-family="sans-serif" font-size="13" fill="#8b949e">sigue abriendo túneles sin DisableForwarding</text>
+</svg>

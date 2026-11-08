@@ -1,0 +1,132 @@
+{
+  "semana": "07",
+  "titulo": "Servidor: sshd_config, Match, chroot SFTP y hardening",
+  "checks": [
+    {
+      "id": "cfg-valida",
+      "descripcion": "sshd -t acepta la configuración del kit",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); sudo ssh-keygen -A >/dev/null; sudo groupadd -f ssh-users; sudo groupadd -f sftp-only; sudo usermod -aG ssh-users alumno; sed \"s|/etc/ssh/sshd_config.d|{proyecto}/server/sshd_config.d|\" /etc/ssh/sshd_config > $d/main; sudo /usr/sbin/sshd -t -f $d/main",
+      "assert": "exit0",
+      "pista": "3-proyecto/README.md, paso 2"
+    },
+    {
+      "id": "cfg-solo-llaves",
+      "descripcion": "Sin contraseña: PasswordAuthentication y KbdInteractiveAuthentication en no",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); sudo ssh-keygen -A >/dev/null; sudo groupadd -f ssh-users; sudo groupadd -f sftp-only; sudo usermod -aG ssh-users alumno; id fuera >/dev/null 2>&1 || sudo useradd -m fuera; id subidas >/dev/null 2>&1 || sudo useradd -M -d /subidas -s /usr/sbin/nologin -G sftp-only subidas; sudo mkdir -p /srv/sftp/subidas/subidas; sudo chown subidas: /srv/sftp/subidas/subidas; sed \"s|/etc/ssh/sshd_config.d|{proyecto}/server/sshd_config.d|\" /etc/ssh/sshd_config > $d/main; sudo /usr/sbin/sshd -T -f $d/main | grep -cE \"^(passwordauthentication|kbdinteractiveauthentication) no$\"",
+      "assert": "stdout~^2$",
+      "pista": "3-proyecto/README.md, paso 3"
+    },
+    {
+      "id": "cfg-sin-root",
+      "descripcion": "root no entra por SSH, ni con llave (PermitRootLogin no)",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); sudo ssh-keygen -A >/dev/null; sudo groupadd -f ssh-users; sudo groupadd -f sftp-only; sudo usermod -aG ssh-users alumno; id fuera >/dev/null 2>&1 || sudo useradd -m fuera; id subidas >/dev/null 2>&1 || sudo useradd -M -d /subidas -s /usr/sbin/nologin -G sftp-only subidas; sudo mkdir -p /srv/sftp/subidas/subidas; sudo chown subidas: /srv/sftp/subidas/subidas; sed \"s|/etc/ssh/sshd_config.d|{proyecto}/server/sshd_config.d|\" /etc/ssh/sshd_config > $d/main; sudo /usr/sbin/sshd -T -f $d/main | grep \"^permitrootlogin\"",
+      "assert": "stdout~^permitrootlogin no$",
+      "pista": "3-proyecto/README.md, paso 3"
+    },
+    {
+      "id": "cfg-grupos",
+      "descripcion": "Solo entran los grupos ssh-users y sftp-only",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); sudo ssh-keygen -A >/dev/null; sudo groupadd -f ssh-users; sudo groupadd -f sftp-only; sudo usermod -aG ssh-users alumno; id fuera >/dev/null 2>&1 || sudo useradd -m fuera; id subidas >/dev/null 2>&1 || sudo useradd -M -d /subidas -s /usr/sbin/nologin -G sftp-only subidas; sudo mkdir -p /srv/sftp/subidas/subidas; sudo chown subidas: /srv/sftp/subidas/subidas; sed \"s|/etc/ssh/sshd_config.d|{proyecto}/server/sshd_config.d|\" /etc/ssh/sshd_config > $d/main; sudo /usr/sbin/sshd -T -f $d/main | grep \"^allowgroups\" | sort | tr \"[:space:]\" \" \"",
+      "assert": "stdout~^allowgroups sftp-only allowgroups ssh-users $",
+      "pista": "3-proyecto/README.md, paso 4"
+    },
+    {
+      "id": "cfg-limites",
+      "descripcion": "MaxAuthTries 3, LoginGraceTime 20 y MaxStartups 10:30:60",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); sudo ssh-keygen -A >/dev/null; sudo groupadd -f ssh-users; sudo groupadd -f sftp-only; sudo usermod -aG ssh-users alumno; id fuera >/dev/null 2>&1 || sudo useradd -m fuera; id subidas >/dev/null 2>&1 || sudo useradd -M -d /subidas -s /usr/sbin/nologin -G sftp-only subidas; sudo mkdir -p /srv/sftp/subidas/subidas; sudo chown subidas: /srv/sftp/subidas/subidas; sed \"s|/etc/ssh/sshd_config.d|{proyecto}/server/sshd_config.d|\" /etc/ssh/sshd_config > $d/main; sudo /usr/sbin/sshd -T -f $d/main | grep -cE \"^(maxauthtries 3|logingracetime 20|maxstartups 10:30:60)$\"",
+      "assert": "stdout~^3$",
+      "pista": "3-proyecto/README.md, paso 5"
+    },
+    {
+      "id": "cfg-sesion",
+      "descripcion": "Sin reenvío de X11 ni de agente, ClientAlive 300 x 2 y LogLevel VERBOSE",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); sudo ssh-keygen -A >/dev/null; sudo groupadd -f ssh-users; sudo groupadd -f sftp-only; sudo usermod -aG ssh-users alumno; id fuera >/dev/null 2>&1 || sudo useradd -m fuera; id subidas >/dev/null 2>&1 || sudo useradd -M -d /subidas -s /usr/sbin/nologin -G sftp-only subidas; sudo mkdir -p /srv/sftp/subidas/subidas; sudo chown subidas: /srv/sftp/subidas/subidas; sed \"s|/etc/ssh/sshd_config.d|{proyecto}/server/sshd_config.d|\" /etc/ssh/sshd_config > $d/main; sudo /usr/sbin/sshd -T -f $d/main | grep -cE \"^(x11forwarding no|allowagentforwarding no|clientaliveinterval 300|clientalivecountmax 2|loglevel VERBOSE)$\"",
+      "assert": "stdout~^5$",
+      "pista": "3-proyecto/README.md, paso 6"
+    },
+    {
+      "id": "cfg-sftp-match",
+      "descripcion": "Un usuario de sftp-only queda en chroot, solo con internal-sftp y sin reenvíos ni terminal",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); sudo ssh-keygen -A >/dev/null; sudo groupadd -f ssh-users; sudo groupadd -f sftp-only; sudo usermod -aG ssh-users alumno; id fuera >/dev/null 2>&1 || sudo useradd -m fuera; id subidas >/dev/null 2>&1 || sudo useradd -M -d /subidas -s /usr/sbin/nologin -G sftp-only subidas; sudo mkdir -p /srv/sftp/subidas/subidas; sudo chown subidas: /srv/sftp/subidas/subidas; sed \"s|/etc/ssh/sshd_config.d|{proyecto}/server/sshd_config.d|\" /etc/ssh/sshd_config > $d/main; sudo /usr/sbin/sshd -T -f $d/main -C user=subidas | grep -cE \"^(chrootdirectory /srv/sftp/%u|forcecommand internal-sftp -d /subidas|disableforwarding yes|permittty no)$\"",
+      "assert": "stdout~^4$",
+      "pista": "3-proyecto/README.md, paso 7"
+    },
+    {
+      "id": "cfg-match-acotado",
+      "descripcion": "El bloque Match no cambia nada a los demás usuarios",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); sudo ssh-keygen -A >/dev/null; sudo groupadd -f ssh-users; sudo groupadd -f sftp-only; sudo usermod -aG ssh-users alumno; id fuera >/dev/null 2>&1 || sudo useradd -m fuera; id subidas >/dev/null 2>&1 || sudo useradd -M -d /subidas -s /usr/sbin/nologin -G sftp-only subidas; sudo mkdir -p /srv/sftp/subidas/subidas; sudo chown subidas: /srv/sftp/subidas/subidas; sed \"s|/etc/ssh/sshd_config.d|{proyecto}/server/sshd_config.d|\" /etc/ssh/sshd_config > $d/main; sudo /usr/sbin/sshd -T -f $d/main -C user=alumno | grep -cE \"^(chrootdirectory none|forcecommand none|permittty yes|disableforwarding no)$\"",
+      "assert": "stdout~^4$",
+      "pista": "3-proyecto/README.md, paso 7"
+    },
+    {
+      "id": "real-llave-entra",
+      "descripcion": "Con el kit en un sshd real, alumno (de ssh-users) entra con llave",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); sudo ssh-keygen -A >/dev/null; sudo groupadd -f ssh-users; sudo groupadd -f sftp-only; sudo usermod -aG ssh-users alumno; id fuera >/dev/null 2>&1 || sudo useradd -m fuera; id subidas >/dev/null 2>&1 || sudo useradd -M -d /subidas -s /usr/sbin/nologin -G sftp-only subidas; sudo mkdir -p /srv/sftp/subidas/subidas; sudo chown subidas: /srv/sftp/subidas/subidas; sed \"s|/etc/ssh/sshd_config.d|{proyecto}/server/sshd_config.d|\" /etc/ssh/sshd_config > $d/main; ssh-keygen -q -t ed25519 -N \"\" -f $d/k; sudo mkdir -p /etc/ssh/ak; for u in alumno fuera subidas; do sudo cp $d/k.pub /etc/ssh/ak/$u; done; sudo /usr/sbin/sshd -f $d/main -p 2207 -o ListenAddress=127.0.0.1 -o AuthorizedKeysFile=/etc/ssh/ak/%u -o PidFile=$d/pid; sleep 0.5; o=\"-F /dev/null -o Port=2207 -i $d/k -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=$d/kh -o LogLevel=ERROR\"; ssh $o alumno@127.0.0.1 id -un 2>&1; sudo pkill -F $d/pid; sudo rm -rf $d",
+      "assert": "stdout~^alumno$",
+      "pista": "3-proyecto/README.md, paso 4"
+    },
+    {
+      "id": "real-sin-password",
+      "descripcion": "Con el kit en un sshd real, la contraseña de alumno (solo laboratorio) se rechaza",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); sudo ssh-keygen -A >/dev/null; sudo groupadd -f ssh-users; sudo groupadd -f sftp-only; sudo usermod -aG ssh-users alumno; id fuera >/dev/null 2>&1 || sudo useradd -m fuera; id subidas >/dev/null 2>&1 || sudo useradd -M -d /subidas -s /usr/sbin/nologin -G sftp-only subidas; sudo mkdir -p /srv/sftp/subidas/subidas; sudo chown subidas: /srv/sftp/subidas/subidas; sed \"s|/etc/ssh/sshd_config.d|{proyecto}/server/sshd_config.d|\" /etc/ssh/sshd_config > $d/main; ssh-keygen -q -t ed25519 -N \"\" -f $d/k; sudo mkdir -p /etc/ssh/ak; for u in alumno fuera subidas; do sudo cp $d/k.pub /etc/ssh/ak/$u; done; sudo /usr/sbin/sshd -f $d/main -p 2207 -o ListenAddress=127.0.0.1 -o AuthorizedKeysFile=/etc/ssh/ak/%u -o PidFile=$d/pid; sleep 0.5; o=\"-F /dev/null -o Port=2207 -i $d/k -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=$d/kh -o LogLevel=ERROR\"; sshpass -p alumno ssh -F /dev/null -o Port=2207 -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=$d/kh2 -o LogLevel=ERROR -o PubkeyAuthentication=no alumno@127.0.0.1 id -un 2>&1; sudo pkill -F $d/pid; sudo rm -rf $d",
+      "assert": "stdout~Permission denied [(]publickey[)]",
+      "pista": "3-proyecto/README.md, paso 3"
+    },
+    {
+      "id": "real-fuera-de-grupos",
+      "descripcion": "Un usuario con llave pero fuera de los grupos no entra",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); sudo ssh-keygen -A >/dev/null; sudo groupadd -f ssh-users; sudo groupadd -f sftp-only; sudo usermod -aG ssh-users alumno; id fuera >/dev/null 2>&1 || sudo useradd -m fuera; id subidas >/dev/null 2>&1 || sudo useradd -M -d /subidas -s /usr/sbin/nologin -G sftp-only subidas; sudo mkdir -p /srv/sftp/subidas/subidas; sudo chown subidas: /srv/sftp/subidas/subidas; sed \"s|/etc/ssh/sshd_config.d|{proyecto}/server/sshd_config.d|\" /etc/ssh/sshd_config > $d/main; ssh-keygen -q -t ed25519 -N \"\" -f $d/k; sudo mkdir -p /etc/ssh/ak; for u in alumno fuera subidas; do sudo cp $d/k.pub /etc/ssh/ak/$u; done; sudo /usr/sbin/sshd -f $d/main -p 2207 -o ListenAddress=127.0.0.1 -o AuthorizedKeysFile=/etc/ssh/ak/%u -o PidFile=$d/pid; sleep 0.5; o=\"-F /dev/null -o Port=2207 -i $d/k -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=$d/kh -o LogLevel=ERROR\"; ssh $o fuera@127.0.0.1 id -un 2>&1; sudo pkill -F $d/pid; sudo rm -rf $d",
+      "assert": "stdout~Permission denied",
+      "pista": "3-proyecto/README.md, paso 4"
+    },
+    {
+      "id": "real-sftp-chroot",
+      "descripcion": "Un usuario de sftp-only sube a /subidas y no puede leer fuera del chroot",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); sudo ssh-keygen -A >/dev/null; sudo groupadd -f ssh-users; sudo groupadd -f sftp-only; sudo usermod -aG ssh-users alumno; id fuera >/dev/null 2>&1 || sudo useradd -m fuera; id subidas >/dev/null 2>&1 || sudo useradd -M -d /subidas -s /usr/sbin/nologin -G sftp-only subidas; sudo mkdir -p /srv/sftp/subidas/subidas; sudo chown subidas: /srv/sftp/subidas/subidas; sed \"s|/etc/ssh/sshd_config.d|{proyecto}/server/sshd_config.d|\" /etc/ssh/sshd_config > $d/main; ssh-keygen -q -t ed25519 -N \"\" -f $d/k; sudo mkdir -p /etc/ssh/ak; for u in alumno fuera subidas; do sudo cp $d/k.pub /etc/ssh/ak/$u; done; sudo /usr/sbin/sshd -f $d/main -p 2207 -o ListenAddress=127.0.0.1 -o AuthorizedKeysFile=/etc/ssh/ak/%u -o PidFile=$d/pid; sleep 0.5; o=\"-F /dev/null -o Port=2207 -i $d/k -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=$d/kh -o LogLevel=ERROR\"; sudo rm -f /srv/sftp/subidas/subidas/f; echo hola > $d/f; echo \"put $d/f\" > $d/lote; echo \"-get /etc/passwd $d/pw\" >> $d/lote; sftp $o -b $d/lote subidas@127.0.0.1 >/dev/null 2>&1; echo \"$(sudo cat /srv/sftp/subidas/subidas/f 2>/dev/null) $(test -e $d/pw && echo leyo || echo noleyo)\"; sudo pkill -F $d/pid; sudo rm -rf $d",
+      "assert": "stdout~^hola noleyo$",
+      "pista": "3-proyecto/README.md, paso 7"
+    },
+    {
+      "id": "real-sftp-sin-shell",
+      "descripcion": "Un usuario de sftp-only no obtiene shell ni ejecuta órdenes",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); sudo ssh-keygen -A >/dev/null; sudo groupadd -f ssh-users; sudo groupadd -f sftp-only; sudo usermod -aG ssh-users alumno; id fuera >/dev/null 2>&1 || sudo useradd -m fuera; id subidas >/dev/null 2>&1 || sudo useradd -M -d /subidas -s /usr/sbin/nologin -G sftp-only subidas; sudo mkdir -p /srv/sftp/subidas/subidas; sudo chown subidas: /srv/sftp/subidas/subidas; sed \"s|/etc/ssh/sshd_config.d|{proyecto}/server/sshd_config.d|\" /etc/ssh/sshd_config > $d/main; ssh-keygen -q -t ed25519 -N \"\" -f $d/k; sudo mkdir -p /etc/ssh/ak; for u in alumno fuera subidas; do sudo cp $d/k.pub /etc/ssh/ak/$u; done; sudo /usr/sbin/sshd -f $d/main -p 2207 -o ListenAddress=127.0.0.1 -o AuthorizedKeysFile=/etc/ssh/ak/%u -o PidFile=$d/pid; sleep 0.5; o=\"-F /dev/null -o Port=2207 -i $d/k -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=$d/kh -o LogLevel=ERROR\"; ssh $o subidas@127.0.0.1 id 2>&1; sudo pkill -F $d/pid; sudo rm -rf $d",
+      "assert": "stdout~This service allows sftp connections only",
+      "pista": "3-proyecto/README.md, paso 7"
+    },
+    {
+      "id": "deploy-aplica",
+      "descripcion": "bin/sshd-deploy aplica el kit: antes la contraseña entraba, después no",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); sudo ssh-keygen -A >/dev/null; sudo groupadd -f ssh-users; sudo groupadd -f sftp-only; sudo usermod -aG ssh-users alumno; sudo pkill -f \"^/usr/sbin/sshd -p 2207\"; sudo rm -rf /etc/ssh/sshd_config.d /etc/ssh/sshd_config.d.anterior; sudo cp -r {raiz}/lab/sshd_config.d /etc/ssh/; ssh-keygen -q -t ed25519 -N \"\" -f $d/k; sudo mkdir -p /etc/ssh/ak; sudo cp $d/k.pub /etc/ssh/ak/alumno; sudo /usr/sbin/sshd -p 2207 -o ListenAddress=127.0.0.1 -o AuthorizedKeysFile=/etc/ssh/ak/%u; sleep 0.5; echo \"Host t\" > $d/cfg; for l in \"HostName 127.0.0.1\" \"Port 2207\" \"User alumno\" \"IdentityFile $d/k\" \"IdentitiesOnly yes\" \"BatchMode yes\" \"StrictHostKeyChecking accept-new\" \"UserKnownHostsFile $d/kh\" \"LogLevel ERROR\" \"ControlMaster auto\" \"ControlPath $d/cm\" \"ControlPersist 1m\"; do echo \"  $l\" >> $d/cfg; done; export SSH_CMD=\"ssh -F $d/cfg\" DEPLOY_TIMEOUT=3; pw() { sshpass -p alumno ssh -F /dev/null -o Port=2207 -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=$d/kh2 -o LogLevel=ERROR -o PubkeyAuthentication=no alumno@127.0.0.1 true >/dev/null 2>&1; echo $?; }; cp -r {proyecto} $d/kit; a=$(pw); $d/kit/bin/sshd-deploy t >/dev/null 2>&1; echo $a $? $(pw); ssh -F $d/cfg -O exit t 2>/dev/null; sudo pkill -F /run/sshd.pid",
+      "assert": "stdout~^0 0 255$",
+      "pista": "3-proyecto/README.md, paso 11"
+    },
+    {
+      "id": "deploy-invalida",
+      "descripcion": "Con un .conf inválido, bin/sshd-deploy sale con 1 y el servidor sigue como estaba",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); sudo ssh-keygen -A >/dev/null; sudo groupadd -f ssh-users; sudo groupadd -f sftp-only; sudo usermod -aG ssh-users alumno; sudo pkill -f \"^/usr/sbin/sshd -p 2207\"; sudo rm -rf /etc/ssh/sshd_config.d /etc/ssh/sshd_config.d.anterior; sudo cp -r {raiz}/lab/sshd_config.d /etc/ssh/; ssh-keygen -q -t ed25519 -N \"\" -f $d/k; sudo mkdir -p /etc/ssh/ak; sudo cp $d/k.pub /etc/ssh/ak/alumno; sudo /usr/sbin/sshd -p 2207 -o ListenAddress=127.0.0.1 -o AuthorizedKeysFile=/etc/ssh/ak/%u; sleep 0.5; echo \"Host t\" > $d/cfg; for l in \"HostName 127.0.0.1\" \"Port 2207\" \"User alumno\" \"IdentityFile $d/k\" \"IdentitiesOnly yes\" \"BatchMode yes\" \"StrictHostKeyChecking accept-new\" \"UserKnownHostsFile $d/kh\" \"LogLevel ERROR\" \"ControlMaster auto\" \"ControlPath $d/cm\" \"ControlPersist 1m\"; do echo \"  $l\" >> $d/cfg; done; export SSH_CMD=\"ssh -F $d/cfg\" DEPLOY_TIMEOUT=3; pw() { sshpass -p alumno ssh -F /dev/null -o Port=2207 -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=$d/kh2 -o LogLevel=ERROR -o PubkeyAuthentication=no alumno@127.0.0.1 true >/dev/null 2>&1; echo $?; }; cp -r {proyecto} $d/kit; echo \"NoExiste yes\" >> $d/kit/server/sshd_config.d/20-sesion.conf; $d/kit/bin/sshd-deploy t >/dev/null 2>&1; echo $? $(pw) $(ls /etc/ssh/sshd_config.d); ssh -F $d/cfg -O exit t 2>/dev/null; sudo pkill -F /run/sshd.pid",
+      "assert": "stdout~^1 0 10-bc-ssh.conf$",
+      "pista": "3-proyecto/README.md, paso 8"
+    },
+    {
+      "id": "deploy-deshace",
+      "descripcion": "Si la configuración nueva deja fuera, sshd-deploy lo detecta aunque haya un master y el servidor la deshace solo",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); sudo ssh-keygen -A >/dev/null; sudo groupadd -f ssh-users; sudo groupadd -f sftp-only; sudo usermod -aG ssh-users alumno; sudo pkill -f \"^/usr/sbin/sshd -p 2207\"; sudo rm -rf /etc/ssh/sshd_config.d /etc/ssh/sshd_config.d.anterior; sudo cp -r {raiz}/lab/sshd_config.d /etc/ssh/; ssh-keygen -q -t ed25519 -N \"\" -f $d/k; sudo mkdir -p /etc/ssh/ak; sudo cp $d/k.pub /etc/ssh/ak/alumno; sudo /usr/sbin/sshd -p 2207 -o ListenAddress=127.0.0.1 -o AuthorizedKeysFile=/etc/ssh/ak/%u; sleep 0.5; echo \"Host t\" > $d/cfg; for l in \"HostName 127.0.0.1\" \"Port 2207\" \"User alumno\" \"IdentityFile $d/k\" \"IdentitiesOnly yes\" \"BatchMode yes\" \"StrictHostKeyChecking accept-new\" \"UserKnownHostsFile $d/kh\" \"LogLevel ERROR\" \"ControlMaster auto\" \"ControlPath $d/cm\" \"ControlPersist 1m\"; do echo \"  $l\" >> $d/cfg; done; export SSH_CMD=\"ssh -F $d/cfg\" DEPLOY_TIMEOUT=3; pw() { sshpass -p alumno ssh -F /dev/null -o Port=2207 -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=$d/kh2 -o LogLevel=ERROR -o PubkeyAuthentication=no alumno@127.0.0.1 true >/dev/null 2>&1; echo $?; }; cp -r {proyecto} $d/kit; echo \"AllowUsers nadie\" > $d/kit/server/sshd_config.d/00-cierre.conf; ssh -F $d/cfg t true; $d/kit/bin/sshd-deploy t >/dev/null 2>&1; a=$?; sleep 5; echo $a $(ssh -F $d/cfg -o ControlPath=none t id -un 2>/dev/null); ssh -F $d/cfg -O exit t 2>/dev/null; sudo pkill -F /run/sshd.pid",
+      "assert": "stdout~^1 alumno$",
+      "pista": "3-proyecto/README.md, pasos 9 y 10"
+    },
+    {
+      "id": "kit-sigue-funcionando",
+      "descripcion": "Los scripts de semanas anteriores siguen respondiendo",
+      "cmd": "{proyecto}/bin/ak-line; a=$?; {proyecto}/bin/kh-add; b=$?; {proyecto}/bin/mux 2>/dev/null; c=$?; {proyecto}/bin/backup 2>/dev/null; e=$?; {proyecto}/bin/mirror 2>/dev/null; echo $a $b $c $e $?",
+      "assert": "stdout~^2 2 2 2 2$",
+      "pista": "3-proyecto/README.md, paso 0"
+    },
+    {
+      "id": "kit-completo-y-limpio",
+      "descripcion": "Sin TODO en config, conf.d/, bin/ y server/, y shellcheck sin avisos",
+      "cmd": "! grep -rn TODO {proyecto}/config {proyecto}/conf.d {proyecto}/bin {proyecto}/server && shellcheck {proyecto}/bin/* && shellcheck -s sh {proyecto}/server/sshd-apply",
+      "assert": "exit0",
+      "pista": "3-proyecto/README.md, paso 12"
+    }
+  ]
+}

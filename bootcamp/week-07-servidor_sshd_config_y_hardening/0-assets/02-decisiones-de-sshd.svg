@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 470">
+  <defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8b949e"/></marker></defs>
+  <rect width="900" height="470" fill="#0d1117"/>
+  <text x="450" y="34" font-family="sans-serif" font-size="20" font-weight="bold" fill="#c9d1d9" text-anchor="middle">Lo que decide sshd sobre una conexión, en orden</text>
+  <g font-family="sans-serif" font-size="14">
+    <rect x="40" y="62" width="560" height="70" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+    <text x="60" y="90" font-weight="bold" fill="#58a6ff">1. Llega una conexión TCP</text>
+    <text x="60" y="114" fill="#c9d1d9" font-family="monospace" font-size="13">MaxStartups 10:30:60 · LoginGraceTime 20</text>
+    <rect x="40" y="148" width="560" height="70" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+    <text x="60" y="176" font-weight="bold" fill="#58a6ff">2. El cliente dice su usuario</text>
+    <text x="60" y="200" fill="#c9d1d9" font-family="monospace" font-size="13">DenyUsers · AllowUsers · DenyGroups · AllowGroups</text>
+    <rect x="40" y="234" width="560" height="70" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+    <text x="60" y="262" font-weight="bold" fill="#58a6ff">3. Se aplican los Match que coinciden</text>
+    <text x="60" y="286" fill="#c9d1d9" font-family="monospace" font-size="13">Match User / Group / Address …  (sshd -T -C user=…)</text>
+    <rect x="40" y="320" width="560" height="70" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+    <text x="60" y="348" font-weight="bold" fill="#58a6ff">4. Autenticación</text>
+    <text x="60" y="372" fill="#c9d1d9" font-family="monospace" font-size="13">Pubkey yes · Password no · PermitRootLogin no · MaxAuthTries 3</text>
+    <rect x="40" y="406" width="560" height="50" rx="8" fill="#161b22" stroke="#3fb950" stroke-width="2"/>
+    <text x="60" y="436" font-weight="bold" fill="#3fb950">5. Sesión:</text>
+    <text x="150" y="436" fill="#c9d1d9" font-family="monospace" font-size="13">ForceCommand · Chroot · X11 · agente · túneles</text>
+  </g>
+  <g stroke="#8b949e" stroke-width="2">
+    <line x1="320" y1="132" x2="320" y2="146" marker-end="url(#fa)"/>
+    <line x1="320" y1="218" x2="320" y2="232" marker-end="url(#fa)"/>
+    <line x1="320" y1="304" x2="320" y2="318" marker-end="url(#fa)"/>
+    <line x1="320" y1="390" x2="320" y2="404" marker-end="url(#fa)"/>
+  </g>
+  <g font-family="sans-serif" font-size="13">
+    <line x1="600" y1="97" x2="636" y2="97" stroke="#f85149" stroke-width="2" marker-end="url(#fa)"/>
+    <text x="645" y="94" fill="#f85149">demasiadas o muy lentas:</text>
+    <text x="645" y="112" fill="#8b949e">se cierra sin pedir nada</text>
+    <line x1="600" y1="183" x2="636" y2="183" stroke="#f85149" stroke-width="2" marker-end="url(#fa)"/>
+    <text x="645" y="180" fill="#f85149">no permitido:</text>
+    <text x="645" y="198" fill="#8b949e">Permission denied, igual que</text>
+    <text x="645" y="214" fill="#8b949e">una llave mala (el porqué, en el log)</text>
+    <line x1="600" y1="355" x2="636" y2="355" stroke="#f85149" stroke-width="2" marker-end="url(#fa)"/>
+    <text x="645" y="352" fill="#f85149">falla 3 veces:</text>
+    <text x="645" y="370" fill="#8b949e">Too many authentication failures</text>
+    <text x="645" y="262" fill="#d29922">un Match puede cambiar</text>
+    <text x="645" y="280" fill="#d29922">los pasos 4 y 5</text>
+  </g>
+</svg>

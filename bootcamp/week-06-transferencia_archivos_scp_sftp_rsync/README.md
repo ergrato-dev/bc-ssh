@@ -76,6 +76,6 @@ du -sh ~/backups/server/2*
 
 | Anterior | Actual | Siguiente |
 |---|---|---|
-| [← Semana 05 — Configuración avanzada del cliente](../week-05-configuracion_avanzada_cliente_ssh/README.md) | **Semana 06 — Transferencia de archivos** | Semana 07 — Servidor: `sshd_config` y hardening (próximamente) |
+| [← Semana 05 — Configuración avanzada del cliente](../week-05-configuracion_avanzada_cliente_ssh/README.md) | **Semana 06 — Transferencia de archivos** | [Semana 07 — Servidor: `sshd_config` y hardening →](../week-07-servidor_sshd_config_y_hardening/README.md) |
 
 [← Volver al índice del bootcamp](../README.md)

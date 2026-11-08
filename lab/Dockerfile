@@ -14,7 +14,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
       openssh-client openssh-server \
-      bash jq git shellcheck rsync sshpass python3 \
+      bash jq git shellcheck rsync sshpass python3 sudo \
       iproute2 iputils-ping netcat-openbsd tcpdump ca-certificates curl less procps nano \
  && rm -rf /var/lib/apt/lists/*
 
@@ -28,6 +28,15 @@ COPY --from=ghcr.io/astral-sh/uv:0.12.2 /uv /uvx /usr/local/bin/
 RUN usermod -l alumno -d /home/alumno -m ubuntu \
  && groupmod -n alumno ubuntu \
  && echo 'alumno:alumno' | chpasswd
+
+# Qué: alumno puede usar sudo sin contraseña. SOLO para el laboratorio.
+# Para qué: administrar sshd en server como en un servidor real
+#   (`ssh server sudo ...`, semana 07) y que los scripts y el autograding
+#   lo hagan sin preguntar.
+# Impacto: en un servidor real, sudo pide contraseña (y se usa `ssh -t`);
+#   nunca des NOPASSWD a una cuenta a la que se entra por SSH.
+RUN echo 'alumno ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/alumno \
+ && chmod 440 /etc/sudoers.d/alumno
 
 # Las host keys se borran de la imagen y se generan al arrancar cada servidor.
 # Impacto: cada contenedor tiene identidad propia, como un servidor real; si se

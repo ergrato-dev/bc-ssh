@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 440">
+  <defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8b949e"/></marker></defs>
+  <rect width="900" height="440" fill="#0d1117"/>
+  <text x="450" y="34" font-family="sans-serif" font-size="20" font-weight="bold" fill="#c9d1d9" text-anchor="middle">sshd lee en este orden y se queda con el primer valor</text>
+  <rect x="40" y="60" width="500" height="350" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="60" y="88" font-family="monospace" font-size="15" font-weight="bold" fill="#c9d1d9">/etc/ssh/sshd_config</text>
+  <text x="60" y="118" font-family="monospace" font-size="14" fill="#8b949e">línea 12:</text>
+  <text x="150" y="118" font-family="monospace" font-size="14" fill="#c9d1d9">Include sshd_config.d/*.conf</text>
+  <rect x="70" y="132" width="440" height="170" rx="6" fill="#0d1117" stroke="#58a6ff" stroke-width="2"/>
+  <text x="90" y="158" font-family="monospace" font-size="14" fill="#58a6ff">sshd_config.d/ (orden alfabético)</text>
+  <text x="90" y="190" font-family="monospace" font-size="14" fill="#c9d1d9">1  10-bc-ssh.conf</text>
+  <text x="320" y="190" font-family="monospace" font-size="13" fill="#3fb950">Password… yes  ← gana</text>
+  <text x="90" y="222" font-family="monospace" font-size="14" fill="#c9d1d9">2  50-cloud-init.conf</text>
+  <text x="320" y="222" font-family="monospace" font-size="13" fill="#8b949e">Password… yes  ignorada</text>
+  <text x="90" y="254" font-family="monospace" font-size="14" fill="#c9d1d9">3  60-endurecido.conf</text>
+  <text x="320" y="254" font-family="monospace" font-size="13" fill="#f85149">Password… no   ignorada</text>
+  <text x="90" y="286" font-family="sans-serif" font-size="13" fill="#8b949e">sin aviso ni error</text>
+  <text x="60" y="334" font-family="monospace" font-size="14" fill="#c9d1d9">4  resto de sshd_config</text>
+  <text x="60" y="360" font-family="monospace" font-size="13" fill="#8b949e">X11Forwarding yes  (gana si nadie lo puso antes)</text>
+  <text x="60" y="390" font-family="monospace" font-size="13" fill="#8b949e">Match …  (al final: se aplican al conectar)</text>
+  <rect x="590" y="60" width="270" height="160" rx="8" fill="#161b22" stroke="#3fb950" stroke-width="2"/>
+  <text x="725" y="90" font-family="sans-serif" font-size="16" font-weight="bold" fill="#3fb950" text-anchor="middle">Qué gana de verdad</text>
+  <text x="610" y="124" font-family="monospace" font-size="14" fill="#c9d1d9">sudo sshd -T</text>
+  <text x="610" y="148" font-family="sans-serif" font-size="13" fill="#8b949e">una línea por opción, con el valor</text>
+  <text x="610" y="168" font-family="sans-serif" font-size="13" fill="#8b949e">ganador, leído de los archivos</text>
+  <text x="610" y="198" font-family="monospace" font-size="13" fill="#c9d1d9">passwordauthentication yes</text>
+  <rect x="590" y="250" width="270" height="160" rx="8" fill="#161b22" stroke="#d29922" stroke-width="2"/>
+  <text x="725" y="280" font-family="sans-serif" font-size="16" font-weight="bold" fill="#d29922" text-anchor="middle">Lo que usa el sshd en marcha</text>
+  <text x="610" y="312" font-family="sans-serif" font-size="13" fill="#8b949e">lo que leyó al arrancar o en la</text>
+  <text x="610" y="332" font-family="sans-serif" font-size="13" fill="#8b949e">última recarga:</text>
+  <text x="610" y="362" font-family="monospace" font-size="13" fill="#c9d1d9">sudo kill -HUP $(cat /run/sshd.pid)</text>
+  <text x="610" y="388" font-family="monospace" font-size="13" fill="#c9d1d9">sudo systemctl reload ssh</text>
+  <line x1="540" y1="190" x2="586" y2="190" stroke="#8b949e" stroke-width="2" marker-end="url(#fa)"/>
+</svg>

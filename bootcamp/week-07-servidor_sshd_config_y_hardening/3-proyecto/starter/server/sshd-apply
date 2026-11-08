@@ -1,0 +1,64 @@
+#!/bin/sh
+#
+# sshd-apply — instala una carpeta sshd_config.d nueva en ESTE servidor y la
+# deshace sola si nadie confirma que se puede seguir entrando.
+#
+# Uso (en el servidor, como root): sshd-apply CARPETA SEGUNDOS
+#
+#   CARPETA   contiene sshd_config.d/ con los .conf nuevos. Para confirmar,
+#             se crea el archivo CARPETA/confirmado (lo hace bin/sshd-deploy
+#             con una conexión SSH nueva).
+#   SEGUNDOS  tiempo para confirmar. Si pasa sin confirmar, vuelve la
+#             configuración anterior y CARPETA se borra.
+#
+# Lo normal es no ejecutarlo a mano: bin/sshd-deploy lo copia y lo lanza.
+# Es sh y no bash para que funcione en cualquier servidor.
+#
+# Códigos de salida: 0 aplicada (falta confirmar), 1 configuración inválida
+# (no se aplicó nada), 2 uso incorrecto.
+
+set -eu
+
+if [ $# -ne 2 ] || [ ! -d "$1/sshd_config.d" ]; then
+  echo "uso: sshd-apply CARPETA SEGUNDOS (CARPETA/sshd_config.d debe existir)" >&2
+  exit 2
+fi
+carpeta=$1
+espera=$2
+dir=/etc/ssh/sshd_config.d
+anterior=$dir.anterior
+
+# Qué: sshd vuelve a leer su configuración sin cortar las sesiones abiertas.
+# systemd en un servidor real; en el contenedor del laboratorio, la señal HUP
+# al proceso cuyo PID guarda sshd en /run/sshd.pid.
+# sleep 1: con HUP, sshd tarda unos milisegundos en volver a escuchar; una
+# conexión que llegue antes recibe "Connection refused" y la prueba de
+# bin/sshd-deploy daría por malo un cambio bueno.
+recargar() {
+  systemctl reload ssh 2>/dev/null || kill -HUP "$(cat /run/sshd.pid)"
+  sleep 1
+}
+restaurar() {
+  rm -rf "$dir"
+  cp -a "$anterior" "$dir"
+}
+
+# La carpeta entera se sustituye: lo que no está en el kit no está en el
+# servidor (también un 50-cloud-init.conf con PasswordAuthentication yes).
+rm -rf "$anterior"
+cp -a "$dir" "$anterior"
+rm -rf "$dir"
+cp -r "$carpeta/sshd_config.d" "$dir"
+chown -R root:root "$dir"
+chmod 755 "$dir"
+chmod 644 "$dir"/*
+
+# TODO 6 (paso 8): antes de recargar, valida con sshd -t. Si falla,
+#   restaura la anterior, borra $carpeta, avisa por stderr y sal con 1.
+recargar
+
+# TODO 8 (paso 10): en segundo plano, espera $espera segundos; si no existe
+#   $carpeta/confirmado, restaura y recarga. Al final, borra $carpeta.
+#   Suelta la entrada y la salida (</dev/null >/dev/null 2>&1) para que la
+#   conexión SSH no se quede esperando.
+echo "sshd-apply: aplicada; se deshace en $espera s si no se confirma" >&2
