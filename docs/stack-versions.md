@@ -4,6 +4,8 @@
 |---|---|---|---|
 | Ubuntu | 24.04 LTS | `lab/Dockerfile` | LTS con soporte hasta 2029 |
 | OpenSSH | 9.6p1 | paquete de Ubuntu 24.04 | Mínimo del curso: ed25519, `-sk`, `sntrup761x25519-sha512` por defecto |
+| PostgreSQL | 17.6 (servidor), 16 (`psql` de Ubuntu 24.04) | `compose.yaml`, `lab/Dockerfile` | Base de datos del curso; `psql` 16 habla sin problema con un servidor 17 |
+| autossh | 1.4g | paquete de Ubuntu 24.04 | Túneles persistentes (semana 08) |
 | uv | 0.12.2 | `lab/Dockerfile` | Único gestor de Python del curso |
 | Docker Compose | v2+ | equipo del estudiante | Sintaxis `compose.yaml` y anclas YAML |
 

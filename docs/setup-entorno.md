@@ -39,7 +39,7 @@ La primera vez tarda unos minutos (descarga Ubuntu e instala paquetes). Comprueb
 docker compose ps
 ```
 
-Debes ver `server`, `bastion` e `interno` con estado `running`.
+Debes ver `server`, `bastion`, `interno` y `db` con estado `running`.
 
 ## 4. Entra al cliente
 
@@ -58,18 +58,19 @@ Para salir: `exit`. El contenedor `client` se borra al salir (`--rm`); tus archi
 ## 5. Topología del laboratorio
 
 ```
-client ── red publica ── server
+client ── red publica ── server ── red datos ── db (PostgreSQL)
                      └── bastion ── red privada ── interno
 ```
 
 | Host | Redes | Para qué |
 |---|---|---|
 | `client` | publica | Tu terminal. Desde aquí ejecutas `ssh` |
-| `server` | publica | Primer servidor al que te conectas |
+| `server` | publica, datos | Primer servidor al que te conectas |
 | `bastion` | publica, privada | Servidor de salto (semana 09) |
 | `interno` | privada | Solo alcanzable a través de `bastion` |
+| `db` | datos | PostgreSQL (base `tienda`); solo alcanzable a través de `server` (semana 08) |
 
-Usuario `alumno`, contraseña `alumno` en todos.
+Usuario `alumno`, contraseña `alumno` en todos, también en PostgreSQL.
 
 > [!WARNING]
 > Esa contraseña es **solo para el laboratorio**. Un servidor real con contraseña débil y `PasswordAuthentication yes` es comprometido por bots en horas. En la semana 07 la desactivas.

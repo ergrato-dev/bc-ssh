@@ -76,6 +76,6 @@ sshpass -p alumno ssh -F config -P sinmux -o PubkeyAuthentication=no lab-server 
 
 | Anterior | Actual | Siguiente |
 |---|---|---|
-| [← Semana 06 — Transferencia de archivos](../week-06-transferencia_archivos_scp_sftp_rsync/README.md) | **Semana 07 — Servidor: `sshd_config` y hardening** | Semana 08 — Túneles y reenvío de puertos (próximamente) |
+| [← Semana 06 — Transferencia de archivos](../week-06-transferencia_archivos_scp_sftp_rsync/README.md) | **Semana 07 — Servidor: `sshd_config` y hardening** | [Semana 08 — Port forwarding, SOCKS y túneles →](../week-08-port_forwarding_socks_y_tuneles/README.md) |
 
 [← Volver al índice del bootcamp](../README.md)

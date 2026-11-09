@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 360">
+  <defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8b949e"/></marker></defs>
+  <rect width="900" height="360" fill="#0d1117"/>
+  <text x="450" y="34" font-family="sans-serif" font-size="20" font-weight="bold" fill="#c9d1d9" text-anchor="middle">autossh vigila a ssh; ServerAliveInterval detecta el corte</text>
+  <rect x="40" y="70" width="230" height="90" rx="8" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+  <text x="155" y="105" font-family="monospace" font-size="15" fill="#c9d1d9" text-anchor="middle">autossh -M 0</text>
+  <text x="155" y="130" font-family="sans-serif" font-size="13" fill="#8b949e" text-anchor="middle">AUTOSSH_PIDFILE</text>
+  <rect x="340" y="70" width="230" height="90" rx="8" fill="#161b22" stroke="#3fb950" stroke-width="2"/>
+  <text x="455" y="105" font-family="monospace" font-size="15" fill="#c9d1d9" text-anchor="middle">ssh -L ... server</text>
+  <text x="455" y="130" font-family="sans-serif" font-size="13" fill="#8b949e" text-anchor="middle">proceso hijo</text>
+  <rect x="640" y="70" width="220" height="90" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="750" y="105" font-family="sans-serif" font-size="15" font-weight="bold" fill="#c9d1d9" text-anchor="middle">server</text>
+  <text x="750" y="130" font-family="sans-serif" font-size="13" fill="#8b949e" text-anchor="middle">cada 15 s: ¿sigues ahí?</text>
+  <line x1="274" y1="105" x2="336" y2="105" stroke="#58a6ff" stroke-width="2" marker-end="url(#fa)"/>
+  <text x="305" y="95" font-family="sans-serif" font-size="12" fill="#58a6ff" text-anchor="middle">lanza</text>
+  <line x1="574" y1="115" x2="636" y2="115" stroke="#3fb950" stroke-width="2" marker-end="url(#fa)" marker-start="url(#fa)"/>
+  <g font-family="sans-serif" font-size="14">
+    <rect x="40" y="195" width="820" height="140" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+    <text x="60" y="225" fill="#c9d1d9">1. Se corta la red: 3 preguntas sin respuesta (45 s).</text>
+    <text x="60" y="252" fill="#f85149">2. ssh sale con 255: «Timeout, server server not responding.»</text>
+    <text x="60" y="279" fill="#3fb950">3. autossh lo relanza: «ssh exited with error status 255; restarting ssh».</text>
+    <text x="60" y="306" fill="#d29922">Si ssh sale con 0 (lo cerraste tú) o autossh recibe TERM, no se relanza.</text>
+  </g>
+</svg>

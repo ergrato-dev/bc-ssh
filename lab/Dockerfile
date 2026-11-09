@@ -9,12 +9,14 @@ ENV DEBIAN_FRONTEND=noninteractive \
     LC_ALL=C.UTF-8 \
     BC_SSH_LAB=1
 
+# postgresql-client (psql) y autossh: túneles a PostgreSQL (semana 08).
 # python3: solo para rrsync (semana 06), el script de rsync que restringe una
 # llave a una carpeta; lo trae el paquete rsync pero sin su intérprete.
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
       openssh-client openssh-server \
       bash jq git shellcheck rsync sshpass python3 sudo \
+      postgresql-client autossh \
       iproute2 iputils-ping netcat-openbsd tcpdump ca-certificates curl less procps nano \
  && rm -rf /var/lib/apt/lists/*
 

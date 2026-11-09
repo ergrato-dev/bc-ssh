@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 300">
+  <defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8b949e"/></marker></defs>
+  <rect width="900" height="300" fill="#0d1117"/>
+  <text x="450" y="34" font-family="sans-serif" font-size="20" font-weight="bold" fill="#c9d1d9" text-anchor="middle">ssh -L 15432:db:5432 server: qué tramo va cifrado</text>
+  <rect x="40" y="80" width="200" height="110" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="140" y="110" font-family="sans-serif" font-size="16" font-weight="bold" fill="#c9d1d9" text-anchor="middle">client</text>
+  <text x="140" y="140" font-family="monospace" font-size="13" fill="#c9d1d9" text-anchor="middle">psql -p 15432</text>
+  <text x="140" y="164" font-family="monospace" font-size="13" fill="#8b949e" text-anchor="middle">127.0.0.1:15432</text>
+  <rect x="350" y="80" width="200" height="110" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="450" y="110" font-family="sans-serif" font-size="16" font-weight="bold" fill="#c9d1d9" text-anchor="middle">server</text>
+  <text x="450" y="140" font-family="monospace" font-size="13" fill="#c9d1d9" text-anchor="middle">sshd</text>
+  <text x="450" y="164" font-family="sans-serif" font-size="13" fill="#8b949e" text-anchor="middle">abre la conexión a db</text>
+  <rect x="660" y="80" width="200" height="110" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="760" y="110" font-family="sans-serif" font-size="16" font-weight="bold" fill="#c9d1d9" text-anchor="middle">db</text>
+  <text x="760" y="140" font-family="monospace" font-size="13" fill="#c9d1d9" text-anchor="middle">PostgreSQL :5432</text>
+  <text x="760" y="164" font-family="sans-serif" font-size="13" fill="#8b949e" text-anchor="middle">ve llegar a server</text>
+  <line x1="244" y1="135" x2="346" y2="135" stroke="#3fb950" stroke-width="4" marker-end="url(#fa)"/>
+  <line x1="554" y1="135" x2="656" y2="135" stroke="#f85149" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#fa)"/>
+  <text x="295" y="220" font-family="sans-serif" font-size="14" fill="#3fb950" text-anchor="middle">cifrado (SSH)</text>
+  <text x="295" y="240" font-family="sans-serif" font-size="13" fill="#8b949e" text-anchor="middle">red publica, Internet</text>
+  <text x="605" y="220" font-family="sans-serif" font-size="14" fill="#f85149" text-anchor="middle">en claro (sin TLS)</text>
+  <text x="605" y="240" font-family="sans-serif" font-size="13" fill="#8b949e" text-anchor="middle">red datos, interna</text>
+  <text x="450" y="280" font-family="sans-serif" font-size="13" fill="#d29922" text-anchor="middle">El túnel protege el camino que no controlas; la red interna se protege aparte.</text>
+</svg>

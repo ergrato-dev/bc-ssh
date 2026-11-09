@@ -4,8 +4,9 @@
 #   ./scripts/verificar-semana.sh NN    # autograding dentro de client
 #
 # Topología:
-#   client ── red publica ── server
+#   client ── red publica ── server ── red datos ── db (PostgreSQL)
 #                         └─ bastion ── red privada ── interno
+# db solo es alcanzable desde server: client llega por un túnel (semana 08).
 # interno no es alcanzable desde client: solo a través de bastion (semana 09).
 x-servidor: &servidor
   build: lab
@@ -16,7 +17,7 @@ services:
   server:
     <<: *servidor
     hostname: server
-    networks: [publica]
+    networks: [publica, datos]
 
   bastion:
     <<: *servidor
@@ -27,6 +28,21 @@ services:
     <<: *servidor
     hostname: interno
     networks: [privada]
+
+  # Qué: PostgreSQL con la base `tienda` (lab/db/*.sql la rellena al crearse).
+  # Para qué: un servicio real al que solo llega server, como la base de datos
+  #   de producción que no escucha en Internet (semana 08).
+  # Impacto: usuario alumno, contraseña alumno, SOLO para el laboratorio.
+  db:
+    image: postgres:17.6-alpine
+    hostname: db
+    environment:
+      POSTGRES_USER: alumno
+      POSTGRES_PASSWORD: alumno
+      POSTGRES_DB: tienda
+    volumes:
+      - ./lab/db:/docker-entrypoint-initdb.d:ro
+    networks: [datos]
 
   client:
     build: lab
@@ -39,9 +55,11 @@ services:
     volumes:
       - .:/bc-ssh
     networks: [publica]
-    depends_on: [server, bastion, interno]
+    depends_on: [server, bastion, interno, db]
 
 networks:
   publica:
   privada:
+    internal: true
+  datos:
     internal: true

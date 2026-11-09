@@ -1,0 +1,111 @@
+{
+  "semana": "08",
+  "titulo": "Port forwarding, SOCKS y túneles",
+  "checks": [
+    {
+      "id": "tun-alias",
+      "descripcion": "tun-pg entra en server como alumno con la llave ~/.ssh/lab",
+      "cmd": "{proyecto}/bin/kit-link >/dev/null; ssh -G -F {proyecto}/config tun-pg | grep -cE \"^(hostname server|user alumno|identityfile ~/.ssh/lab)$\"",
+      "assert": "stdout~^3$",
+      "pista": "3-proyecto/README.md, paso 2"
+    },
+    {
+      "id": "tun-forward",
+      "descripcion": "tun-pg reenvía 127.0.0.1:15432 de tu equipo a db:5432",
+      "cmd": "{proyecto}/bin/kit-link >/dev/null; ssh -G -F {proyecto}/config tun-pg | grep \"^localforward\"",
+      "assert": "stdout~^localforward .127.0.0.1.:15432 .db.:5432$",
+      "pista": "3-proyecto/README.md, paso 2"
+    },
+    {
+      "id": "tun-exit-on-failure",
+      "descripcion": "tun-pg sale con error si no puede abrir el puerto (ExitOnForwardFailure yes)",
+      "cmd": "{proyecto}/bin/kit-link >/dev/null; ssh -G -F {proyecto}/config tun-pg | grep \"^exitonforwardfailure\"",
+      "assert": "stdout~^exitonforwardfailure yes$",
+      "pista": "3-proyecto/README.md, paso 3"
+    },
+    {
+      "id": "tun-keepalive",
+      "descripcion": "tun-pg detecta una conexión muerta: ServerAliveInterval 15 y ServerAliveCountMax 3",
+      "cmd": "{proyecto}/bin/kit-link >/dev/null; ssh -G -F {proyecto}/config tun-pg | grep -cE \"^(serveraliveinterval 15|serveralivecountmax 3)$\"",
+      "assert": "stdout~^2$",
+      "pista": "3-proyecto/README.md, paso 3"
+    },
+    {
+      "id": "tun-sin-sesion-ni-master",
+      "descripcion": "tun-pg no abre sesión (SessionType none) ni usa multiplexing",
+      "cmd": "{proyecto}/bin/kit-link >/dev/null; ssh -G -F {proyecto}/config tun-pg > /tmp/g.$$; echo \"$(grep -cE \"^(sessiontype none|controlmaster false)$\" /tmp/g.$$) $(grep -c \"^controlpath\" /tmp/g.$$)\"; rm -f /tmp/g.$$",
+      "assert": "stdout~^2 0$",
+      "pista": "3-proyecto/README.md, paso 4"
+    },
+    {
+      "id": "tunnel-uso",
+      "descripcion": "bin/tunnel sale con 2 si el uso es incorrecto",
+      "cmd": "T={proyecto}/bin/tunnel; $T 2>/dev/null; a=$?; $T x tun-pg 2>/dev/null; b=$?; $T status 2>/dev/null; c=$?; $T status tun-pg x 2>/dev/null; e=$?; TUNNEL_TIMEOUT=0 $T up tun-pg 2>/dev/null; echo $a $b $c $e $?",
+      "assert": "stdout~^2 2 2 2 2$",
+      "pista": "3-proyecto/README.md, paso 5"
+    },
+    {
+      "id": "tunnel-sin-forward",
+      "descripcion": "bin/tunnel up sale con 1 si el host no tiene LocalForward",
+      "cmd": "{proyecto}/bin/kit-link >/dev/null; {proyecto}/bin/tunnel up lab-server 2>/dev/null",
+      "assert": "exit=1",
+      "pista": "3-proyecto/README.md, paso 5"
+    },
+    {
+      "id": "tunnel-up-datos",
+      "descripcion": "bin/tunnel up abre el túnel y los datos llegan al otro lado",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; {proyecto}/bin/kit-link >/dev/null; pkill -f \"^/usr/lib/autossh/autossh\"; d=$(mktemp -d -p ~); ssh-keygen -q -t ed25519 -N \"\" -f $d/hk; ssh-keygen -q -t ed25519 -N \"\" -f $d/k; echo \"[127.0.0.1]:2208 $(cat $d/hk.pub)\" > $d/kh; cp $d/k.pub $d/ak; /usr/sbin/sshd -f /dev/null -h $d/hk -p 2208 -o PidFile=$d/pid -o AuthorizedKeysFile=$d/ak; grep -q \" db$\" /etc/hosts || echo \"127.0.0.1 db\" | sudo tee -a /etc/hosts >/dev/null; mkdir $d/www; echo ok > $d/www/ok; (cd $d/www && exec python3 -m http.server 5432 --bind 127.0.0.1 >/dev/null 2>&1 &); sleep 0.5; export TUNNEL_DIR=$d/tun; T={proyecto}/bin/tunnel; O=\"-o HostName=127.0.0.1 -o Port=2208 -o UserKnownHostsFile=$d/kh -o IdentityFile=$d/k -o BatchMode=yes -o LogLevel=ERROR\"; $T up tun-pg $O >/dev/null; r=\"$? $(curl -s -m 3 127.0.0.1:15432/ok)\"; $T down tun-pg >/dev/null 2>&1; pkill -f \"^/usr/lib/autossh/autossh\"; pkill -f \"^sshd: alumno\"; kill $(cat $d/pid); pkill -f \"^python3 -m http.server 5432\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^0 ok$",
+      "pista": "3-proyecto/README.md, paso 6"
+    },
+    {
+      "id": "tunnel-up-una-vez",
+      "descripcion": "Un segundo bin/tunnel up no arranca otro autossh",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; {proyecto}/bin/kit-link >/dev/null; pkill -f \"^/usr/lib/autossh/autossh\"; d=$(mktemp -d -p ~); ssh-keygen -q -t ed25519 -N \"\" -f $d/hk; ssh-keygen -q -t ed25519 -N \"\" -f $d/k; echo \"[127.0.0.1]:2208 $(cat $d/hk.pub)\" > $d/kh; cp $d/k.pub $d/ak; /usr/sbin/sshd -f /dev/null -h $d/hk -p 2208 -o PidFile=$d/pid -o AuthorizedKeysFile=$d/ak; grep -q \" db$\" /etc/hosts || echo \"127.0.0.1 db\" | sudo tee -a /etc/hosts >/dev/null; mkdir $d/www; echo ok > $d/www/ok; (cd $d/www && exec python3 -m http.server 5432 --bind 127.0.0.1 >/dev/null 2>&1 &); sleep 0.5; export TUNNEL_DIR=$d/tun; T={proyecto}/bin/tunnel; O=\"-o HostName=127.0.0.1 -o Port=2208 -o UserKnownHostsFile=$d/kh -o IdentityFile=$d/k -o BatchMode=yes -o LogLevel=ERROR\"; $T up tun-pg $O >/dev/null; $T up tun-pg $O >/dev/null; r=\"$? $(pgrep -c autossh)\"; $T down tun-pg >/dev/null 2>&1; pkill -f \"^/usr/lib/autossh/autossh\"; pkill -f \"^sshd: alumno\"; kill $(cat $d/pid); pkill -f \"^python3 -m http.server 5432\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^0 1$",
+      "pista": "3-proyecto/README.md, paso 7"
+    },
+    {
+      "id": "tunnel-status-down",
+      "descripcion": "status sale con 0 con el túnel activo y con 1 tras down, que no deja procesos",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; {proyecto}/bin/kit-link >/dev/null; pkill -f \"^/usr/lib/autossh/autossh\"; d=$(mktemp -d -p ~); ssh-keygen -q -t ed25519 -N \"\" -f $d/hk; ssh-keygen -q -t ed25519 -N \"\" -f $d/k; echo \"[127.0.0.1]:2208 $(cat $d/hk.pub)\" > $d/kh; cp $d/k.pub $d/ak; /usr/sbin/sshd -f /dev/null -h $d/hk -p 2208 -o PidFile=$d/pid -o AuthorizedKeysFile=$d/ak; grep -q \" db$\" /etc/hosts || echo \"127.0.0.1 db\" | sudo tee -a /etc/hosts >/dev/null; mkdir $d/www; echo ok > $d/www/ok; (cd $d/www && exec python3 -m http.server 5432 --bind 127.0.0.1 >/dev/null 2>&1 &); sleep 0.5; export TUNNEL_DIR=$d/tun; T={proyecto}/bin/tunnel; O=\"-o HostName=127.0.0.1 -o Port=2208 -o UserKnownHostsFile=$d/kh -o IdentityFile=$d/k -o BatchMode=yes -o LogLevel=ERROR\"; $T up tun-pg $O >/dev/null; $T status tun-pg >/dev/null; a=$?; $T down tun-pg >/dev/null; sleep 0.5; $T status tun-pg 2>/dev/null; r=\"$a $? $(pgrep -c autossh)\"; $T down tun-pg >/dev/null 2>&1; pkill -f \"^/usr/lib/autossh/autossh\"; pkill -f \"^sshd: alumno\"; kill $(cat $d/pid); pkill -f \"^python3 -m http.server 5432\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^0 1 0$",
+      "pista": "3-proyecto/README.md, paso 8"
+    },
+    {
+      "id": "tunnel-reconecta",
+      "descripcion": "Si la conexión cae, autossh la vuelve a abrir y el túnel sigue funcionando",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; {proyecto}/bin/kit-link >/dev/null; pkill -f \"^/usr/lib/autossh/autossh\"; d=$(mktemp -d -p ~); ssh-keygen -q -t ed25519 -N \"\" -f $d/hk; ssh-keygen -q -t ed25519 -N \"\" -f $d/k; echo \"[127.0.0.1]:2208 $(cat $d/hk.pub)\" > $d/kh; cp $d/k.pub $d/ak; /usr/sbin/sshd -f /dev/null -h $d/hk -p 2208 -o PidFile=$d/pid -o AuthorizedKeysFile=$d/ak; grep -q \" db$\" /etc/hosts || echo \"127.0.0.1 db\" | sudo tee -a /etc/hosts >/dev/null; mkdir $d/www; echo ok > $d/www/ok; (cd $d/www && exec python3 -m http.server 5432 --bind 127.0.0.1 >/dev/null 2>&1 &); sleep 0.5; export TUNNEL_DIR=$d/tun; T={proyecto}/bin/tunnel; O=\"-o HostName=127.0.0.1 -o Port=2208 -o UserKnownHostsFile=$d/kh -o IdentityFile=$d/k -o BatchMode=yes -o LogLevel=ERROR\"; $T up tun-pg $O >/dev/null; p=$(cat $d/tun/tun-pg.pid 2>/dev/null); h=$(pgrep -P \"$p\"); pkill -f \"^sshd: alumno\"; r=caido; for i in $(seq 20); do sleep 0.5; n=$(pgrep -P \"$p\"); if [ -n \"$n\" ] && [ \"$n\" != \"$h\" ] && [ \"$(curl -s -m 1 127.0.0.1:15432/ok)\" = ok ]; then r=\"otro ssh ok\"; break; fi; done; $T down tun-pg >/dev/null 2>&1; pkill -f \"^/usr/lib/autossh/autossh\"; pkill -f \"^sshd: alumno\"; kill $(cat $d/pid); pkill -f \"^python3 -m http.server 5432\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^otro ssh ok$",
+      "pista": "3-proyecto/README.md, paso 9"
+    },
+    {
+      "id": "tunnel-puerto-ocupado",
+      "descripcion": "bin/tunnel up sale con 1 si el puerto local está ocupado y no deja procesos",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; {proyecto}/bin/kit-link >/dev/null; pkill -f \"^/usr/lib/autossh/autossh\"; d=$(mktemp -d -p ~); ssh-keygen -q -t ed25519 -N \"\" -f $d/hk; ssh-keygen -q -t ed25519 -N \"\" -f $d/k; echo \"[127.0.0.1]:2208 $(cat $d/hk.pub)\" > $d/kh; cp $d/k.pub $d/ak; /usr/sbin/sshd -f /dev/null -h $d/hk -p 2208 -o PidFile=$d/pid -o AuthorizedKeysFile=$d/ak; grep -q \" db$\" /etc/hosts || echo \"127.0.0.1 db\" | sudo tee -a /etc/hosts >/dev/null; mkdir $d/www; echo ok > $d/www/ok; (cd $d/www && exec python3 -m http.server 5432 --bind 127.0.0.1 >/dev/null 2>&1 &); sleep 0.5; export TUNNEL_DIR=$d/tun; T={proyecto}/bin/tunnel; O=\"-o HostName=127.0.0.1 -o Port=2208 -o UserKnownHostsFile=$d/kh -o IdentityFile=$d/k -o BatchMode=yes -o LogLevel=ERROR\"; (exec nc -lk 127.0.0.1 15432 >/dev/null 2>&1 &); sleep 0.3; $T up tun-pg $O 2>/dev/null; r=\"$? $(pgrep -c autossh)\"; pkill -f \"^nc -lk 127.0.0.1 15432\"; $T down tun-pg >/dev/null 2>&1; pkill -f \"^/usr/lib/autossh/autossh\"; pkill -f \"^sshd: alumno\"; kill $(cat $d/pid); pkill -f \"^python3 -m http.server 5432\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^1 0$",
+      "pista": "3-proyecto/README.md, paso 7"
+    },
+    {
+      "id": "tunnel-sin-acceso",
+      "descripcion": "bin/tunnel up sale con 1 en TUNNEL_TIMEOUT si no puede entrar, y no deja procesos",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; {proyecto}/bin/kit-link >/dev/null; pkill -f \"^/usr/lib/autossh/autossh\"; d=$(mktemp -d -p ~); ssh-keygen -q -t ed25519 -N \"\" -f $d/hk; ssh-keygen -q -t ed25519 -N \"\" -f $d/k; echo \"[127.0.0.1]:2208 $(cat $d/hk.pub)\" > $d/kh; cp $d/k.pub $d/ak; /usr/sbin/sshd -f /dev/null -h $d/hk -p 2208 -o PidFile=$d/pid -o AuthorizedKeysFile=$d/ak; grep -q \" db$\" /etc/hosts || echo \"127.0.0.1 db\" | sudo tee -a /etc/hosts >/dev/null; mkdir $d/www; echo ok > $d/www/ok; (cd $d/www && exec python3 -m http.server 5432 --bind 127.0.0.1 >/dev/null 2>&1 &); sleep 0.5; export TUNNEL_DIR=$d/tun; T={proyecto}/bin/tunnel; O=\"-o HostName=127.0.0.1 -o Port=2208 -o UserKnownHostsFile=$d/kh -o IdentityFile=$d/k -o BatchMode=yes -o LogLevel=ERROR\"; rm $d/ak; TUNNEL_TIMEOUT=3 $T up tun-pg $O 2>/dev/null; r=\"$? $(pgrep -c autossh)\"; $T down tun-pg >/dev/null 2>&1; pkill -f \"^/usr/lib/autossh/autossh\"; pkill -f \"^sshd: alumno\"; kill $(cat $d/pid); pkill -f \"^python3 -m http.server 5432\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^1 0$",
+      "pista": "3-proyecto/README.md, paso 6"
+    },
+    {
+      "id": "kit-sigue-funcionando",
+      "descripcion": "Los scripts de las semanas anteriores siguen respondiendo",
+      "cmd": "{proyecto}/bin/ak-line; a=$?; {proyecto}/bin/kh-add; b=$?; {proyecto}/bin/mux 2>/dev/null; c=$?; {proyecto}/bin/backup 2>/dev/null; e=$?; {proyecto}/bin/sshd-deploy 2>/dev/null; echo $a $b $c $e $?",
+      "assert": "stdout~^2 2 2 2 2$",
+      "pista": "3-proyecto/README.md, paso 10"
+    },
+    {
+      "id": "kit-completo-y-limpio",
+      "descripcion": "Sin TODOs y shellcheck sin avisos",
+      "cmd": "! grep -rn TODO {proyecto}/README.md {proyecto}/config {proyecto}/conf.d {proyecto}/bin {proyecto}/server && shellcheck {proyecto}/bin/* && shellcheck -s sh {proyecto}/server/sshd-apply",
+      "assert": "exit0",
+      "pista": "3-proyecto/README.md, paso 10"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520">
+  <defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8b949e"/></marker></defs>
+  <rect width="900" height="520" fill="#0d1117"/>
+  <text x="450" y="34" font-family="sans-serif" font-size="20" font-weight="bold" fill="#c9d1d9" text-anchor="middle">Tres tipos de reenvío: quién escucha y quién conecta</text>
+  <g font-family="sans-serif" font-size="15" font-weight="bold" fill="#c9d1d9" text-anchor="middle">
+    <text x="150" y="70">Tu equipo (client)</text><text x="450" y="70">server</text><text x="750" y="70">Destino</text>
+  </g>
+  <!-- -L -->
+  <rect x="30" y="85" width="840" height="130" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="50" y="110" font-family="monospace" font-size="15" fill="#58a6ff">ssh -L 15432:db:5432 server</text>
+  <rect x="80" y="125" width="140" height="44" rx="6" fill="#0d1117" stroke="#58a6ff" stroke-width="2"/>
+  <text x="150" y="152" font-family="monospace" font-size="13" fill="#c9d1d9" text-anchor="middle">escucha :15432</text>
+  <rect x="380" y="125" width="140" height="44" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="2"/>
+  <text x="450" y="152" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">conecta con db</text>
+  <rect x="680" y="125" width="140" height="44" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="2"/>
+  <text x="750" y="152" font-family="monospace" font-size="13" fill="#c9d1d9" text-anchor="middle">db:5432</text>
+  <line x1="222" y1="147" x2="376" y2="147" stroke="#3fb950" stroke-width="3" marker-end="url(#fa)"/>
+  <line x1="522" y1="147" x2="676" y2="147" stroke="#8b949e" stroke-width="2" marker-end="url(#fa)"/>
+  <text x="300" y="195" font-family="sans-serif" font-size="13" fill="#3fb950" text-anchor="middle">canal direct-tcpip (cifrado)</text>
+  <text x="600" y="195" font-family="sans-serif" font-size="13" fill="#8b949e" text-anchor="middle">TCP normal: db lo resuelve server</text>
+  <!-- -R -->
+  <rect x="30" y="230" width="840" height="130" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="50" y="255" font-family="monospace" font-size="15" fill="#d29922">ssh -R 9000:localhost:9000 server</text>
+  <rect x="80" y="270" width="140" height="44" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="2"/>
+  <text x="150" y="297" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">conecta con :9000</text>
+  <rect x="380" y="270" width="140" height="44" rx="6" fill="#0d1117" stroke="#d29922" stroke-width="2"/>
+  <text x="450" y="297" font-family="monospace" font-size="13" fill="#c9d1d9" text-anchor="middle">escucha :9000</text>
+  <rect x="680" y="270" width="140" height="44" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="2"/>
+  <text x="750" y="290" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">un usuario</text>
+  <text x="750" y="306" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">de server</text>
+  <line x1="676" y1="292" x2="524" y2="292" stroke="#8b949e" stroke-width="2" marker-end="url(#fa)"/>
+  <line x1="376" y1="292" x2="224" y2="292" stroke="#3fb950" stroke-width="3" marker-end="url(#fa)"/>
+  <text x="300" y="340" font-family="sans-serif" font-size="13" fill="#3fb950" text-anchor="middle">canal forwarded-tcpip (cifrado)</text>
+  <text x="600" y="340" font-family="sans-serif" font-size="13" fill="#8b949e" text-anchor="middle">entra por server, sale en tu equipo</text>
+  <!-- -D -->
+  <rect x="30" y="375" width="840" height="130" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="50" y="400" font-family="monospace" font-size="15" fill="#3fb950">ssh -D 1080 server</text>
+  <rect x="80" y="415" width="140" height="44" rx="6" fill="#0d1117" stroke="#3fb950" stroke-width="2"/>
+  <text x="150" y="435" font-family="monospace" font-size="13" fill="#c9d1d9" text-anchor="middle">SOCKS :1080</text>
+  <text x="150" y="451" font-family="sans-serif" font-size="12" fill="#8b949e" text-anchor="middle">el programa dice a dónde</text>
+  <rect x="380" y="415" width="140" height="44" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="2"/>
+  <text x="450" y="442" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">conecta con cada uno</text>
+  <rect x="680" y="415" width="140" height="44" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="2"/>
+  <text x="750" y="442" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">cualquier host:puerto</text>
+  <line x1="222" y1="437" x2="376" y2="437" stroke="#3fb950" stroke-width="3" marker-end="url(#fa)"/>
+  <line x1="522" y1="437" x2="676" y2="437" stroke="#8b949e" stroke-width="2" marker-end="url(#fa)"/>
+  <text x="300" y="485" font-family="sans-serif" font-size="13" fill="#3fb950" text-anchor="middle">un canal direct-tcpip por conexión</text>
+  <text x="600" y="485" font-family="sans-serif" font-size="13" fill="#8b949e" text-anchor="middle">lo que server alcance</text>
+</svg>
