@@ -1,0 +1,118 @@
+{
+  "semana": "09",
+  "titulo": "Bastion hosts y arquitecturas segmentadas",
+  "checks": [
+    {
+      "id": "salto-alias",
+      "descripcion": "lab-salto entra en bastion como salto con la llave ~/.ssh/lab",
+      "cmd": "{proyecto}/bin/kit-link >/dev/null; ssh -G -F {proyecto}/config lab-salto | grep -cE \"^(hostname bastion|user salto|identityfile ~/.ssh/lab)$\"",
+      "assert": "stdout~^3$",
+      "pista": "3-proyecto/README.md, paso 2"
+    },
+    {
+      "id": "interno-alias",
+      "descripcion": "lab-interno entra en interno como alumno con la llave ~/.ssh/lab",
+      "cmd": "{proyecto}/bin/kit-link >/dev/null; ssh -G -F {proyecto}/config lab-interno | grep -cE \"^(hostname interno|user alumno|identityfile ~/.ssh/lab)$\"",
+      "assert": "stdout~^3$",
+      "pista": "3-proyecto/README.md, paso 2"
+    },
+    {
+      "id": "interno-proxyjump",
+      "descripcion": "lab-interno salta por lab-salto (ProxyJump)",
+      "cmd": "{proyecto}/bin/kit-link >/dev/null; ssh -G -F {proyecto}/config lab-interno | grep \"^proxyjump\"",
+      "assert": "stdout~^proxyjump lab-salto$",
+      "pista": "3-proyecto/README.md, paso 2"
+    },
+    {
+      "id": "salto-funciona",
+      "descripcion": "ssh lab-interno entra a través del salto, y sin el salto no entra",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; {proyecto}/bin/kit-link >/dev/null; d=$(mktemp -d -p ~); for n in hs hi k; do ssh-keygen -q -t ed25519 -N \"\" -f $d/$n; done; cp $d/k.pub $d/ak; for p in 2209:hs 2210:hi; do /usr/sbin/sshd -f /dev/null -h $d/${p#*:} -p ${p%:*} -o ListenAddress=127.0.0.1 -o PidFile=$d/${p#*:}.pid -o AuthorizedKeysFile=$d/ak; done; echo \"[127.0.0.1]:2209 $(cat $d/hs.pub)\" > $d/kh; echo \"[127.0.0.1]:2210 $(cat $d/hi.pub)\" >> $d/kh; FI=$(ssh-keygen -lf $d/hi.pub | cut -d\" \" -f2); (echo \"Host lab-salto\"; echo \" HostName 127.0.0.1\"; echo \" Port 2209\"; echo \" User $(id -un)\"; echo \"Host lab-interno\"; echo \" HostName 127.0.0.1\"; echo \" Port 2210\"; echo \"Host *\"; echo \" UserKnownHostsFile $d/kh\"; echo \" IdentityFile $d/k\"; echo \" BatchMode yes\"; echo \" ControlPath none\"; echo \" LogLevel ERROR\"; echo \"Include {proyecto}/config\") > $d/cfg; KH=\"{proyecto}/bin/kh-add\"; export SSH_CMD=\"ssh -F $d/cfg\" KH_FILE=$d/kh3; a=$(ssh -F $d/cfg lab-interno echo dentro 2>&1); kill $(cat $d/hs.pid); sleep 0.3; ssh -F $d/cfg lab-interno true 2>/dev/null; r=\"$a $?\"; kill $(cat $d/hs.pid $d/hi.pid 2>/dev/null) 2>/dev/null; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^dentro 255$",
+      "pista": "3-proyecto/README.md, paso 7"
+    },
+    {
+      "id": "kh-uso",
+      "descripcion": "bin/kh-add sale con 2 si -J no lleva salto o faltan argumentos",
+      "cmd": "K={proyecto}/bin/kh-add; $K -J 2>/dev/null; a=$?; $K -J \"\" h SHA256:x 2>/dev/null; b=$?; $K -J s h 2>/dev/null; c=$?; $K -J s h nohuella 2>/dev/null; echo $a $b $c $?",
+      "assert": "stdout~^2 2 2 2$",
+      "pista": "3-proyecto/README.md, paso 3"
+    },
+    {
+      "id": "kh-salto-anade",
+      "descripcion": "bin/kh-add -J lee la host key a través del salto y la añade si la huella coincide",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; {proyecto}/bin/kit-link >/dev/null; d=$(mktemp -d -p ~); for n in hs hi k; do ssh-keygen -q -t ed25519 -N \"\" -f $d/$n; done; cp $d/k.pub $d/ak; for p in 2209:hs 2210:hi; do /usr/sbin/sshd -f /dev/null -h $d/${p#*:} -p ${p%:*} -o ListenAddress=127.0.0.1 -o PidFile=$d/${p#*:}.pid -o AuthorizedKeysFile=$d/ak; done; echo \"[127.0.0.1]:2209 $(cat $d/hs.pub)\" > $d/kh; echo \"[127.0.0.1]:2210 $(cat $d/hi.pub)\" >> $d/kh; FI=$(ssh-keygen -lf $d/hi.pub | cut -d\" \" -f2); (echo \"Host lab-salto\"; echo \" HostName 127.0.0.1\"; echo \" Port 2209\"; echo \" User $(id -un)\"; echo \"Host lab-interno\"; echo \" HostName 127.0.0.1\"; echo \" Port 2210\"; echo \"Host *\"; echo \" UserKnownHostsFile $d/kh\"; echo \" IdentityFile $d/k\"; echo \" BatchMode yes\"; echo \" ControlPath none\"; echo \" LogLevel ERROR\"; echo \"Include {proyecto}/config\") > $d/cfg; KH=\"{proyecto}/bin/kh-add\"; export SSH_CMD=\"ssh -F $d/cfg\" KH_FILE=$d/kh3; $KH -J lab-salto 127.0.0.1:2210 $FI >/dev/null 2>&1; a=$?; r=\"$a $(ssh-keygen -F \"[127.0.0.1]:2210\" -f $d/kh3 2>/dev/null | grep -c ssh-ed25519)\"; kill $(cat $d/hs.pid $d/hi.pid 2>/dev/null) 2>/dev/null; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^0 1$",
+      "pista": "3-proyecto/README.md, paso 3"
+    },
+    {
+      "id": "kh-salto-huella-mala",
+      "descripcion": "bin/kh-add -J sale con 1 y no escribe nada si la huella no coincide",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; {proyecto}/bin/kit-link >/dev/null; d=$(mktemp -d -p ~); for n in hs hi k; do ssh-keygen -q -t ed25519 -N \"\" -f $d/$n; done; cp $d/k.pub $d/ak; for p in 2209:hs 2210:hi; do /usr/sbin/sshd -f /dev/null -h $d/${p#*:} -p ${p%:*} -o ListenAddress=127.0.0.1 -o PidFile=$d/${p#*:}.pid -o AuthorizedKeysFile=$d/ak; done; echo \"[127.0.0.1]:2209 $(cat $d/hs.pub)\" > $d/kh; echo \"[127.0.0.1]:2210 $(cat $d/hi.pub)\" >> $d/kh; FI=$(ssh-keygen -lf $d/hi.pub | cut -d\" \" -f2); (echo \"Host lab-salto\"; echo \" HostName 127.0.0.1\"; echo \" Port 2209\"; echo \" User $(id -un)\"; echo \"Host lab-interno\"; echo \" HostName 127.0.0.1\"; echo \" Port 2210\"; echo \"Host *\"; echo \" UserKnownHostsFile $d/kh\"; echo \" IdentityFile $d/k\"; echo \" BatchMode yes\"; echo \" ControlPath none\"; echo \" LogLevel ERROR\"; echo \"Include {proyecto}/config\") > $d/cfg; KH=\"{proyecto}/bin/kh-add\"; export SSH_CMD=\"ssh -F $d/cfg\" KH_FILE=$d/kh3; $KH -J lab-salto 127.0.0.1:2210 SHA256:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA >/dev/null 2>&1; r=\"$? $(cat $d/kh3 2>/dev/null | wc -l)\"; kill $(cat $d/hs.pid $d/hi.pid 2>/dev/null) 2>/dev/null; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^1 0$",
+      "pista": "3-proyecto/README.md, paso 3"
+    },
+    {
+      "id": "kh-salto-caido",
+      "descripcion": "bin/kh-add -J sale con 3 si no llega a través del salto",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; {proyecto}/bin/kit-link >/dev/null; d=$(mktemp -d -p ~); for n in hs hi k; do ssh-keygen -q -t ed25519 -N \"\" -f $d/$n; done; cp $d/k.pub $d/ak; for p in 2209:hs 2210:hi; do /usr/sbin/sshd -f /dev/null -h $d/${p#*:} -p ${p%:*} -o ListenAddress=127.0.0.1 -o PidFile=$d/${p#*:}.pid -o AuthorizedKeysFile=$d/ak; done; echo \"[127.0.0.1]:2209 $(cat $d/hs.pub)\" > $d/kh; echo \"[127.0.0.1]:2210 $(cat $d/hi.pub)\" >> $d/kh; FI=$(ssh-keygen -lf $d/hi.pub | cut -d\" \" -f2); (echo \"Host lab-salto\"; echo \" HostName 127.0.0.1\"; echo \" Port 2209\"; echo \" User $(id -un)\"; echo \"Host lab-interno\"; echo \" HostName 127.0.0.1\"; echo \" Port 2210\"; echo \"Host *\"; echo \" UserKnownHostsFile $d/kh\"; echo \" IdentityFile $d/k\"; echo \" BatchMode yes\"; echo \" ControlPath none\"; echo \" LogLevel ERROR\"; echo \"Include {proyecto}/config\") > $d/cfg; KH=\"{proyecto}/bin/kh-add\"; export SSH_CMD=\"ssh -F $d/cfg\" KH_FILE=$d/kh3; kill $(cat $d/hs.pid); sleep 0.3; $KH -J lab-salto 127.0.0.1:2210 $FI >/dev/null 2>&1; r=$?; kill $(cat $d/hs.pid $d/hi.pid 2>/dev/null) 2>/dev/null; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^3$",
+      "pista": "3-proyecto/README.md, paso 3"
+    },
+    {
+      "id": "kh-sin-salto",
+      "descripcion": "bin/kh-add sin -J sigue leyendo la llave directamente",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; {proyecto}/bin/kit-link >/dev/null; d=$(mktemp -d -p ~); for n in hs hi k; do ssh-keygen -q -t ed25519 -N \"\" -f $d/$n; done; cp $d/k.pub $d/ak; for p in 2209:hs 2210:hi; do /usr/sbin/sshd -f /dev/null -h $d/${p#*:} -p ${p%:*} -o ListenAddress=127.0.0.1 -o PidFile=$d/${p#*:}.pid -o AuthorizedKeysFile=$d/ak; done; echo \"[127.0.0.1]:2209 $(cat $d/hs.pub)\" > $d/kh; echo \"[127.0.0.1]:2210 $(cat $d/hi.pub)\" >> $d/kh; FI=$(ssh-keygen -lf $d/hi.pub | cut -d\" \" -f2); (echo \"Host lab-salto\"; echo \" HostName 127.0.0.1\"; echo \" Port 2209\"; echo \" User $(id -un)\"; echo \"Host lab-interno\"; echo \" HostName 127.0.0.1\"; echo \" Port 2210\"; echo \"Host *\"; echo \" UserKnownHostsFile $d/kh\"; echo \" IdentityFile $d/k\"; echo \" BatchMode yes\"; echo \" ControlPath none\"; echo \" LogLevel ERROR\"; echo \"Include {proyecto}/config\") > $d/cfg; KH=\"{proyecto}/bin/kh-add\"; export SSH_CMD=\"ssh -F $d/cfg\" KH_FILE=$d/kh3; $KH 127.0.0.1:2210 $FI >/dev/null 2>&1; r=$?; kill $(cat $d/hs.pid $d/hi.pid 2>/dev/null) 2>/dev/null; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^0$",
+      "pista": "3-proyecto/README.md, paso 3"
+    },
+    {
+      "id": "srv-grupos",
+      "descripcion": "sshd deja entrar a los grupos ssh-users, sftp-only y saltadores",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); sudo ssh-keygen -A >/dev/null; sudo groupadd -f ssh-users; sudo groupadd -f saltadores; sudo usermod -aG ssh-users alumno; id salto >/dev/null 2>&1 || sudo useradd -M -s /usr/sbin/nologin -G saltadores salto; sed \"s|/etc/ssh/sshd_config.d|{proyecto}/server/sshd_config.d|\" /etc/ssh/sshd_config > $d/main; T=\"sudo /usr/sbin/sshd -T -f $d/main\"; $T | grep \"^allowgroups\" | sort | tr \"[:space:]\" \" \"",
+      "assert": "stdout~^allowgroups saltadores allowgroups sftp-only allowgroups ssh-users $",
+      "pista": "3-proyecto/README.md, paso 5"
+    },
+    {
+      "id": "srv-salto-sin-sesion",
+      "descripcion": "Un usuario de saltadores no tiene shell, comandos ni terminal",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); sudo ssh-keygen -A >/dev/null; sudo groupadd -f ssh-users; sudo groupadd -f saltadores; sudo usermod -aG ssh-users alumno; id salto >/dev/null 2>&1 || sudo useradd -M -s /usr/sbin/nologin -G saltadores salto; sed \"s|/etc/ssh/sshd_config.d|{proyecto}/server/sshd_config.d|\" /etc/ssh/sshd_config > $d/main; T=\"sudo /usr/sbin/sshd -T -f $d/main\"; $T -C user=salto | grep -cE \"^(forcecommand /usr/sbin/nologin|permittty no)$\"",
+      "assert": "stdout~^2$",
+      "pista": "3-proyecto/README.md, paso 5"
+    },
+    {
+      "id": "srv-salto-solo-interno",
+      "descripcion": "Un usuario de saltadores solo reenvía a interno:22, sin -R, agente, sockets, X11 ni tun",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); sudo ssh-keygen -A >/dev/null; sudo groupadd -f ssh-users; sudo groupadd -f saltadores; sudo usermod -aG ssh-users alumno; id salto >/dev/null 2>&1 || sudo useradd -M -s /usr/sbin/nologin -G saltadores salto; sed \"s|/etc/ssh/sshd_config.d|{proyecto}/server/sshd_config.d|\" /etc/ssh/sshd_config > $d/main; T=\"sudo /usr/sbin/sshd -T -f $d/main\"; $T -C user=salto | grep -cE \"^(allowtcpforwarding local|permitopen interno:22|allowagentforwarding no|allowstreamlocalforwarding no|x11forwarding no|permittunnel no)$\"",
+      "assert": "stdout~^6$",
+      "pista": "3-proyecto/README.md, paso 5"
+    },
+    {
+      "id": "srv-salto-log",
+      "descripcion": "Los saltos quedan en el log (DEBUG1 para saltadores, VERBOSE para el resto)",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); sudo ssh-keygen -A >/dev/null; sudo groupadd -f ssh-users; sudo groupadd -f saltadores; sudo usermod -aG ssh-users alumno; id salto >/dev/null 2>&1 || sudo useradd -M -s /usr/sbin/nologin -G saltadores salto; sed \"s|/etc/ssh/sshd_config.d|{proyecto}/server/sshd_config.d|\" /etc/ssh/sshd_config > $d/main; T=\"sudo /usr/sbin/sshd -T -f $d/main\"; echo $($T -C user=salto | grep \"^loglevel\") $($T -C user=alumno | grep \"^loglevel\")",
+      "assert": "stdout~^loglevel DEBUG1? loglevel VERBOSE$",
+      "pista": "3-proyecto/README.md, paso 5"
+    },
+    {
+      "id": "srv-resto-sin-cambio",
+      "descripcion": "El Match de saltadores no limita a los demás usuarios",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); sudo ssh-keygen -A >/dev/null; sudo groupadd -f ssh-users; sudo groupadd -f saltadores; sudo usermod -aG ssh-users alumno; id salto >/dev/null 2>&1 || sudo useradd -M -s /usr/sbin/nologin -G saltadores salto; sed \"s|/etc/ssh/sshd_config.d|{proyecto}/server/sshd_config.d|\" /etc/ssh/sshd_config > $d/main; T=\"sudo /usr/sbin/sshd -T -f $d/main\"; $T -C user=alumno | grep -cE \"^(forcecommand none|allowtcpforwarding yes|permitopen any)$\"",
+      "assert": "stdout~^3$",
+      "pista": "3-proyecto/README.md, paso 5"
+    },
+    {
+      "id": "kit-sigue-funcionando",
+      "descripcion": "Los scripts de las semanas anteriores siguen respondiendo",
+      "cmd": "{proyecto}/bin/ak-line; a=$?; {proyecto}/bin/tunnel 2>/dev/null; b=$?; {proyecto}/bin/mux 2>/dev/null; c=$?; {proyecto}/bin/backup 2>/dev/null; e=$?; {proyecto}/bin/sshd-deploy 2>/dev/null; echo $a $b $c $e $?",
+      "assert": "stdout~^2 2 2 2 2$",
+      "pista": "3-proyecto/README.md, paso 9"
+    },
+    {
+      "id": "kit-completo-y-limpio",
+      "descripcion": "Sin TODOs y shellcheck sin avisos",
+      "cmd": "! grep -rn TODO {proyecto}/README.md {proyecto}/config {proyecto}/conf.d {proyecto}/bin {proyecto}/server && shellcheck {proyecto}/bin/* && shellcheck -s sh {proyecto}/server/sshd-apply",
+      "assert": "exit0",
+      "pista": "3-proyecto/README.md, paso 9"
+    }
+  ]
+}

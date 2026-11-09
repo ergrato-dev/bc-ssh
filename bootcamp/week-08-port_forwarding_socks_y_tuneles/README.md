@@ -77,6 +77,6 @@ bin/tunnel down tun-pg
 
 | Anterior | Actual | Siguiente |
 |---|---|---|
-| [← Semana 07 — Servidor: `sshd_config` y hardening](../week-07-servidor_sshd_config_y_hardening/README.md) | **Semana 08 — Port forwarding, SOCKS y túneles** | Semana 09 — Bastion hosts y arquitecturas segmentadas (próximamente) |
+| [← Semana 07 — Servidor: `sshd_config` y hardening](../week-07-servidor_sshd_config_y_hardening/README.md) | **Semana 08 — Port forwarding, SOCKS y túneles** | [Semana 09 — Bastion hosts y arquitecturas segmentadas →](../week-09-bastion_hosts_y_arquitecturas_segmentadas/README.md) |
 
 [← Volver al índice del bootcamp](../README.md)

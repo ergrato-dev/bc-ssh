@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 460">
+  <defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8b949e"/></marker></defs>
+  <rect width="900" height="460" fill="#0d1117"/>
+  <text x="450" y="34" font-family="sans-serif" font-size="20" font-weight="bold" fill="#c9d1d9" text-anchor="middle">Agente reenviado frente a ProxyJump</text>
+  <!-- -A -->
+  <rect x="30" y="55" width="840" height="175" rx="8" fill="#161b22" stroke="#f85149" stroke-width="2"/>
+  <text x="50" y="80" font-family="monospace" font-size="15" fill="#f85149">ssh -A bastion, y desde allí ssh interno</text>
+  <g font-family="monospace" font-size="13" fill="#c9d1d9" text-anchor="middle">
+    <rect x="60" y="100" width="160" height="50" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="2"/><text x="140" y="130">ssh-agent</text>
+    <rect x="370" y="100" width="160" height="50" rx="6" fill="#0d1117" stroke="#f85149" stroke-width="2"/><text x="450" y="122">bastion</text><text x="450" y="140">/tmp/ssh-*/agent.N</text>
+    <rect x="680" y="95" width="160" height="40" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="2"/><text x="760" y="120">interno</text>
+    <rect x="680" y="160" width="160" height="40" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="2"/><text x="760" y="185">server</text>
+  </g>
+  <line x1="222" y1="125" x2="366" y2="125" stroke="#8b949e" stroke-width="2" marker-start="url(#fa)" marker-end="url(#fa)"/>
+  <text x="294" y="117" font-family="sans-serif" font-size="12" fill="#8b949e" text-anchor="middle">firmas</text>
+  <line x1="532" y1="118" x2="676" y2="114" stroke="#8b949e" stroke-width="2" marker-end="url(#fa)"/>
+  <line x1="532" y1="140" x2="676" y2="178" stroke="#f85149" stroke-width="3" marker-end="url(#fa)"/>
+  <text x="600" y="190" font-family="sans-serif" font-size="12" fill="#f85149" text-anchor="middle">root, con tu agente</text>
+  <text x="50" y="218" font-family="sans-serif" font-size="13" fill="#c9d1d9">Mientras dure la conexión, quien abra el socket (tú o root en el bastion) firma con tus llaves.</text>
+  <!-- -J -->
+  <rect x="30" y="250" width="840" height="175" rx="8" fill="#161b22" stroke="#3fb950" stroke-width="2"/>
+  <text x="50" y="275" font-family="monospace" font-size="15" fill="#3fb950">ssh -J bastion interno</text>
+  <g font-family="monospace" font-size="13" fill="#c9d1d9" text-anchor="middle">
+    <rect x="60" y="295" width="160" height="50" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="2"/><text x="140" y="317">ssh-agent</text><text x="140" y="335">+ dos ssh</text>
+    <rect x="370" y="295" width="160" height="50" rx="6" fill="#0d1117" stroke="#3fb950" stroke-width="2"/><text x="450" y="317">bastion</text><text x="450" y="335">sin socket</text>
+    <rect x="680" y="295" width="160" height="50" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="2"/><text x="760" y="325">interno</text>
+  </g>
+  <line x1="222" y1="320" x2="368" y2="320" stroke="#3fb950" stroke-width="3" stroke-dasharray="10 5"/><line x1="532" y1="320" x2="676" y2="320" stroke="#3fb950" stroke-width="3" stroke-dasharray="10 5" marker-end="url(#fa)"/>
+  <text x="450" y="289" font-family="sans-serif" font-size="12" fill="#3fb950" text-anchor="middle">autenticación con interno desde tu equipo, a través del canal</text>
+  <text x="50" y="380" font-family="sans-serif" font-size="13" fill="#c9d1d9">El bastion solo reenvía un canal cifrado: no tiene llave, agente ni contraseña que robar.</text>
+  <text x="50" y="404" font-family="sans-serif" font-size="13" fill="#c9d1d9">La cuenta de salto ni siquiera necesita shell (teoría 03).</text>
+</svg>

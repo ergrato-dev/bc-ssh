@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 440">
+  <defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8b949e"/></marker></defs>
+  <rect width="900" height="440" fill="#0d1117"/>
+  <text x="450" y="34" font-family="sans-serif" font-size="20" font-weight="bold" fill="#c9d1d9" text-anchor="middle">ssh -J bastion interno: un ssh dentro de otro</text>
+  <g font-family="sans-serif" font-size="15" font-weight="bold" fill="#c9d1d9" text-anchor="middle">
+    <text x="130" y="70">Tu equipo</text><text x="450" y="70">bastion</text><text x="770" y="70">interno</text>
+  </g>
+  <rect x="40" y="85" width="180" height="210" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <rect x="60" y="105" width="140" height="44" rx="6" fill="#0d1117" stroke="#58a6ff" stroke-width="2"/>
+  <text x="130" y="132" font-family="monospace" font-size="13" fill="#c9d1d9" text-anchor="middle">ssh interno</text>
+  <rect x="60" y="225" width="140" height="44" rx="6" fill="#0d1117" stroke="#d29922" stroke-width="2"/>
+  <text x="130" y="252" font-family="monospace" font-size="13" fill="#c9d1d9" text-anchor="middle">ssh -W interno:22</text>
+  <line x1="130" y1="151" x2="130" y2="221" stroke="#8b949e" stroke-width="2" marker-end="url(#fa)" marker-start="url(#fa)"/>
+  <text x="140" y="192" font-family="sans-serif" font-size="12" fill="#8b949e">stdin/stdout</text>
+  <rect x="360" y="85" width="180" height="210" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="450" y="190" font-family="monospace" font-size="13" fill="#c9d1d9" text-anchor="middle">sshd: canal</text>
+  <text x="450" y="210" font-family="monospace" font-size="13" fill="#c9d1d9" text-anchor="middle">direct-tcpip</text>
+  <rect x="680" y="85" width="180" height="210" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="810" y="132" font-family="monospace" font-size="13" fill="#c9d1d9" text-anchor="middle">sshd</text>
+  <!-- conexion exterior -->
+  <line x1="202" y1="247" x2="358" y2="247" stroke="#d29922" stroke-width="8"/>
+  <text x="280" y="275" font-family="sans-serif" font-size="12" fill="#d29922" text-anchor="middle">SSH con bastion</text><text x="280" y="290" font-family="sans-serif" font-size="12" fill="#d29922" text-anchor="middle">(lleva el canal)</text>
+  <line x1="540" y1="230" x2="790" y2="140" stroke="#8b949e" stroke-width="2" marker-end="url(#fa)"/>
+  <text x="680" y="225" font-family="sans-serif" font-size="12" fill="#8b949e" text-anchor="middle">TCP a interno:22</text>
+  <!-- conexion interior -->
+  <path d="M202,127 L776,127" stroke="#3fb950" stroke-width="3" stroke-dasharray="10 5" fill="none" marker-end="url(#fa)"/>
+  <text x="450" y="118" font-family="sans-serif" font-size="13" fill="#3fb950" text-anchor="middle">SSH con interno: cifrado de extremo a extremo</text>
+  <g font-family="sans-serif" font-size="14" fill="#c9d1d9">
+    <text x="40" y="335">• Los dos ssh corren en tu equipo, con tus llaves y tu known_hosts: dos host keys, dos autenticaciones.</text>
+    <text x="40" y="361">• El ssh -W pide al bastion un canal hasta interno:22 y lo une a su entrada y salida.</text>
+    <text x="40" y="387">• El ssh de fuera habla con interno por ahí: el bastion copia bytes que no puede descifrar.</text>
+    <text x="40" y="413">• El bastion solo sabe quién saltó, a qué host:puerto, cuándo y cuánto tráfico.</text>
+  </g>
+</svg>

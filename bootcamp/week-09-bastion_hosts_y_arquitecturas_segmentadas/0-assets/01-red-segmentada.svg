@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 480">
+  <defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8b949e"/></marker></defs>
+  <rect width="900" height="480" fill="#0d1117"/>
+  <text x="450" y="34" font-family="sans-serif" font-size="20" font-weight="bold" fill="#c9d1d9" text-anchor="middle">El laboratorio: tres redes y una sola puerta a cada una</text>
+  <!-- redes -->
+  <rect x="30" y="60" width="840" height="120" rx="8" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+  <text x="50" y="84" font-family="sans-serif" font-size="15" font-weight="bold" fill="#58a6ff">red publica</text>
+  <rect x="30" y="240" width="400" height="140" rx="8" fill="#161b22" stroke="#3fb950" stroke-width="2"/>
+  <text x="50" y="368" font-family="sans-serif" font-size="15" font-weight="bold" fill="#3fb950">red privada (internal)</text>
+  <rect x="470" y="240" width="400" height="140" rx="8" fill="#161b22" stroke="#d29922" stroke-width="2"/>
+  <text x="490" y="368" font-family="sans-serif" font-size="15" font-weight="bold" fill="#d29922">red datos (internal)</text>
+  <!-- maquinas -->
+  <g font-family="monospace" font-size="15" fill="#c9d1d9" text-anchor="middle">
+    <rect x="70" y="100" width="150" height="50" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="2"/><text x="145" y="131">client</text>
+    <rect x="250" y="190" width="150" height="70" rx="6" fill="#0d1117" stroke="#c9d1d9" stroke-width="2"/><text x="325" y="230">bastion</text>
+    <rect x="590" y="190" width="150" height="70" rx="6" fill="#0d1117" stroke="#c9d1d9" stroke-width="2"/><text x="665" y="230">server</text>
+    <rect x="250" y="290" width="150" height="50" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="2"/><text x="325" y="321">interno</text>
+    <rect x="590" y="290" width="150" height="50" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="2"/><text x="665" y="321">db</text>
+  </g>
+  <!-- conexiones -->
+  <line x1="200" y1="152" x2="290" y2="188" stroke="#3fb950" stroke-width="3" marker-end="url(#fa)"/>
+  <line x1="222" y1="125" x2="588" y2="215" stroke="#8b949e" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#fa)"/>
+  <line x1="325" y1="262" x2="325" y2="288" stroke="#3fb950" stroke-width="3" marker-end="url(#fa)"/>
+  <line x1="665" y1="262" x2="665" y2="288" stroke="#d29922" stroke-width="3" marker-end="url(#fa)"/>
+  <line x1="100" y1="152" x2="246" y2="312" stroke="#f85149" stroke-width="2" stroke-dasharray="4 4"/>
+  <text x="150" y="240" font-family="sans-serif" font-size="13" fill="#f85149" text-anchor="end">sin ruta</text>
+  <g font-family="sans-serif" font-size="14" fill="#c9d1d9">
+    <text x="30" y="410">bastion y server están en dos redes: son la única puerta a la suya.</text>
+    <text x="30" y="434">client no llega a interno ni resuelve su nombre: entra con ssh -J bastion interno.</text>
+    <text x="30" y="458">bastion no llega a db; server no llega a interno. Cada puerta abre solo su red.</text>
+  </g>
+</svg>
