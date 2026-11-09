@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# ca-init — crea las dos autoridades de certificados del kit: una para
+# usuarios y otra para hosts.
+#
+# Uso: ca-init [CARPETA]   (por defecto CA_DIR, o ~/.ssh-ca)
+#
+# Qué: user_ca y host_ca (Ed25519, 100 rondas de bcrypt para la frase), el
+#   contador de números de serie, el registro de emisiones, la carpeta con
+#   una copia de cada certificado emitido y una KRL vacía.
+# Para qué: dos llaves distintas, porque quien firma servidores no tiene por
+#   qué poder firmar personas; y todo lo que ca-sign y ca-revoke necesitan
+#   para que cada certificado tenga un número único y se pueda revocar.
+# Impacto: quien tenga user_ca entra como cualquiera en todo servidor que
+#   confíe en ella. Por eso no pisa una CA que ya existe y se niega a crearla
+#   dentro de un repositorio git: la llave privada acabaría en un commit.
+#
+# Variables: CA_DIR. CA_FRASE: la frase de las dos CA; si no existe,
+#   ssh-keygen la pide (lo recomendado). CA_FRASE= (vacía) solo para pruebas.
+# Salida: 0 creada, 1 ya existe, está dentro de git o ssh-keygen falla,
+#         2 uso incorrecto.
+set -euo pipefail
+
+uso() {
+  echo "uso: ca-init [CARPETA]" >&2
+  exit 2
+}
+
+[[ $# -le 1 ]] || uso
+dir=${1:-${CA_DIR:-$HOME/.ssh-ca}}
+[[ -n $dir ]] || uso
+
+if [[ -e $dir/user_ca || -e $dir/host_ca ]]; then
+  echo "ca-init: $dir ya tiene una CA; no la piso" >&2
+  exit 1
+fi
+# git busca el repositorio desde la carpeta hacia arriba: empieza por la
+# primera que ya exista.
+padre=$dir
+while [[ ! -d $padre ]]; do padre=$(dirname "$padre"); done
+if git -C "$padre" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  echo "ca-init: $dir está dentro de un repositorio git; elige una carpeta fuera" >&2
+  exit 1
+fi
+
+frase=()
+[[ -v CA_FRASE ]] && frase=(-N "$CA_FRASE")
+
+umask 077
+mkdir -p "$dir/emitidos"
+chmod 700 "$dir"
+for t in user:usuarios host:hosts; do
+  ssh-keygen -q -t ed25519 -a 100 "${frase[@]}" -C "CA de ${t#*:} $(date +%Y)" -f "$dir/${t%%:*}_ca" ||
+    { echo "ca-init: ssh-keygen no pudo crear ${t%%:*}_ca" >&2; exit 1; }
+done
+echo 0 > "$dir/serial"
+: > "$dir/emitidos.log"
+ssh-keygen -q -k -f "$dir/revoked.krl"
+chmod 644 "$dir/user_ca.pub" "$dir/host_ca.pub" "$dir/revoked.krl"
+
+echo "ca-init: CA creada en $dir"
+ssh-keygen -lf "$dir/user_ca.pub"
+ssh-keygen -lf "$dir/host_ca.pub"

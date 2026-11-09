@@ -1,0 +1,132 @@
+{
+  "semana": "10",
+  "titulo": "Certificados SSH: CA, principals, KRL y rotación",
+  "checks": [
+    {
+      "id": "ca-init-crea",
+      "descripcion": "ca-init crea user_ca y host_ca Ed25519 en una carpeta 700, con contador a 0 y una KRL vacía",
+      "cmd": "d=$(mktemp -d -p ~); export CA_DIR=$d/ca CA_FRASE=; I={proyecto}/ca/ca-init; S={proyecto}/ca/ca-sign; R={proyecto}/ca/ca-revoke; for n in k k2; do ssh-keygen -q -t ed25519 -N \"\" -C $n -f $d/$n; done; $I >/dev/null 2>&1; r=\"$? $(stat -c %a $CA_DIR $CA_DIR/user_ca $CA_DIR/host_ca 2>/dev/null | xargs) $(cat $CA_DIR/user_ca.pub $CA_DIR/host_ca.pub 2>/dev/null | grep -c \"^ssh-ed25519 \") $(cat $CA_DIR/serial 2>/dev/null) $(ssh-keygen -Q -l -f $CA_DIR/revoked.krl >/dev/null 2>&1 && echo krl)\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^0 700 600 600 2 0 krl$",
+      "pista": "3-proyecto/README.md, paso 2"
+    },
+    {
+      "id": "ca-init-no-pisa",
+      "descripcion": "ca-init sale con 1 y no toca una CA que ya existe",
+      "cmd": "d=$(mktemp -d -p ~); export CA_DIR=$d/ca CA_FRASE=; I={proyecto}/ca/ca-init; S={proyecto}/ca/ca-sign; R={proyecto}/ca/ca-revoke; for n in k k2; do ssh-keygen -q -t ed25519 -N \"\" -C $n -f $d/$n; done; $I >/dev/null 2>&1; a=$(cat $CA_DIR/user_ca.pub 2>/dev/null); $I >/dev/null 2>&1; r=\"$? $([ -n \"$a\" ] && [ \"$a\" = \"$(cat $CA_DIR/user_ca.pub)\" ] && echo igual)\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^1 igual$",
+      "pista": "3-proyecto/README.md, paso 2"
+    },
+    {
+      "id": "ca-init-fuera-de-git",
+      "descripcion": "ca-init sale con 1 y no crea nada dentro de un repositorio git",
+      "cmd": "d=$(mktemp -d -p ~); export CA_DIR=$d/ca CA_FRASE=; I={proyecto}/ca/ca-init; S={proyecto}/ca/ca-sign; R={proyecto}/ca/ca-revoke; for n in k k2; do ssh-keygen -q -t ed25519 -N \"\" -C $n -f $d/$n; done; git init -q $d/repo; CA_DIR=$d/repo/sub/ca $I >/dev/null 2>&1; r=\"$? $(find $d/repo/sub 2>/dev/null | wc -l)\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^1 0$",
+      "pista": "3-proyecto/README.md, paso 2"
+    },
+    {
+      "id": "ca-uso",
+      "descripcion": "ca-init, ca-sign y ca-revoke salen con 2 por uso incorrecto (sin .pub, identidad con espacios, opción desconocida)",
+      "cmd": "d=$(mktemp -d -p ~); export CA_DIR=$d/ca CA_FRASE=; I={proyecto}/ca/ca-init; S={proyecto}/ca/ca-sign; R={proyecto}/ca/ca-revoke; for n in k k2; do ssh-keygen -q -t ed25519 -N \"\" -C $n -f $d/$n; done; $S 2>/dev/null; a=$?; $S $d/k id alumno 2>/dev/null; b=$?; $S $d/k.pub \"a b\" alumno 2>/dev/null; c=$?; $S -x $d/k.pub id alumno 2>/dev/null; e=$?; $R 2>/dev/null; f=$?; $I a b 2>/dev/null; r=\"$a $b $c $e $f $?\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^2 2 2 2 2 2$",
+      "pista": "3-proyecto/README.md, paso 3"
+    },
+    {
+      "id": "ca-sign-usuario",
+      "descripcion": "ca-sign firma un certificado de usuario con user_ca, la identidad, los principals y el número de serie 1",
+      "cmd": "d=$(mktemp -d -p ~); export CA_DIR=$d/ca CA_FRASE=; I={proyecto}/ca/ca-init; S={proyecto}/ca/ca-sign; R={proyecto}/ca/ca-revoke; for n in k k2; do ssh-keygen -q -t ed25519 -N \"\" -C $n -f $d/$n; done; $I >/dev/null 2>&1; $S $d/k.pub alumno@client alumno,admins >/dev/null 2>&1; a=$?; c=$(ssh-keygen -Lf $d/k-cert.pub 2>/dev/null); f=$(ssh-keygen -lf $CA_DIR/user_ca.pub 2>/dev/null | cut -d\" \" -f2); r=\"$a $(grep -cE \"user certificate|Key ID: .alumno@client.|Serial: 1$\" <<<\"$c\") $(sed -n \"/Principals/,/Critical/p\" <<<\"$c\" | grep -cwE \"alumno|admins\") $(grep \"Signing CA\" <<<\"$c\" | grep -cF \"${f:-x}\")\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^0 3 2 1$",
+      "pista": "3-proyecto/README.md, paso 3"
+    },
+    {
+      "id": "ca-sign-validez",
+      "descripcion": "ca-sign da 8 h y 5 min de margen por defecto a un usuario, y respeta -V",
+      "cmd": "d=$(mktemp -d -p ~); export CA_DIR=$d/ca CA_FRASE=; I={proyecto}/ca/ca-init; S={proyecto}/ca/ca-sign; R={proyecto}/ca/ca-revoke; for n in k k2; do ssh-keygen -q -t ed25519 -N \"\" -C $n -f $d/$n; done; $I >/dev/null 2>&1; m(){ v=$(ssh-keygen -Lf $1 2>/dev/null | grep -o \"from [^ ]* to [^ ]*\"); echo $(( ($(date -d \"$(echo $v | cut -d\" \" -f4)\" +%s) - $(date -d \"$(echo $v | cut -d\" \" -f2)\" +%s)) / 60 )); }; $S $d/k.pub a alumno >/dev/null 2>&1; x=$(m $d/k-cert.pub); $S -V -1m:+2h $d/k.pub a alumno >/dev/null 2>&1; r=\"$x $(m $d/k-cert.pub)\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^485 121$",
+      "pista": "3-proyecto/README.md, paso 3"
+    },
+    {
+      "id": "ca-sign-host",
+      "descripcion": "ca-sign -h firma un certificado de host con host_ca, sus nombres y un año de validez",
+      "cmd": "d=$(mktemp -d -p ~); export CA_DIR=$d/ca CA_FRASE=; I={proyecto}/ca/ca-init; S={proyecto}/ca/ca-sign; R={proyecto}/ca/ca-revoke; for n in k k2; do ssh-keygen -q -t ed25519 -N \"\" -C $n -f $d/$n; done; $I >/dev/null 2>&1; m(){ v=$(ssh-keygen -Lf $1 2>/dev/null | grep -o \"from [^ ]* to [^ ]*\"); echo $(( ($(date -d \"$(echo $v | cut -d\" \" -f4)\" +%s) - $(date -d \"$(echo $v | cut -d\" \" -f2)\" +%s)) / 60 )); }; $S -h $d/k.pub server server,server.lab >/dev/null 2>&1; a=$?; c=$(ssh-keygen -Lf $d/k-cert.pub 2>/dev/null); f=$(ssh-keygen -lf $CA_DIR/host_ca.pub 2>/dev/null | cut -d\" \" -f2); r=\"$a $(grep -c \"host certificate\" <<<\"$c\") $(grep \"Signing CA\" <<<\"$c\" | grep -cF \"${f:-x}\") $(sed -n \"/Principals/,/Critical/p\" <<<\"$c\" | grep -cwE \"server|server.lab\") $(m $d/k-cert.pub)\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^0 1 1 2 524165$",
+      "pista": "3-proyecto/README.md, paso 3"
+    },
+    {
+      "id": "ca-sign-registro",
+      "descripcion": "ca-sign numera cada certificado, guarda una copia en emitidos/ y una línea en emitidos.log",
+      "cmd": "d=$(mktemp -d -p ~); export CA_DIR=$d/ca CA_FRASE=; I={proyecto}/ca/ca-init; S={proyecto}/ca/ca-sign; R={proyecto}/ca/ca-revoke; for n in k k2; do ssh-keygen -q -t ed25519 -N \"\" -C $n -f $d/$n; done; $I >/dev/null 2>&1; $S $d/k.pub a alumno >/dev/null 2>&1; $S $d/k2.pub b alumno >/dev/null 2>&1; $S -h $d/k.pub c server >/dev/null 2>&1; r=\"$(cat $CA_DIR/serial) $(ls $CA_DIR/emitidos 2>/dev/null | xargs) $(grep -cE \"serie=[123] .*id=[abc] \" $CA_DIR/emitidos.log 2>/dev/null) $(ssh-keygen -Lf $CA_DIR/emitidos/2-cert.pub 2>/dev/null | grep -c \"Key ID: .b.\")\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^3 1-cert.pub 2-cert.pub 3-cert.pub 3 1$",
+      "pista": "3-proyecto/README.md, paso 3"
+    },
+    {
+      "id": "ca-sign-opciones",
+      "descripcion": "ca-sign pasa las -O a ssh-keygen (force-command, source-address)",
+      "cmd": "d=$(mktemp -d -p ~); export CA_DIR=$d/ca CA_FRASE=; I={proyecto}/ca/ca-init; S={proyecto}/ca/ca-sign; R={proyecto}/ca/ca-revoke; for n in k k2; do ssh-keygen -q -t ed25519 -N \"\" -C $n -f $d/$n; done; $I >/dev/null 2>&1; $S -O force-command=uptime -O source-address=10.0.0.0/8 $d/k.pub a alumno >/dev/null 2>&1; r=\"$? $(ssh-keygen -Lf $d/k-cert.pub 2>/dev/null | grep -cE \"force-command uptime|source-address 10.0.0.0/8\")\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^0 2$",
+      "pista": "3-proyecto/README.md, paso 3"
+    },
+    {
+      "id": "ca-sign-errores",
+      "descripcion": "ca-sign sale con 1 sin CA o sin la llave, y no gasta números de serie",
+      "cmd": "d=$(mktemp -d -p ~); export CA_DIR=$d/ca CA_FRASE=; I={proyecto}/ca/ca-init; S={proyecto}/ca/ca-sign; R={proyecto}/ca/ca-revoke; for n in k k2; do ssh-keygen -q -t ed25519 -N \"\" -C $n -f $d/$n; done; $I >/dev/null 2>&1; CA_DIR=$d/nada $S $d/k.pub a alumno >/dev/null 2>&1; a=$?; $S $d/no.pub a alumno >/dev/null 2>&1; r=\"$a $? $(cat $CA_DIR/serial 2>/dev/null)\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^1 1 0$",
+      "pista": "3-proyecto/README.md, paso 3"
+    },
+    {
+      "id": "ca-sign-agente",
+      "descripcion": "ca-sign firma con la CA cargada en el agente si su llave privada no está en la carpeta",
+      "cmd": "d=$(mktemp -d -p ~); export CA_DIR=$d/ca CA_FRASE=; I={proyecto}/ca/ca-init; S={proyecto}/ca/ca-sign; R={proyecto}/ca/ca-revoke; for n in k k2; do ssh-keygen -q -t ed25519 -N \"\" -C $n -f $d/$n; done; $I >/dev/null 2>&1; eval $(ssh-agent) >/dev/null; ssh-add -q $CA_DIR/user_ca 2>/dev/null; mv $CA_DIR/user_ca $d/ 2>/dev/null; $S $d/k.pub a alumno >/dev/null 2>&1; a=$?; kill $SSH_AGENT_PID; f=$(ssh-keygen -lf $CA_DIR/user_ca.pub 2>/dev/null | cut -d\" \" -f2); r=\"$a $(ssh-keygen -Lf $d/k-cert.pub 2>/dev/null | grep \"Signing CA\" | grep -cF \"${f:-x}\")\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^0 1$",
+      "pista": "3-proyecto/README.md, paso 3"
+    },
+    {
+      "id": "ca-revoke-certificado",
+      "descripcion": "ca-revoke revoca un certificado sin revocar su llave ni los demás certificados",
+      "cmd": "d=$(mktemp -d -p ~); export CA_DIR=$d/ca CA_FRASE=; I={proyecto}/ca/ca-init; S={proyecto}/ca/ca-sign; R={proyecto}/ca/ca-revoke; for n in k k2; do ssh-keygen -q -t ed25519 -N \"\" -C $n -f $d/$n; done; $I >/dev/null 2>&1; q(){ ssh-keygen -Q -f $CA_DIR/revoked.krl $1 2>/dev/null | grep -oE \"(REVOKED|ok)$\"; }; $S $d/k.pub a alumno >/dev/null 2>&1; $S $d/k2.pub b alumno >/dev/null 2>&1; $R $d/k-cert.pub >/dev/null 2>&1; r=\"$? $(q $d/k-cert.pub) $(q $d/k.pub) $(q $d/k2-cert.pub)\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^0 REVOKED ok ok$",
+      "pista": "3-proyecto/README.md, paso 4"
+    },
+    {
+      "id": "ca-revoke-serie",
+      "descripcion": "ca-revoke SERIE revoca por número; con un número que no existe sale con 1 y no toca la KRL",
+      "cmd": "d=$(mktemp -d -p ~); export CA_DIR=$d/ca CA_FRASE=; I={proyecto}/ca/ca-init; S={proyecto}/ca/ca-sign; R={proyecto}/ca/ca-revoke; for n in k k2; do ssh-keygen -q -t ed25519 -N \"\" -C $n -f $d/$n; done; $I >/dev/null 2>&1; q(){ ssh-keygen -Q -f $CA_DIR/revoked.krl $1 2>/dev/null | grep -oE \"(REVOKED|ok)$\"; }; $S $d/k.pub a alumno >/dev/null 2>&1; cp $d/k-cert.pub $d/uno; $S $d/k.pub b alumno >/dev/null 2>&1; $R 1 >/dev/null 2>&1; a=$?; cp $CA_DIR/revoked.krl $d/antes 2>/dev/null; $R 99 >/dev/null 2>&1; b=$?; r=\"$a $(q $d/uno) $(q $d/k-cert.pub) $b $(cmp -s $d/antes $CA_DIR/revoked.krl && echo igual)\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^0 REVOKED ok 1 igual$",
+      "pista": "3-proyecto/README.md, paso 4"
+    },
+    {
+      "id": "ca-revoke-llave",
+      "descripcion": "ca-revoke de una llave pública revoca sus certificados de antes y de después",
+      "cmd": "d=$(mktemp -d -p ~); export CA_DIR=$d/ca CA_FRASE=; I={proyecto}/ca/ca-init; S={proyecto}/ca/ca-sign; R={proyecto}/ca/ca-revoke; for n in k k2; do ssh-keygen -q -t ed25519 -N \"\" -C $n -f $d/$n; done; $I >/dev/null 2>&1; q(){ ssh-keygen -Q -f $CA_DIR/revoked.krl $1 2>/dev/null | grep -oE \"(REVOKED|ok)$\"; }; $S $d/k.pub a alumno >/dev/null 2>&1; cp $d/k-cert.pub $d/viejo; $R $d/k.pub >/dev/null 2>&1; a=$?; $S $d/k.pub b alumno >/dev/null 2>&1; r=\"$a $(q $d/viejo) $(q $d/k-cert.pub)\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^0 REVOKED REVOKED$",
+      "pista": "3-proyecto/README.md, paso 4"
+    },
+    {
+      "id": "srv-ca",
+      "descripcion": "sshd confía en /etc/ssh/user_ca.pub, lee principals/%u y revoked.krl, y presenta el certificado de host",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); sudo ssh-keygen -A >/dev/null; sudo groupadd -f ssh-users; sudo groupadd -f saltadores; sudo usermod -aG ssh-users alumno; id salto >/dev/null 2>&1 || sudo useradd -M -s /usr/sbin/nologin -G saltadores salto; sed \"s|/etc/ssh/sshd_config.d|{proyecto}/server/sshd_config.d|\" /etc/ssh/sshd_config > $d/main; T=\"sudo /usr/sbin/sshd -T -f $d/main\"; $T 2>/dev/null | grep -cE \"^(trustedusercakeys /etc/ssh/user_ca.pub|authorizedprincipalsfile /etc/ssh/principals/%u|revokedkeys /etc/ssh/revoked.krl|hostcertificate /etc/ssh/ssh_host_ed25519_key-cert.pub)$\"; rm -rf $d",
+      "assert": "stdout~^4$",
+      "pista": "3-proyecto/README.md, paso 5"
+    },
+    {
+      "id": "certificado-entra",
+      "descripcion": "Con el kit, un certificado con el rol admins entra sin authorized_keys en un sshd que solo conoces por la CA de hosts",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d -p ~); export CA_DIR=$d/ca CA_FRASE=; I={proyecto}/ca/ca-init; S={proyecto}/ca/ca-sign; R={proyecto}/ca/ca-revoke; for n in k k2; do ssh-keygen -q -t ed25519 -N \"\" -C $n -f $d/$n; done; $I >/dev/null 2>&1; e=$d/etc; mkdir -p $e/principals; ssh-keygen -q -t ed25519 -N \"\" -f $e/ssh_host_ed25519_key; sed \"s|/etc/ssh/|$e/|\" {proyecto}/server/sshd_config.d/50-ca.conf > $d/sshd.conf; echo admins > $e/principals/$(id -un); $S -h $e/ssh_host_ed25519_key.pub localhost localhost >/dev/null 2>&1; $S $d/k.pub prueba@client admins >/dev/null 2>&1; cp $CA_DIR/user_ca.pub $CA_DIR/revoked.krl $e/ 2>/dev/null; echo \"@cert-authority localhost $(cat $CA_DIR/host_ca.pub 2>/dev/null)\" > $d/kh; /usr/sbin/sshd -f $d/sshd.conf -h $e/ssh_host_ed25519_key -p 2211 -o ListenAddress=127.0.0.1 -o PidFile=$d/pid -o AuthorizedKeysFile=none; sleep 0.3; X=\"ssh -F /dev/null -p 2211 -o UserKnownHostsFile=$d/kh -o GlobalKnownHostsFile=/dev/null -o StrictHostKeyChecking=yes -o BatchMode=yes -o IdentitiesOnly=yes -i $d/k localhost\"; r=$($X echo dentro 2>&1); kill $(cat $d/pid 2>/dev/null) 2>/dev/null; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^dentro$",
+      "pista": "3-proyecto/README.md, paso 7"
+    },
+    {
+      "id": "certificado-revocado",
+      "descripcion": "Tras ca-revoke y copiar la KRL, el mismo certificado ya no entra",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d -p ~); export CA_DIR=$d/ca CA_FRASE=; I={proyecto}/ca/ca-init; S={proyecto}/ca/ca-sign; R={proyecto}/ca/ca-revoke; for n in k k2; do ssh-keygen -q -t ed25519 -N \"\" -C $n -f $d/$n; done; $I >/dev/null 2>&1; e=$d/etc; mkdir -p $e/principals; ssh-keygen -q -t ed25519 -N \"\" -f $e/ssh_host_ed25519_key; sed \"s|/etc/ssh/|$e/|\" {proyecto}/server/sshd_config.d/50-ca.conf > $d/sshd.conf; echo admins > $e/principals/$(id -un); $S -h $e/ssh_host_ed25519_key.pub localhost localhost >/dev/null 2>&1; $S $d/k.pub prueba@client admins >/dev/null 2>&1; cp $CA_DIR/user_ca.pub $CA_DIR/revoked.krl $e/ 2>/dev/null; echo \"@cert-authority localhost $(cat $CA_DIR/host_ca.pub 2>/dev/null)\" > $d/kh; /usr/sbin/sshd -f $d/sshd.conf -h $e/ssh_host_ed25519_key -p 2211 -o ListenAddress=127.0.0.1 -o PidFile=$d/pid -o AuthorizedKeysFile=none; sleep 0.3; X=\"ssh -F /dev/null -p 2211 -o UserKnownHostsFile=$d/kh -o GlobalKnownHostsFile=/dev/null -o StrictHostKeyChecking=yes -o BatchMode=yes -o IdentitiesOnly=yes -i $d/k localhost\"; a=$($X echo dentro 2>&1); $R $d/k-cert.pub >/dev/null 2>&1; cp $CA_DIR/revoked.krl $e/; $X true 2>/dev/null; r=\"$a $?\"; kill $(cat $d/pid 2>/dev/null) 2>/dev/null; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^dentro 255$",
+      "pista": "3-proyecto/README.md, paso 8"
+    },
+    {
+      "id": "kit-completo-y-limpio",
+      "descripcion": "Sin TODOs, shellcheck sin avisos y los scripts anteriores siguen respondiendo",
+      "cmd": "! grep -rn TODO {proyecto}/README.md {proyecto}/config {proyecto}/conf.d {proyecto}/bin {proyecto}/ca {proyecto}/server && shellcheck {proyecto}/bin/* {proyecto}/ca/* && shellcheck -s sh {proyecto}/server/sshd-apply && { {proyecto}/bin/ak-line; a=$?; {proyecto}/bin/tunnel 2>/dev/null; b=$?; {proyecto}/bin/kh-add -J 2>/dev/null; c=$?; {proyecto}/bin/sshd-deploy 2>/dev/null; [ \"$a$b$c$?\" = 2222 ]; }",
+      "assert": "exit0",
+      "pista": "3-proyecto/README.md, paso 9"
+    }
+  ]
+}

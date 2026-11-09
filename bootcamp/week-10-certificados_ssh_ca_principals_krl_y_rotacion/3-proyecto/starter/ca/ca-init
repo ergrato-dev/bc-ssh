@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# ca-init — crea las dos autoridades de certificados del kit: una para
+# usuarios y otra para hosts.
+#
+# Uso: ca-init [CARPETA]   (por defecto CA_DIR, o ~/.ssh-ca)
+#
+# Qué: user_ca y host_ca (Ed25519, 100 rondas de bcrypt para la frase), el
+#   contador de números de serie, el registro de emisiones, la carpeta con
+#   una copia de cada certificado emitido y una KRL vacía.
+# Para qué: dos llaves distintas, porque quien firma servidores no tiene por
+#   qué poder firmar personas; y todo lo que ca-sign y ca-revoke necesitan
+#   para que cada certificado tenga un número único y se pueda revocar.
+# Impacto: quien tenga user_ca entra como cualquiera en todo servidor que
+#   confíe en ella. Por eso no pisa una CA que ya existe y se niega a crearla
+#   dentro de un repositorio git: la llave privada acabaría en un commit.
+#
+# Variables: CA_DIR. CA_FRASE: la frase de las dos CA; si no existe,
+#   ssh-keygen la pide (lo recomendado). CA_FRASE= (vacía) solo para pruebas.
+# Salida: 0 creada, 1 ya existe, está dentro de git o ssh-keygen falla,
+#         2 uso incorrecto.
+set -euo pipefail
+
+uso() {
+  echo "uso: ca-init [CARPETA]" >&2
+  exit 2
+}
+
+[[ $# -le 1 ]] || uso
+dir=${1:-${CA_DIR:-$HOME/.ssh-ca}}
+[[ -n $dir ]] || uso
+
+# TODO 1: si $dir ya tiene user_ca o host_ca, o está dentro de un repositorio
+#   git, explica por qué por stderr y sal con 1 (3-proyecto/README.md, paso 2).
+# TODO 2: con umask 077, crea emitidos/, la carpeta en 700, user_ca y host_ca
+#   (con CA_FRASE si existe), serial con 0, emitidos.log vacío y revoked.krl;
+#   .pub y KRL en 644; termina con las dos huellas (paso 2).
+echo "ca-init: sin terminar (TODOs 1 y 2)" >&2
+exit 1

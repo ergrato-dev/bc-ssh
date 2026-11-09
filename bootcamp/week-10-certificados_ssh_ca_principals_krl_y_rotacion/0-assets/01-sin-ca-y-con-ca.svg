@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 450">
+  <defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8b949e"/></marker><marker id="fv" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#3fb950"/></marker></defs>
+  <rect width="900" height="450" fill="#0d1117"/>
+  <text x="450" y="34" font-family="sans-serif" font-size="20" font-weight="bold" fill="#c9d1d9" text-anchor="middle">Sin CA, cada servidor lista a cada persona; con CA, una línea</text>
+  <rect x="20" y="55" width="420" height="380" rx="6" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <rect x="460" y="55" width="420" height="380" rx="6" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="230" y="82" font-family="sans-serif" font-size="16" font-weight="bold" fill="#c9d1d9" text-anchor="middle">Sin CA</text>
+  <text x="670" y="82" font-family="sans-serif" font-size="16" font-weight="bold" fill="#c9d1d9" text-anchor="middle">Con CA</text>
+  <rect x="45" y="120" width="110" height="40" rx="6" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+  <text x="100" y="145" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">ana</text>
+  <rect x="45" y="210" width="110" height="40" rx="6" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+  <text x="100" y="235" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">luis</text>
+  <rect x="45" y="300" width="110" height="40" rx="6" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+  <text x="100" y="325" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">alumno</text>
+  <rect x="305" y="120" width="110" height="40" rx="6" fill="#161b22" stroke="#d29922" stroke-width="2"/>
+  <text x="360" y="145" font-family="monospace" font-size="13" fill="#c9d1d9" text-anchor="middle">server</text>
+  <rect x="305" y="210" width="110" height="40" rx="6" fill="#161b22" stroke="#d29922" stroke-width="2"/>
+  <text x="360" y="235" font-family="monospace" font-size="13" fill="#c9d1d9" text-anchor="middle">bastion</text>
+  <rect x="305" y="300" width="110" height="40" rx="6" fill="#161b22" stroke="#d29922" stroke-width="2"/>
+  <text x="360" y="325" font-family="monospace" font-size="13" fill="#c9d1d9" text-anchor="middle">interno</text>
+  <line x1="157" y1="140" x2="303" y2="140" stroke="#f85149" stroke-width="1.5"/>
+  <line x1="157" y1="140" x2="303" y2="230" stroke="#f85149" stroke-width="1.5"/>
+  <line x1="157" y1="140" x2="303" y2="320" stroke="#f85149" stroke-width="1.5"/>
+  <line x1="157" y1="230" x2="303" y2="140" stroke="#f85149" stroke-width="1.5"/>
+  <line x1="157" y1="230" x2="303" y2="230" stroke="#f85149" stroke-width="1.5"/>
+  <line x1="157" y1="230" x2="303" y2="320" stroke="#f85149" stroke-width="1.5"/>
+  <line x1="157" y1="320" x2="303" y2="140" stroke="#f85149" stroke-width="1.5"/>
+  <line x1="157" y1="320" x2="303" y2="230" stroke="#f85149" stroke-width="1.5"/>
+  <line x1="157" y1="320" x2="303" y2="320" stroke="#f85149" stroke-width="1.5"/>
+  <text x="230" y="392" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">authorized_keys: 3 × 3 = 9 líneas</text>
+  <text x="230" y="414" font-family="sans-serif" font-size="13" fill="#8b949e" text-anchor="middle">known_hosts: otras 9, con una pregunta cada una</text>
+  <rect x="600" y="100" width="140" height="44" rx="6" fill="#161b22" stroke="#3fb950" stroke-width="2"/>
+  <text x="670" y="127" font-family="monospace" font-size="14" fill="#c9d1d9" text-anchor="middle">user_ca</text>
+  <rect x="490" y="200" width="110" height="40" rx="6" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+  <text x="545" y="218" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">ana</text>
+  <text x="545" y="233" font-family="sans-serif" font-size="11" fill="#3fb950" text-anchor="middle">+ certificado</text>
+  <line x1="670" y1="146" x2="545" y2="198" stroke="#3fb950" stroke-width="2" marker-end="url(#fv)"/>
+  <rect x="620" y="200" width="110" height="40" rx="6" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+  <text x="675" y="218" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">luis</text>
+  <text x="675" y="233" font-family="sans-serif" font-size="11" fill="#3fb950" text-anchor="middle">+ certificado</text>
+  <line x1="670" y1="146" x2="675" y2="198" stroke="#3fb950" stroke-width="2" marker-end="url(#fv)"/>
+  <rect x="750" y="200" width="110" height="40" rx="6" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+  <text x="805" y="218" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">alumno</text>
+  <text x="805" y="233" font-family="sans-serif" font-size="11" fill="#3fb950" text-anchor="middle">+ certificado</text>
+  <line x1="670" y1="146" x2="805" y2="198" stroke="#3fb950" stroke-width="2" marker-end="url(#fv)"/>
+  <rect x="490" y="300" width="110" height="40" rx="6" fill="#161b22" stroke="#d29922" stroke-width="2"/>
+  <text x="545" y="325" font-family="monospace" font-size="13" fill="#c9d1d9" text-anchor="middle">server</text>
+  <rect x="620" y="300" width="110" height="40" rx="6" fill="#161b22" stroke="#d29922" stroke-width="2"/>
+  <text x="675" y="325" font-family="monospace" font-size="13" fill="#c9d1d9" text-anchor="middle">bastion</text>
+  <rect x="750" y="300" width="110" height="40" rx="6" fill="#161b22" stroke="#d29922" stroke-width="2"/>
+  <text x="805" y="325" font-family="monospace" font-size="13" fill="#c9d1d9" text-anchor="middle">interno</text>
+  <text x="750" y="127" font-family="sans-serif" font-size="12" fill="#3fb950" text-anchor="start">firma</text>
+  <line x1="545" y1="298" x2="545" y2="242" stroke="#8b949e" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#fa)"/>
+  <line x1="675" y1="298" x2="675" y2="242" stroke="#8b949e" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#fa)"/>
+  <line x1="805" y1="298" x2="805" y2="242" stroke="#8b949e" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#fa)"/>
+  <text x="610" y="274" font-family="sans-serif" font-size="12" fill="#8b949e" text-anchor="middle">entran</text>
+  <text x="670" y="370" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">cada servidor: TrustedUserCAKeys (1 línea)</text>
+  <text x="670" y="392" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">cada persona: 1 certificado</text>
+  <text x="670" y="414" font-family="sans-serif" font-size="13" fill="#8b949e" text-anchor="middle">cada cliente: 1 @cert-authority para los hosts</text>
+</svg>

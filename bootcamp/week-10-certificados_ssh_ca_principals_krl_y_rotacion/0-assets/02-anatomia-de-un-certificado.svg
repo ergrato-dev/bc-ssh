@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 470">
+  <defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8b949e"/></marker><marker id="fv" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#3fb950"/></marker></defs>
+  <rect width="900" height="470" fill="#0d1117"/>
+  <text x="450" y="34" font-family="sans-serif" font-size="20" font-weight="bold" fill="#c9d1d9" text-anchor="middle">Un certificado de usuario: qué lleva y quién lo comprueba</text>
+  <rect x="200" y="60" width="400" height="370" rx="6" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+  <text x="400" y="86" font-family="monospace" font-size="15" font-weight="bold" fill="#c9d1d9" text-anchor="middle">trabajo-cert.pub</text>
+  <rect x="215" y="104" width="370" height="32" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="2"/>
+  <text x="225" y="125" font-family="sans-serif" font-size="12" font-weight="bold" fill="#58a6ff" text-anchor="start">Public key</text>
+  <text x="350" y="125" font-family="monospace" font-size="12" fill="#c9d1d9" text-anchor="start">tu llave pública</text>
+  <rect x="215" y="144" width="370" height="32" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="2"/>
+  <text x="225" y="165" font-family="sans-serif" font-size="12" font-weight="bold" fill="#58a6ff" text-anchor="start">Key ID</text>
+  <text x="350" y="165" font-family="monospace" font-size="12" fill="#c9d1d9" text-anchor="start">"alumno@client"</text>
+  <text x="120" y="165" font-family="monospace" font-size="12" fill="#8b949e" text-anchor="end">ssh-keygen -I</text>
+  <line x1="125" y1="160" x2="212" y2="160" stroke="#8b949e" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#fa)"/>
+  <rect x="215" y="184" width="370" height="32" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="2"/>
+  <text x="225" y="205" font-family="sans-serif" font-size="12" font-weight="bold" fill="#58a6ff" text-anchor="start">Serial</text>
+  <text x="350" y="205" font-family="monospace" font-size="12" fill="#c9d1d9" text-anchor="start">7</text>
+  <text x="120" y="205" font-family="monospace" font-size="12" fill="#8b949e" text-anchor="end">ssh-keygen -z</text>
+  <line x1="125" y1="200" x2="212" y2="200" stroke="#8b949e" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#fa)"/>
+  <rect x="215" y="224" width="370" height="32" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="2"/>
+  <text x="225" y="245" font-family="sans-serif" font-size="12" font-weight="bold" fill="#58a6ff" text-anchor="start">Valid</text>
+  <text x="350" y="245" font-family="monospace" font-size="12" fill="#c9d1d9" text-anchor="start">03:45 → 04:46</text>
+  <text x="120" y="245" font-family="monospace" font-size="12" fill="#8b949e" text-anchor="end">ssh-keygen -V</text>
+  <line x1="125" y1="240" x2="212" y2="240" stroke="#8b949e" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#fa)"/>
+  <rect x="215" y="264" width="370" height="32" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="2"/>
+  <text x="225" y="285" font-family="sans-serif" font-size="12" font-weight="bold" fill="#58a6ff" text-anchor="start">Principals</text>
+  <text x="350" y="285" font-family="monospace" font-size="12" fill="#c9d1d9" text-anchor="start">alumno, admins</text>
+  <text x="120" y="285" font-family="monospace" font-size="12" fill="#8b949e" text-anchor="end">ssh-keygen -n</text>
+  <line x1="125" y1="280" x2="212" y2="280" stroke="#8b949e" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#fa)"/>
+  <rect x="215" y="304" width="370" height="32" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="2"/>
+  <text x="225" y="325" font-family="sans-serif" font-size="12" font-weight="bold" fill="#58a6ff" text-anchor="start">Critical Options</text>
+  <text x="350" y="325" font-family="monospace" font-size="12" fill="#c9d1d9" text-anchor="start">force-command, source-address</text>
+  <text x="120" y="325" font-family="monospace" font-size="12" fill="#8b949e" text-anchor="end">ssh-keygen -O</text>
+  <line x1="125" y1="320" x2="212" y2="320" stroke="#8b949e" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#fa)"/>
+  <rect x="215" y="344" width="370" height="32" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="2"/>
+  <text x="225" y="365" font-family="sans-serif" font-size="12" font-weight="bold" fill="#58a6ff" text-anchor="start">Extensions</text>
+  <text x="350" y="365" font-family="monospace" font-size="12" fill="#c9d1d9" text-anchor="start">permit-pty, permit-port-forwarding…</text>
+  <text x="120" y="365" font-family="monospace" font-size="12" fill="#8b949e" text-anchor="end">ssh-keygen -O</text>
+  <line x1="125" y1="360" x2="212" y2="360" stroke="#8b949e" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#fa)"/>
+  <rect x="215" y="384" width="370" height="32" rx="6" fill="#0d1117" stroke="#3fb950" stroke-width="2"/>
+  <text x="400" y="405" font-family="sans-serif" font-size="12" fill="#3fb950" text-anchor="middle">firma de user_ca sobre todo lo anterior</text>
+  <text x="650" y="72" font-family="sans-serif" font-size="14" font-weight="bold" fill="#d29922" text-anchor="start">sshd comprueba</text>
+  <line x1="645" y1="400" x2="592" y2="400" stroke="#d29922" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="650" y="398" font-family="sans-serif" font-size="11" fill="#c9d1d9" text-anchor="start">¿firmado por una CA de</text>
+  <text x="650" y="412" font-family="sans-serif" font-size="11" fill="#c9d1d9" text-anchor="start">TrustedUserCAKeys?</text>
+  <line x1="645" y1="240" x2="592" y2="240" stroke="#d29922" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="650" y="238" font-family="sans-serif" font-size="11" fill="#c9d1d9" text-anchor="start">¿hora dentro de Valid?</text>
+  <line x1="645" y1="280" x2="592" y2="280" stroke="#d29922" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="650" y="278" font-family="sans-serif" font-size="11" fill="#c9d1d9" text-anchor="start">¿usuario en Principals</text>
+  <text x="650" y="292" font-family="sans-serif" font-size="11" fill="#c9d1d9" text-anchor="start">(o en principals/%u)?</text>
+  <line x1="645" y1="200" x2="592" y2="200" stroke="#d29922" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="650" y="198" font-family="sans-serif" font-size="11" fill="#c9d1d9" text-anchor="start">¿serie (o llave) en la KRL?</text>
+  <line x1="645" y1="320" x2="592" y2="320" stroke="#d29922" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="650" y="318" font-family="sans-serif" font-size="11" fill="#c9d1d9" text-anchor="start">aplica las opciones;</text>
+  <text x="650" y="332" font-family="sans-serif" font-size="11" fill="#c9d1d9" text-anchor="start">vale lo más restrictivo</text>
+  <text x="450" y="452" font-family="sans-serif" font-size="13" fill="#8b949e" text-anchor="middle">Y tu ssh demuestra que tiene la llave privada de "Public key": sin ella, el certificado no sirve.</text>
+</svg>

@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# ca-sign — firma una llave pública con la CA del kit y anota el certificado.
+#
+# Uso: ca-sign [-h] [-V VALIDEZ] [-O OPCIÓN]... LLAVE.pub IDENTIDAD PRINCIPALES
+#   -h: certificado de host (host_ca); sin -h, de usuario (user_ca).
+#   -V: validez de ssh-keygen; por defecto -5m:+8h (usuario) o -5m:+52w (host).
+#   -O: opción de ssh-keygen (force-command=..., source-address=..., no-pty...).
+#   IDENTIDAD: quién es (alumno@portatil), sin espacios: aparece en los logs.
+#   PRINCIPALES: usuarios o roles (usuario) o nombres (host), con comas.
+#
+# Qué: ssh-keygen -s con el siguiente número de serie del contador, una copia
+#   del certificado en emitidos/SERIE-cert.pub y una línea en emitidos.log.
+# Para qué: cada certificado con un número único (dos con el mismo número se
+#   revocan juntos) y un registro para saber de quién es el que ves en el log
+#   de un servidor, y para revocarlo por su número con ca-revoke.
+# Impacto: un certificado de usuario dura 8 horas: caduca solo, sin KRL. El
+#   inicio 5 minutos atrás tolera servidores con el reloj algo atrasado. Si la
+#   llave privada de la CA no está en la carpeta (la guardas fuera), firma con
+#   la que tengas cargada en el agente (ssh-keygen -U).
+#
+# Variables: CA_DIR (por defecto ~/.ssh-ca).
+# Salida: 0 firmado, 1 falta la llave o la CA o ssh-keygen falla,
+#         2 uso incorrecto.
+set -euo pipefail
+
+uso() {
+  echo "uso: ca-sign [-h] [-V VALIDEZ] [-O OPCIÓN]... LLAVE.pub IDENTIDAD PRINCIPALES" >&2
+  exit 2
+}
+
+host=0 validez='' opciones=()
+while getopts hV:O: o; do
+  case $o in
+    h) host=1 ;;
+    V) validez=$OPTARG ;;
+    O) opciones+=(-O "$OPTARG") ;;
+    *) uso ;;
+  esac
+done
+shift $((OPTIND - 1))
+[[ $# -eq 3 && $1 == *.pub && -n $2 && -n $3 ]] || uso
+pub=$1 id=$2 principales=$3
+[[ $id != *[[:space:]]* && $principales != *[[:space:]]* ]] || uso
+
+dir=${CA_DIR:-$HOME/.ssh-ca}
+# TODO 3: elige CA, tipo y validez por defecto según -h; sal con 1 si falta
+#   $pub, $dir/$ca.pub o $dir/serial; firma con el agente (-U) si la llave
+#   privada de la CA no está en $dir (3-proyecto/README.md, paso 3).
+# TODO 4: firma con el siguiente número de serie y, solo si funciona,
+#   actualiza serial, copia el certificado a emitidos/ y añade su línea a
+#   emitidos.log (paso 3).
+echo "ca-sign: sin terminar (TODOs 3 y 4)" >&2
+exit 1

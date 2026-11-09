@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# ca-revoke — añade certificados o llaves a la KRL de la CA del kit.
+#
+# Uso: ca-revoke SERIE|ARCHIVO...
+#   SERIE: número de un certificado de ca-sign (usa emitidos/SERIE-cert.pub).
+#   ARCHIVO: un certificado (revoca ese certificado) o una llave pública
+#     (revoca la llave y todos sus certificados, pasados y futuros).
+#
+# Qué: ssh-keygen -k -u sobre una copia de revoked.krl, comprobada con
+#   ssh-keygen -Q antes de sustituir la buena.
+# Para qué: dejar fuera un certificado antes de que caduque: una llave
+#   robada, un portátil perdido, alguien que se va.
+# Impacto: sshd lee la KRL en cada autenticación: basta con copiarla a
+#   /etc/ssh/revoked.krl de cada servidor, sin recargar. Si ese archivo falta
+#   o está roto, sshd rechaza TODAS las llaves; por eso no se toca la KRL
+#   hasta tener la nueva comprobada.
+#
+# Variables: CA_DIR (por defecto ~/.ssh-ca).
+# Salida: 0 revocados, 1 falta un archivo o la KRL o ssh-keygen falla,
+#         2 uso incorrecto.
+set -euo pipefail
+
+uso() {
+  echo "uso: ca-revoke SERIE|ARCHIVO..." >&2
+  exit 2
+}
+
+[[ $# -ge 1 ]] || uso
+dir=${CA_DIR:-$HOME/.ssh-ca}
+krl=$dir/revoked.krl
+[[ -f $krl ]] || { echo "ca-revoke: no hay KRL en $dir (crea la CA con ca-init)" >&2; exit 1; }
+
+archivos=()
+for a in "$@"; do
+  [[ $a =~ ^[0-9]+$ ]] && a=$dir/emitidos/$a-cert.pub
+  [[ -f $a ]] || { echo "ca-revoke: no existe $a" >&2; exit 1; }
+  archivos+=("$a")
+done
+
+# TODO 5: revoca sobre una copia temporal de la KRL, comprueba con
+#   ssh-keygen -Q que todo quedó REVOKED y solo entonces sustituye la KRL
+#   (3-proyecto/README.md, paso 4).
+echo "ca-revoke: sin terminar (TODO 5)" >&2
+exit 1

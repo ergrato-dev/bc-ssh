@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 430">
+  <defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8b949e"/></marker><marker id="fv" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#3fb950"/></marker></defs>
+  <rect width="900" height="430" fill="#0d1117"/>
+  <text x="450" y="34" font-family="sans-serif" font-size="20" font-weight="bold" fill="#c9d1d9" text-anchor="middle">Rotar una CA: dos fases con las dos, nunca un salto</text>
+  <text x="150" y="70" font-family="sans-serif" font-size="15" font-weight="bold" fill="#c9d1d9" text-anchor="middle">1. Antes</text>
+  <text x="450" y="70" font-family="sans-serif" font-size="15" font-weight="bold" fill="#c9d1d9" text-anchor="middle">2. Transición</text>
+  <text x="750" y="70" font-family="sans-serif" font-size="15" font-weight="bold" fill="#c9d1d9" text-anchor="middle">3. Después</text>
+  <text x="20" y="105" font-family="sans-serif" font-size="14" font-weight="bold" fill="#58a6ff" text-anchor="start">CA de usuarios</text>
+  <text x="20" y="250" font-family="sans-serif" font-size="14" font-weight="bold" fill="#d29922" text-anchor="start">CA de hosts</text>
+  <rect x="20" y="115" width="260" height="80" rx="6" fill="#161b22" stroke="#f85149" stroke-width="2"/>
+  <text x="150" y="147" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">servidores: vieja</text>
+  <text x="150" y="171" font-family="sans-serif" font-size="13" fill="#8b949e" text-anchor="middle">certificados: vieja</text>
+  <line x1="282" y1="155" x2="358" y2="155" stroke="#8b949e" stroke-width="2" marker-end="url(#fa)"/>
+  <rect x="320" y="115" width="260" height="80" rx="6" fill="#161b22" stroke="#3fb950" stroke-width="2"/>
+  <text x="450" y="147" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">servidores: vieja + nueva</text>
+  <text x="450" y="171" font-family="sans-serif" font-size="13" fill="#8b949e" text-anchor="middle">firmas con la nueva</text>
+  <line x1="582" y1="155" x2="658" y2="155" stroke="#8b949e" stroke-width="2" marker-end="url(#fa)"/>
+  <rect x="620" y="115" width="260" height="80" rx="6" fill="#161b22" stroke="#3fb950" stroke-width="2"/>
+  <text x="750" y="147" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">servidores: nueva</text>
+  <text x="750" y="171" font-family="sans-serif" font-size="13" fill="#8b949e" text-anchor="middle">(caducó el último viejo)</text>
+  <rect x="20" y="260" width="260" height="80" rx="6" fill="#161b22" stroke="#f85149" stroke-width="2"/>
+  <text x="150" y="292" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">clientes: @ca vieja</text>
+  <text x="150" y="316" font-family="sans-serif" font-size="13" fill="#8b949e" text-anchor="middle">servidores: cert. vieja</text>
+  <line x1="282" y1="300" x2="358" y2="300" stroke="#8b949e" stroke-width="2" marker-end="url(#fa)"/>
+  <rect x="320" y="260" width="260" height="80" rx="6" fill="#161b22" stroke="#3fb950" stroke-width="2"/>
+  <text x="450" y="292" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">clientes: @ca vieja + nueva</text>
+  <text x="450" y="316" font-family="sans-serif" font-size="13" fill="#8b949e" text-anchor="middle">servidores: cert. nueva</text>
+  <line x1="582" y1="300" x2="658" y2="300" stroke="#8b949e" stroke-width="2" marker-end="url(#fa)"/>
+  <rect x="620" y="260" width="260" height="80" rx="6" fill="#161b22" stroke="#3fb950" stroke-width="2"/>
+  <text x="750" y="292" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">clientes: @revoked vieja</text>
+  <text x="750" y="316" font-family="sans-serif" font-size="13" fill="#8b949e" text-anchor="middle">+ @ca nueva</text>
+  <text x="450" y="215" font-family="sans-serif" font-size="12" fill="#58a6ff" text-anchor="middle">primero cambian los servidores (quien comprueba)</text>
+  <text x="450" y="360" font-family="sans-serif" font-size="12" fill="#d29922" text-anchor="middle">primero cambian los clientes (quien comprueba)</text>
+  <text x="450" y="395" font-family="sans-serif" font-size="13" fill="#f85149" text-anchor="middle">Si la vieja se filtró: su llave pública en la KRL (usuarios) y @revoked (hosts).</text>
+  <text x="450" y="416" font-family="sans-serif" font-size="13" fill="#8b949e" text-anchor="middle">Retira la vieja cuando caduque el último certificado que firmó.</text>
+</svg>

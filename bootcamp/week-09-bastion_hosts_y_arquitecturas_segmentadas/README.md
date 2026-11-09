@@ -76,6 +76,6 @@ ssh -F config lab-interno hostname
 
 | Anterior | Actual | Siguiente |
 |---|---|---|
-| [← Semana 08 — Port forwarding, SOCKS y túneles](../week-08-port_forwarding_socks_y_tuneles/README.md) | **Semana 09 — Bastion hosts y arquitecturas segmentadas** | Semana 10 — Certificados SSH: CA, principals, KRL y rotación (próximamente) |
+| [← Semana 08 — Port forwarding, SOCKS y túneles](../week-08-port_forwarding_socks_y_tuneles/README.md) | **Semana 09 — Bastion hosts y arquitecturas segmentadas** | [Semana 10 — Certificados SSH: CA, principals, KRL y rotación →](../week-10-certificados_ssh_ca_principals_krl_y_rotacion/README.md) |
 
 [← Volver al índice del bootcamp](../README.md)
