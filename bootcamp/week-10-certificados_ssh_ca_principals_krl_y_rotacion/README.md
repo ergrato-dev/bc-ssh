@@ -76,6 +76,6 @@ ssh -F config lab-server hostname
 
 | Anterior | Actual | Siguiente |
 |---|---|---|
-| [← Semana 09 — Bastion hosts y arquitecturas segmentadas](../week-09-bastion_hosts_y_arquitecturas_segmentadas/README.md) | **Semana 10 — Certificados SSH: CA, principals, KRL y rotación** | Semana 11 — 2FA, fail2ban y auditoría (próximamente) |
+| [← Semana 09 — Bastion hosts y arquitecturas segmentadas](../week-09-bastion_hosts_y_arquitecturas_segmentadas/README.md) | **Semana 10 — Certificados SSH: CA, principals, KRL y rotación** | [Semana 11 — 2FA, fail2ban y auditoría con ssh-audit →](../week-11-2fa_fail2ban_y_auditoria/README.md) |
 
 [← Volver al índice del bootcamp](../README.md)

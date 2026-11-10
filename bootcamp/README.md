@@ -14,7 +14,7 @@ Estado de cada semana. ✅ = migrada a la estructura de `CLAUDE.md` (labs con st
 | [08](week-08-port_forwarding_socks_y_tuneles/README.md) | Port forwarding, SOCKS y túneles | Redes | ✅ |
 | [09](week-09-bastion_hosts_y_arquitecturas_segmentadas/README.md) | Bastion hosts y arquitecturas segmentadas | Redes | ✅ |
 | [10](week-10-certificados_ssh_ca_principals_krl_y_rotacion/README.md) | Certificados SSH: CA, principals, KRL y rotación | Seguridad avanzada | ✅ |
-| 11 | 2FA, fail2ban y auditoría | Seguridad avanzada | ⬜ |
+| [11](week-11-2fa_fail2ban_y_auditoria/README.md) | 2FA, fail2ban y auditoría | Seguridad avanzada | ✅ |
 | 12 | Automatización: scripting, CI/CD y Ansible | Automatización | ⬜ |
 | 13 | Operación y troubleshooting: algoritmos post-cuánticos, rendimiento y migraciones | Operación | ⬜ |
 | 14 | Proyecto integrador `ssh-infra-kit` | Integración | ⬜ |

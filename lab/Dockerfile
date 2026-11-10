@@ -12,16 +12,25 @@ ENV DEBIAN_FRONTEND=noninteractive \
 # postgresql-client (psql) y autossh: túneles a PostgreSQL (semana 08).
 # python3: solo para rrsync (semana 06), el script de rsync que restringe una
 # llave a una carpeta; lo trae el paquete rsync pero sin su intérprete.
+# libpam-google-authenticator y oathtool: segundo factor TOTP (semana 11);
+# oathtool calcula los códigos que daría la app del móvil.
+# fail2ban y nftables: bloquear IP que fallan al entrar (semana 11).
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
       openssh-client openssh-server \
       bash jq git shellcheck rsync sshpass python3 sudo \
       postgresql-client autossh \
+      libpam-google-authenticator oathtool fail2ban nftables \
       iproute2 iputils-ping netcat-openbsd tcpdump ca-certificates curl less procps nano \
  && rm -rf /var/lib/apt/lists/*
 
 # Python solo con uv (ssh-audit, Ansible). Versión fijada en docs/stack-versions.md.
 COPY --from=ghcr.io/astral-sh/uv:0.12.2 /uv /uvx /usr/local/bin/
+
+# ssh-audit (semana 11) instalado al construir: los labs y el autograding no
+# salen a Internet. uv lo aísla en /opt/uv-tools con su propio entorno.
+RUN UV_TOOL_DIR=/opt/uv-tools UV_TOOL_BIN_DIR=/usr/local/bin \
+    uv tool install --python /usr/bin/python3 ssh-audit==3.3.0
 
 # ubuntu:24.04 trae el usuario "ubuntu" con UID 1000: se renombra para que los
 # archivos creados en el volumen pertenezcan al estudiante en el host.

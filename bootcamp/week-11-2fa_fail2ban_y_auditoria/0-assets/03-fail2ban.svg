@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 420">
+  <defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8b949e"/></marker></defs>
+  <rect width="900" height="420" fill="#0d1117"/>
+  <text x="450" y="34" font-family="sans-serif" font-size="19" fill="#c9d1d9" text-anchor="middle">fail2ban: del log al cortafuegos</text>
+  <rect x="30" y="70" width="250" height="110" rx="6" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="155" y="96" font-family="monospace" font-size="13" fill="#c9d1d9" text-anchor="middle">/var/log/auth.log</text>
+  <text x="155" y="122" font-family="monospace" font-size="10" fill="#f85149" text-anchor="middle">Invalid user oracle from 192.0.2.7</text>
+  <text x="155" y="142" font-family="monospace" font-size="10" fill="#f85149" text-anchor="middle">Invalid user test from 192.0.2.7</text>
+  <text x="155" y="162" font-family="monospace" font-size="10" fill="#3fb950" text-anchor="middle">Accepted publickey for alumno</text>
+  <line x1="282" y1="125" x2="338" y2="125" stroke="#8b949e" stroke-width="2" marker-end="url(#fa)"/>
+  <rect x="340" y="70" width="220" height="110" rx="6" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+  <text x="450" y="98" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">filtro sshd (mode = normal)</text>
+  <text x="450" y="124" font-family="sans-serif" font-size="12" fill="#8b949e" text-anchor="middle">¿es un fallo? ¿de qué IP?</text>
+  <text x="450" y="150" font-family="monospace" font-size="12" fill="#58a6ff" text-anchor="middle">&lt;HOST&gt; = 192.0.2.7</text>
+  <line x1="562" y1="125" x2="618" y2="125" stroke="#8b949e" stroke-width="2" marker-end="url(#fa)"/>
+  <rect x="620" y="70" width="250" height="110" rx="6" fill="#161b22" stroke="#d29922" stroke-width="2"/>
+  <text x="745" y="98" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">jaula sshd</text>
+  <text x="745" y="124" font-family="monospace" font-size="12" fill="#d29922" text-anchor="middle">192.0.2.7: 5 fallos en 10m</text>
+  <text x="745" y="150" font-family="monospace" font-size="11" fill="#8b949e" text-anchor="middle">maxretry = 5  findtime = 10m</text>
+  <line x1="745" y1="182" x2="745" y2="228" stroke="#8b949e" stroke-width="2" marker-end="url(#fa)"/>
+  <rect x="620" y="230" width="250" height="110" rx="6" fill="#161b22" stroke="#f85149" stroke-width="2"/>
+  <text x="745" y="258" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">acción nftables</text>
+  <text x="745" y="284" font-family="monospace" font-size="12" fill="#f85149" text-anchor="middle">Ban 192.0.2.7 (bantime 1h)</text>
+  <text x="745" y="310" font-family="monospace" font-size="11" fill="#8b949e" text-anchor="middle">tcp dport 22 reject</text>
+  <line x1="618" y1="285" x2="452" y2="285" stroke="#8b949e" stroke-width="2" marker-end="url(#fa)"/>
+  <rect x="30" y="230" width="420" height="110" rx="6" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="240" y="260" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">La siguiente conexión desde 192.0.2.7:</text>
+  <text x="240" y="288" font-family="monospace" font-size="14" fill="#f85149" text-anchor="middle">Connection refused</text>
+  <text x="240" y="316" font-family="sans-serif" font-size="12" fill="#8b949e" text-anchor="middle">también las que ya estaban abiertas</text>
+  <text x="450" y="385" font-family="sans-serif" font-size="13" fill="#8b949e" text-anchor="middle">Pasado bantime, Unban. Si vuelve, el siguiente bloqueo dura el doble (bantime.increment), hasta 1w.</text>
+</svg>

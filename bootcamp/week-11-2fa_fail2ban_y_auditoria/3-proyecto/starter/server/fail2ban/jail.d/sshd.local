@@ -1,0 +1,11 @@
+# ssh-infra-kit — fail2ban para sshd. Se instala en /etc/fail2ban/jail.d/
+# (lo hace server/sshd-apply). Los .local se leen después de los .conf:
+# lo de aquí gana a jail.conf y a defaults-debian.conf.
+# Comprueba: sudo fail2ban-client -d | grep "'sshd'" y
+#            sudo fail2ban-client status sshd
+
+[sshd]
+# TODO 7: enabled; mode normal (y por qué no aggressive); backend auto y
+#   logpath /var/log/auth.log; 5 fallos en 10m bloquean 1h, creciendo hasta
+#   1w; ignoreip solo para el propio servidor. Cada opción con su Qué / Para
+#   qué / Impacto. Lab 06.

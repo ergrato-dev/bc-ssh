@@ -1,0 +1,118 @@
+{
+  "semana": "11",
+  "titulo": "2FA, fail2ban y auditoría con ssh-audit",
+  "checks": [
+    {
+      "id": "audit-uso",
+      "descripcion": "audit sale con 2 sin hosts, con una opción desconocida o sin política legible",
+      "cmd": "A={proyecto}/bin/audit; $A >/dev/null 2>&1; a=$?; $A -x server >/dev/null 2>&1; b=$?; $A -p /no/existe server >/dev/null 2>&1; echo \"$a $b $?\"",
+      "assert": "stdout~^2 2 2$",
+      "pista": "3-proyecto/README.md, paso 2"
+    },
+    {
+      "id": "audit-cumple",
+      "descripcion": "audit dice «cumple» y sale con 0 con un sshd que usa 15-algoritmos.conf, resolviendo el alias con ssh -G",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); A={proyecto}/bin/audit; ssh-keygen -q -t ed25519 -N \"\" -f $d/hk; echo \"Include {proyecto}/server/sshd_config.d/15-algoritmos.conf\" > $d/fuerte; : > $d/debil; for n in \"fuerte 2212\" \"debil 2213\"; do set -- $n; /usr/sbin/sshd -f $d/$1 -h $d/hk -p $2 -o ListenAddress=127.0.0.1 -o PidFile=$d/$1.pid; done; for n in \"fuerte 2212\" \"debil 2213\" \"cerrado 2214\"; do set -- $n; echo \"Host $1\"; echo \"  HostName 127.0.0.1\"; echo \"  Port $2\"; done > $d/cfg; export SSH_CMD=\"ssh -F $d/cfg\"; sleep 0.3; o=$($A fuerte 2>&1); r=\"$? $o\"; kill $(cat $d/*.pid 2>/dev/null) 2>/dev/null; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^0 fuerte: cumple$",
+      "pista": "3-proyecto/README.md, paso 2"
+    },
+    {
+      "id": "audit-no-cumple",
+      "descripcion": "audit dice «no cumple», enseña qué falla y sale con 1 si un host ofrece algoritmos fuera de la política",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); A={proyecto}/bin/audit; ssh-keygen -q -t ed25519 -N \"\" -f $d/hk; echo \"Include {proyecto}/server/sshd_config.d/15-algoritmos.conf\" > $d/fuerte; : > $d/debil; for n in \"fuerte 2212\" \"debil 2213\"; do set -- $n; /usr/sbin/sshd -f $d/$1 -h $d/hk -p $2 -o ListenAddress=127.0.0.1 -o PidFile=$d/$1.pid; done; for n in \"fuerte 2212\" \"debil 2213\" \"cerrado 2214\"; do set -- $n; echo \"Host $1\"; echo \"  HostName 127.0.0.1\"; echo \"  Port $2\"; done > $d/cfg; export SSH_CMD=\"ssh -F $d/cfg\"; sleep 0.3; o=$($A fuerte debil 2>&1); c=$?; r=\"$c $(grep -cx \"fuerte: cumple\" <<<\"$o\") $(grep -cx \"debil: no cumple\" <<<\"$o\") $(grep -c \"MACs did not match\" <<<\"$o\")\"; kill $(cat $d/*.pid 2>/dev/null) 2>/dev/null; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^1 1 1 1$",
+      "pista": "3-proyecto/README.md, paso 2"
+    },
+    {
+      "id": "audit-no-responde",
+      "descripcion": "audit dice «no responde» y sale con 1 si no puede conectar",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); A={proyecto}/bin/audit; ssh-keygen -q -t ed25519 -N \"\" -f $d/hk; echo \"Include {proyecto}/server/sshd_config.d/15-algoritmos.conf\" > $d/fuerte; : > $d/debil; for n in \"fuerte 2212\" \"debil 2213\"; do set -- $n; /usr/sbin/sshd -f $d/$1 -h $d/hk -p $2 -o ListenAddress=127.0.0.1 -o PidFile=$d/$1.pid; done; for n in \"fuerte 2212\" \"debil 2213\" \"cerrado 2214\"; do set -- $n; echo \"Host $1\"; echo \"  HostName 127.0.0.1\"; echo \"  Port $2\"; done > $d/cfg; export SSH_CMD=\"ssh -F $d/cfg\"; sleep 0.3; o=$($A cerrado 2>&1); r=\"$? $o\"; kill $(cat $d/*.pid 2>/dev/null) 2>/dev/null; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^1 cerrado: no responde$",
+      "pista": "3-proyecto/README.md, paso 2"
+    },
+    {
+      "id": "algoritmos-sshd",
+      "descripcion": "15-algoritmos.conf quita curvas NIST, grupo 14, SHA-1, umac-64 y MAC sin etm, y conserva sntrup761 y los certificados Ed25519",
+      "cmd": "d=$(mktemp -d); ssh-keygen -q -t ed25519 -N \"\" -f $d/hk; echo \"Include {proyecto}/server/sshd_config.d/15-algoritmos.conf\" > $d/c; t=$(/usr/sbin/sshd -T -f $d/c -h $d/hk 2>&1); k=$(grep ^kexalgorithms <<<\"$t\"); m=$(grep ^macs <<<\"$t\"); h=$(grep ^hostkeyalgorithms <<<\"$t\"); rm -rf $d; echo \"$(grep -cE \"nistp|group14\" <<<\"$k$h\") $(grep -cE \"sha1|umac-64\" <<<\"$m\") $(tr , \" \" <<<\"${m#macs }\" | xargs -n1 | grep -vc etm) $(grep -c ssh-ed25519-cert <<<\"$h\") $(grep -c sntrup761 <<<\"$k\")\"",
+      "assert": "stdout~^0 0 0 1 1$",
+      "pista": "3-proyecto/README.md, paso 1"
+    },
+    {
+      "id": "politica-subconjunto",
+      "descripcion": "La política acepta un servidor que ofrece menos algoritmos y rechaza uno que añade un cifrado CBC",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); A={proyecto}/bin/audit; ssh-keygen -q -t ed25519 -N \"\" -f $d/hk; echo \"Include {proyecto}/server/sshd_config.d/15-algoritmos.conf\" > $d/fuerte; : > $d/debil; for n in \"fuerte 2212\" \"debil 2213\"; do set -- $n; /usr/sbin/sshd -f $d/$1 -h $d/hk -p $2 -o ListenAddress=127.0.0.1 -o PidFile=$d/$1.pid; done; for n in \"fuerte 2212\" \"debil 2213\" \"cerrado 2214\"; do set -- $n; echo \"Host $1\"; echo \"  HostName 127.0.0.1\"; echo \"  Port $2\"; done > $d/cfg; export SSH_CMD=\"ssh -F $d/cfg\"; sleep 0.3; echo \"Ciphers aes256-gcm@openssh.com\" >> $d/fuerte; echo \"Include {proyecto}/server/sshd_config.d/15-algoritmos.conf\" > $d/cbc; echo \"Ciphers +aes256-cbc\" >> $d/cbc; /usr/sbin/sshd -f $d/cbc -h $d/hk -p 2215 -o ListenAddress=127.0.0.1 -o PidFile=$d/cbc.pid; kill $(cat $d/fuerte.pid); sleep 0.3; /usr/sbin/sshd -f $d/fuerte -h $d/hk -p 2212 -o ListenAddress=127.0.0.1 -o PidFile=$d/fuerte.pid; sleep 0.3; $A fuerte >/dev/null 2>&1; a=$?; echo \"Host cbc\" >> $d/cfg; echo \"  HostName 127.0.0.1\" >> $d/cfg; echo \"  Port 2215\" >> $d/cfg; $A cbc >/dev/null 2>&1; r=\"$a $?\"; kill $(cat $d/*.pid 2>/dev/null) 2>/dev/null; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^0 1$",
+      "pista": "3-proyecto/README.md, paso 2"
+    },
+    {
+      "id": "dosfa-pide-codigo",
+      "descripcion": "Con 60-2fa.conf, un usuario de dosfa con su llave no entra sin código (keyboard-interactive)",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); sudo ssh-keygen -A >/dev/null; sudo groupadd -f ssh-users; sudo groupadd -f dosfa; sudo usermod -aG ssh-users alumno; sudo gpasswd -d alumno dosfa >/dev/null 2>&1; sudo cp /etc/pam.d/sshd $d/pam; sudo cp {proyecto}/server/pam.d/sshd /etc/pam.d/sshd; ssh-keygen -q -t ed25519 -N \"\" -f $d/k; sudo mkdir -p /etc/ssh/ak; sudo cp $d/k.pub /etc/ssh/ak/alumno; for f in 10-acceso 15-algoritmos 60-2fa; do echo \"Include {proyecto}/server/sshd_config.d/$f.conf\"; done > $d/c; echo \"UsePAM yes\" >> $d/c; rm -f ~/.google_authenticator; google-authenticator -t -d -f -r 3 -R 30 -w 3 -Q NONE -e 1 -q; S=$(head -1 ~/.google_authenticator); sudo usermod -aG dosfa alumno; sudo /usr/sbin/sshd -f $d/c -p 2212 -o ListenAddress=127.0.0.1 -o PidFile=$d/pid -o AuthorizedKeysFile=/etc/ssh/ak/%u; sleep 0.5; X=\"ssh -F /dev/null -p 2212 -o UserKnownHostsFile=$d/kh -o StrictHostKeyChecking=accept-new -o LogLevel=ERROR -o IdentitiesOnly=yes -i $d/k alumno@127.0.0.1\"; T() { timeout 15 sshpass -P \"Verification code\" -p \"$1\" $X \"${@:2}\"; }; r=$($X -o BatchMode=yes id -un 2>&1); sudo kill $(cat $d/pid 2>/dev/null) 2>/dev/null; sudo cp $d/pam /etc/pam.d/sshd; sudo gpasswd -d alumno dosfa >/dev/null 2>&1; rm -f ~/.google_authenticator; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~Permission denied .keyboard-interactive.",
+      "pista": "3-proyecto/README.md, paso 3"
+    },
+    {
+      "id": "dosfa-llave-y-codigo",
+      "descripcion": "Un usuario de dosfa entra con su llave y el código TOTP, que PAM pide como «Verification code» y no como contraseña",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); sudo ssh-keygen -A >/dev/null; sudo groupadd -f ssh-users; sudo groupadd -f dosfa; sudo usermod -aG ssh-users alumno; sudo gpasswd -d alumno dosfa >/dev/null 2>&1; sudo cp /etc/pam.d/sshd $d/pam; sudo cp {proyecto}/server/pam.d/sshd /etc/pam.d/sshd; ssh-keygen -q -t ed25519 -N \"\" -f $d/k; sudo mkdir -p /etc/ssh/ak; sudo cp $d/k.pub /etc/ssh/ak/alumno; for f in 10-acceso 15-algoritmos 60-2fa; do echo \"Include {proyecto}/server/sshd_config.d/$f.conf\"; done > $d/c; echo \"UsePAM yes\" >> $d/c; rm -f ~/.google_authenticator; google-authenticator -t -d -f -r 3 -R 30 -w 3 -Q NONE -e 1 -q; S=$(head -1 ~/.google_authenticator); sudo usermod -aG dosfa alumno; sudo /usr/sbin/sshd -f $d/c -p 2212 -o ListenAddress=127.0.0.1 -o PidFile=$d/pid -o AuthorizedKeysFile=/etc/ssh/ak/%u; sleep 0.5; X=\"ssh -F /dev/null -p 2212 -o UserKnownHostsFile=$d/kh -o StrictHostKeyChecking=accept-new -o LogLevel=ERROR -o IdentitiesOnly=yes -i $d/k alumno@127.0.0.1\"; T() { timeout 15 sshpass -P \"Verification code\" -p \"$1\" $X \"${@:2}\"; }; a=$($X -o BatchMode=yes true >/dev/null 2>&1 || echo pide); r=\"$a $(T \"$(oathtool --totp -b $S)\" id -un 2>&1)\"; sudo kill $(cat $d/pid 2>/dev/null) 2>/dev/null; sudo cp $d/pam /etc/pam.d/sshd; sudo gpasswd -d alumno dosfa >/dev/null 2>&1; rm -f ~/.google_authenticator; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^pide alumno$",
+      "pista": "3-proyecto/README.md, paso 4"
+    },
+    {
+      "id": "dosfa-codigo-malo",
+      "descripcion": "Un código equivocado no entra, y el mismo código bueno no sirve dos veces",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); sudo ssh-keygen -A >/dev/null; sudo groupadd -f ssh-users; sudo groupadd -f dosfa; sudo usermod -aG ssh-users alumno; sudo gpasswd -d alumno dosfa >/dev/null 2>&1; sudo cp /etc/pam.d/sshd $d/pam; sudo cp {proyecto}/server/pam.d/sshd /etc/pam.d/sshd; ssh-keygen -q -t ed25519 -N \"\" -f $d/k; sudo mkdir -p /etc/ssh/ak; sudo cp $d/k.pub /etc/ssh/ak/alumno; for f in 10-acceso 15-algoritmos 60-2fa; do echo \"Include {proyecto}/server/sshd_config.d/$f.conf\"; done > $d/c; echo \"UsePAM yes\" >> $d/c; rm -f ~/.google_authenticator; google-authenticator -t -d -f -r 3 -R 30 -w 3 -Q NONE -e 1 -q; S=$(head -1 ~/.google_authenticator); sudo usermod -aG dosfa alumno; sudo /usr/sbin/sshd -f $d/c -p 2212 -o ListenAddress=127.0.0.1 -o PidFile=$d/pid -o AuthorizedKeysFile=/etc/ssh/ak/%u; sleep 0.5; X=\"ssh -F /dev/null -p 2212 -o UserKnownHostsFile=$d/kh -o StrictHostKeyChecking=accept-new -o LogLevel=ERROR -o IdentitiesOnly=yes -i $d/k alumno@127.0.0.1\"; T() { timeout 15 sshpass -P \"Verification code\" -p \"$1\" $X \"${@:2}\"; }; c=$(oathtool --totp -b $S); T 000000 true >/dev/null 2>&1; a=$?; [ \"$c\" = 000000 ] && a=5; T $c true >/dev/null 2>&1; b=$?; T $c true >/dev/null 2>&1 || e=rechazado; r=\"$a $b $e\"; sudo kill $(cat $d/pid 2>/dev/null) 2>/dev/null; sudo cp $d/pam /etc/pam.d/sshd; sudo gpasswd -d alumno dosfa >/dev/null 2>&1; rm -f ~/.google_authenticator; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^5 0 rechazado$",
+      "pista": "3-proyecto/README.md, paso 4"
+    },
+    {
+      "id": "dosfa-sin-llave",
+      "descripcion": "El código TOTP sin la llave no entra: primero publickey",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); sudo ssh-keygen -A >/dev/null; sudo groupadd -f ssh-users; sudo groupadd -f dosfa; sudo usermod -aG ssh-users alumno; sudo gpasswd -d alumno dosfa >/dev/null 2>&1; sudo cp /etc/pam.d/sshd $d/pam; sudo cp {proyecto}/server/pam.d/sshd /etc/pam.d/sshd; ssh-keygen -q -t ed25519 -N \"\" -f $d/k; sudo mkdir -p /etc/ssh/ak; sudo cp $d/k.pub /etc/ssh/ak/alumno; for f in 10-acceso 15-algoritmos 60-2fa; do echo \"Include {proyecto}/server/sshd_config.d/$f.conf\"; done > $d/c; echo \"UsePAM yes\" >> $d/c; rm -f ~/.google_authenticator; google-authenticator -t -d -f -r 3 -R 30 -w 3 -Q NONE -e 1 -q; S=$(head -1 ~/.google_authenticator); sudo usermod -aG dosfa alumno; sudo /usr/sbin/sshd -f $d/c -p 2212 -o ListenAddress=127.0.0.1 -o PidFile=$d/pid -o AuthorizedKeysFile=/etc/ssh/ak/%u; sleep 0.5; X=\"ssh -F /dev/null -p 2212 -o UserKnownHostsFile=$d/kh -o StrictHostKeyChecking=accept-new -o LogLevel=ERROR -o IdentitiesOnly=yes -i $d/k alumno@127.0.0.1\"; T() { timeout 15 sshpass -P \"Verification code\" -p \"$1\" $X \"${@:2}\"; }; r=$(T \"$(oathtool --totp -b $S)\" -o PubkeyAuthentication=no true 2>&1); sudo kill $(cat $d/pid 2>/dev/null) 2>/dev/null; sudo cp $d/pam /etc/pam.d/sshd; sudo gpasswd -d alumno dosfa >/dev/null 2>&1; rm -f ~/.google_authenticator; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~Permission denied .publickey.",
+      "pista": "3-proyecto/README.md, paso 3"
+    },
+    {
+      "id": "dosfa-solo-el-grupo",
+      "descripcion": "Quien no está en dosfa sigue entrando solo con su llave",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); sudo ssh-keygen -A >/dev/null; sudo groupadd -f ssh-users; sudo groupadd -f dosfa; sudo usermod -aG ssh-users alumno; sudo gpasswd -d alumno dosfa >/dev/null 2>&1; sudo cp /etc/pam.d/sshd $d/pam; sudo cp {proyecto}/server/pam.d/sshd /etc/pam.d/sshd; ssh-keygen -q -t ed25519 -N \"\" -f $d/k; sudo mkdir -p /etc/ssh/ak; sudo cp $d/k.pub /etc/ssh/ak/alumno; for f in 10-acceso 15-algoritmos 60-2fa; do echo \"Include {proyecto}/server/sshd_config.d/$f.conf\"; done > $d/c; echo \"UsePAM yes\" >> $d/c; rm -f ~/.google_authenticator; google-authenticator -t -d -f -r 3 -R 30 -w 3 -Q NONE -e 1 -q; S=$(head -1 ~/.google_authenticator); sudo /usr/sbin/sshd -f $d/c -p 2212 -o ListenAddress=127.0.0.1 -o PidFile=$d/pid -o AuthorizedKeysFile=/etc/ssh/ak/%u; sleep 0.5; X=\"ssh -F /dev/null -p 2212 -o UserKnownHostsFile=$d/kh -o StrictHostKeyChecking=accept-new -o LogLevel=ERROR -o IdentitiesOnly=yes -i $d/k alumno@127.0.0.1\"; T() { timeout 15 sshpass -P \"Verification code\" -p \"$1\" $X \"${@:2}\"; }; r=$($X -o BatchMode=yes id -un 2>&1); sudo kill $(cat $d/pid 2>/dev/null) 2>/dev/null; sudo cp $d/pam /etc/pam.d/sshd; sudo gpasswd -d alumno dosfa >/dev/null 2>&1; rm -f ~/.google_authenticator; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^alumno$",
+      "pista": "3-proyecto/README.md, paso 3"
+    },
+    {
+      "id": "fail2ban-jaula",
+      "descripcion": "La jaula sshd del kit es válida: activa, lee /var/log/auth.log, 5 fallos en 10m, 1h creciente hasta 1w",
+      "cmd": "d=$(mktemp -d); cp -r /etc/fail2ban $d/f2b; cp {proyecto}/server/fail2ban/jail.d/*.local $d/f2b/jail.d/ 2>/dev/null; sudo touch /var/log/auth.log; t=$(fail2ban-client -c $d/f2b -t >/dev/null 2>&1 && echo valida); v=$(fail2ban-client -c $d/f2b -d 2>/dev/null); rm -rf $d; echo \"$t $(grep -cE \"^.(.add., .sshd., .auto.|.set., .sshd., .(maxretry., 5|findtime., .10m.|bantime., .1h.|bantime.increment., True|bantime.maxtime., .1w.)|.set., .sshd., .addlogpath., ./var/log/auth.log.)\" <<<\"$v\")\"",
+      "assert": "stdout~^valida 7$",
+      "pista": "3-proyecto/README.md, paso 5"
+    },
+    {
+      "id": "fail2ban-banea",
+      "descripcion": "fail2ban bloquea la IP con 5 usuarios inválidos, no la de 4 ni la de conexiones cerradas sin autenticar, ni 127.0.0.1",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); cp -r /etc/fail2ban $d/f2b; cp {proyecto}/server/fail2ban/jail.d/*.local $d/f2b/jail.d/ 2>/dev/null; sudo touch /var/log/auth.log; { echo \"[Definition]\"; echo \"socket = $d/sock\"; echo \"pidfile = $d/pid\"; echo \"dbfile = :memory:\"; echo \"logtarget = $d/f2b.log\"; } > $d/f2b/fail2ban.local; { echo \"[sshd]\"; echo \"logpath = $d/auth.log\"; echo \"action = dummy[target=$d/dummy]\"; } > $d/f2b/jail.d/zz-prueba.local; touch $d/auth.log; sudo fail2ban-client -c $d/f2b start >/dev/null 2>&1; sleep 1; L() { for i in $(seq $1); do echo \"$(date \"+%F %T\") client sshd: $2 port 40$i\" >> $d/auth.log; done; }; L 5 \"Invalid user root from 192.0.2.7\"; L 4 \"Invalid user root from 192.0.2.8\"; L 6 \"Connection closed by authenticating user alumno 192.0.2.9\"; L 6 \"Invalid user admin from 127.0.0.1\"; sleep 4; r=$(sudo fail2ban-client -c $d/f2b status sshd 2>&1 | grep \"Banned IP list\"); sudo fail2ban-client -c $d/f2b stop >/dev/null 2>&1; sudo rm -rf $d; echo \"$r\"",
+      "assert": "stdout~Banned IP list:[[:space:]]*192.0.2.7[[:space:]]*$",
+      "pista": "3-proyecto/README.md, paso 5"
+    },
+    {
+      "id": "deploy-instala-todo",
+      "descripcion": "sshd-deploy instala sshd_config.d, pam.d/sshd y la jaula de fail2ban, arranca fail2ban y confirma",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); sudo ssh-keygen -A >/dev/null; sudo groupadd -f ssh-users; sudo groupadd -f sftp-only; sudo groupadd -f saltadores; sudo usermod -aG ssh-users alumno; sudo gpasswd -d alumno dosfa >/dev/null 2>&1; sudo pkill -f \"^/usr/sbin/sshd -p 2207\"; sudo fail2ban-client stop >/dev/null 2>&1; sudo touch /var/log/auth.log /etc/ssh/revoked.krl; sudo rm -rf /etc/ssh/sshd_config.d /etc/ssh/sshd_config.d.anterior /etc/fail2ban/jail.d.anterior /etc/pam.d/sshd.anterior; sudo cp -r {raiz}/lab/sshd_config.d /etc/ssh/; sudo cp /etc/pam.d/sshd $d/pam; ls /etc/fail2ban/jail.d > $d/jaulas; ssh-keygen -q -t ed25519 -N \"\" -f $d/k; sudo mkdir -p /etc/ssh/ak; sudo cp $d/k.pub /etc/ssh/ak/alumno; sudo /usr/sbin/sshd -p 2207 -o ListenAddress=127.0.0.1 -o AuthorizedKeysFile=/etc/ssh/ak/%u; sleep 0.5; echo \"Host t\" > $d/cfg; for l in \"HostName 127.0.0.1\" \"Port 2207\" \"User alumno\" \"IdentityFile $d/k\" \"IdentitiesOnly yes\" \"BatchMode yes\" \"StrictHostKeyChecking accept-new\" \"UserKnownHostsFile $d/kh\" \"LogLevel ERROR\" \"ControlMaster auto\" \"ControlPath $d/cm\" \"ControlPersist 1m\"; do echo \"  $l\" >> $d/cfg; done; export SSH_CMD=\"ssh -F $d/cfg\" DEPLOY_TIMEOUT=3; cp -r {proyecto} $d/kit; $d/kit/bin/sshd-deploy t >/dev/null 2>&1; a=$?; r=\"$a $(sudo cmp -s {proyecto}/server/pam.d/sshd /etc/pam.d/sshd && echo pam) $(cmp -s {proyecto}/server/fail2ban/jail.d/sshd.local /etc/fail2ban/jail.d/sshd.local && echo jaula) $(sudo fail2ban-client status sshd >/dev/null 2>&1 && echo activa) $(ls /etc/ssh/sshd_config.d | grep -c -e 15-algoritmos -e 60-2fa)\"; ssh -F $d/cfg -O exit t 2>/dev/null; sudo pkill -F /run/sshd.pid; sudo fail2ban-client stop >/dev/null 2>&1; sudo cp $d/pam /etc/pam.d/sshd; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^0 pam jaula activa 2$",
+      "pista": "3-proyecto/README.md, paso 6"
+    },
+    {
+      "id": "deploy-deshace-todo",
+      "descripcion": "Si no se confirma, sshd-apply devuelve también el PAM y las jaulas anteriores",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); sudo ssh-keygen -A >/dev/null; sudo groupadd -f ssh-users; sudo groupadd -f sftp-only; sudo groupadd -f saltadores; sudo usermod -aG ssh-users alumno; sudo gpasswd -d alumno dosfa >/dev/null 2>&1; sudo pkill -f \"^/usr/sbin/sshd -p 2207\"; sudo fail2ban-client stop >/dev/null 2>&1; sudo touch /var/log/auth.log /etc/ssh/revoked.krl; sudo rm -rf /etc/ssh/sshd_config.d /etc/ssh/sshd_config.d.anterior /etc/fail2ban/jail.d.anterior /etc/pam.d/sshd.anterior; sudo cp -r {raiz}/lab/sshd_config.d /etc/ssh/; sudo cp /etc/pam.d/sshd $d/pam; ls /etc/fail2ban/jail.d > $d/jaulas; ssh-keygen -q -t ed25519 -N \"\" -f $d/k; sudo mkdir -p /etc/ssh/ak; sudo cp $d/k.pub /etc/ssh/ak/alumno; sudo /usr/sbin/sshd -p 2207 -o ListenAddress=127.0.0.1 -o AuthorizedKeysFile=/etc/ssh/ak/%u; sleep 0.5; echo \"Host t\" > $d/cfg; for l in \"HostName 127.0.0.1\" \"Port 2207\" \"User alumno\" \"IdentityFile $d/k\" \"IdentitiesOnly yes\" \"BatchMode yes\" \"StrictHostKeyChecking accept-new\" \"UserKnownHostsFile $d/kh\" \"LogLevel ERROR\" \"ControlMaster auto\" \"ControlPath $d/cm\" \"ControlPersist 1m\"; do echo \"  $l\" >> $d/cfg; done; export SSH_CMD=\"ssh -F $d/cfg\" DEPLOY_TIMEOUT=3; cp -r {proyecto} $d/kit; echo \"AllowUsers nadie\" > $d/kit/server/sshd_config.d/00-cierre.conf; ssh -F $d/cfg t true; $d/kit/bin/sshd-deploy t >/dev/null 2>&1; a=$?; sleep 5; r=\"$a $(cmp -s $d/pam /etc/pam.d/sshd && echo pam-anterior) $(ls /etc/fail2ban/jail.d | cmp -s - $d/jaulas && echo jaulas-anteriores) $(ls /etc/ssh/sshd_config.d)\"; ssh -F $d/cfg -O exit t 2>/dev/null; sudo pkill -F /run/sshd.pid; sudo fail2ban-client stop >/dev/null 2>&1; sudo cp $d/pam /etc/pam.d/sshd; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^1 pam-anterior jaulas-anteriores 10-bc-ssh.conf$",
+      "pista": "3-proyecto/README.md, paso 6"
+    },
+    {
+      "id": "kit-completo-y-limpio",
+      "descripcion": "Sin TODOs, shellcheck sin avisos y los scripts anteriores siguen respondiendo",
+      "cmd": "! grep -rn TODO {proyecto}/README.md {proyecto}/config {proyecto}/conf.d {proyecto}/bin {proyecto}/ca {proyecto}/server && shellcheck {proyecto}/bin/* {proyecto}/ca/* && shellcheck -s sh {proyecto}/server/sshd-apply && { {proyecto}/bin/ak-line; a=$?; {proyecto}/bin/tunnel 2>/dev/null; b=$?; {proyecto}/bin/kh-add -J 2>/dev/null; c=$?; {proyecto}/ca/ca-sign 2>/dev/null; e=$?; {proyecto}/bin/sshd-deploy 2>/dev/null; [ \"$a$b$c$e$?\" = 22222 ]; }",
+      "assert": "exit0",
+      "pista": "3-proyecto/README.md, paso 8"
+    }
+  ]
+}

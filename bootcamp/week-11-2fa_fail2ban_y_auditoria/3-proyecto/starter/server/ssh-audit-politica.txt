@@ -1,0 +1,11 @@
+# ssh-infra-kit — política de ssh-audit: lo único que pueden ofrecer tus
+# servidores. La usa bin/audit (ssh-audit -P). Sale de 15-algoritmos.conf.
+
+name = "ssh-infra-kit"
+version = 1
+
+# TODO 2: allow_algorithm_subset_and_reordering y allow_larger_keys con su
+#   Qué / Impacto; host_key_sizes y dh_modulus_sizes; y las listas host keys,
+#   optional host keys (certificados), key exchanges (con mlkem768x25519 para
+#   9.9+ y los avisos ext-info-s y kex-strict-s-v00), ciphers y macs: lo que
+#   deja 15-algoritmos.conf. Lab 04.

@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+#
+# mux — lista o cierra los masters de multiplexing (ControlPath ~/.ssh/cm/%C).
+#
+# Uso: mux list | mux stop
+#
+#   list  una línea por socket:
+#           activo    pid=83    /home/alumno/.ssh/cm/e02bc41e...
+#           huérfano          /home/alumno/.ssh/cm/5f1a0c9d...
+#   stop  cierra cada master (ssh -O exit) y borra los sockets huérfanos.
+#         Úsalo después de cambiar llaves o authorized_keys: un master
+#         abierto sigue entrando con la autenticación del principio.
+#
+# MUX_DIR cambia la carpeta (~/.ssh/cm por defecto).
+# Códigos de salida: 0 bien, 2 uso incorrecto.
+
+set -euo pipefail
+
+if [[ $# -ne 1 || ( "$1" != list && "$1" != stop ) ]]; then
+  echo "uso: mux list|stop" >&2
+  exit 2
+fi
+orden="$1"
+dir="${MUX_DIR:-$HOME/.ssh/cm}"
+
+# Sin sockets, el bucle no da ninguna vuelta (y no recibe el patrón literal).
+shopt -s nullglob
+
+for s in "$dir"/*; do
+  [[ -S "$s" ]] || continue
+  # -S elige el socket; -F /dev/null, para que ningún config lo cambie. El
+  # host (_) es obligatorio, pero con -O no se usa.
+  if estado=$(ssh -F /dev/null -S "$s" -O check _ 2>&1); then
+    # estado: "Master running (pid=83)", con \r al final. Sus únicas
+    # cifras son el pid.
+    pid="${estado//[!0-9]/}"
+    if [[ "$orden" == list ]]; then
+      printf 'activo    pid=%-5s %s\n' "$pid" "$s"
+    else
+      ssh -F /dev/null -S "$s" -O exit _ 2>/dev/null
+      printf 'cerrado   %s\n' "$s"
+    fi
+  else
+    # Su master murió sin borrarlo (kill -9, apagón): nadie escucha.
+    if [[ "$orden" == list ]]; then
+      printf 'huérfano            %s\n' "$s"
+    else
+      rm -f "$s"
+      printf 'borrado   %s\n' "$s"
+    fi
+  fi
+done

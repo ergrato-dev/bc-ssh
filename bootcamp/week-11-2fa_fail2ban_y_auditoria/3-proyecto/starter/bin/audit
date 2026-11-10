@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+#
+# audit — comprueba con ssh-audit que cada servidor ofrece solo los
+# algoritmos que permite la política del kit.
+#
+# Uso: audit [-p POLÍTICA] HOST...
+#
+#   HOST      un alias de conf.d/ (lab-server) o un nombre. El nombre real y
+#             el puerto salen de `ssh -G`, igual que al conectar (SSH_CMD
+#             cambia el ssh; `ssh -F config` del kit por defecto).
+#   -p        otra política (por defecto server/ssh-audit-politica.txt).
+#
+# Escribe una línea por host: "HOST: cumple", "HOST: no cumple" seguida de
+# lo que falla, o "HOST: no responde".
+#
+# Necesita ssh-audit (uv tool install ssh-audit). Solo mira lo que el
+# servidor anuncia al conectar: no entra, no necesita llave ni cuenta.
+#
+# Códigos de salida: 0 todos cumplen, 1 alguno no cumple o no responde,
+# 2 uso incorrecto.
+set -euo pipefail
+
+kit="$(cd "$(dirname "$0")/.." && pwd)"
+politica="$kit/server/ssh-audit-politica.txt"
+
+uso() {
+  echo "uso: audit [-p POLÍTICA] HOST..." >&2
+  exit 2
+}
+
+while getopts p: opcion; do
+  case $opcion in
+    p) politica=$OPTARG ;;
+    *) uso ;;
+  esac
+done
+shift $((OPTIND - 1))
+[[ $# -ge 1 ]] || uso
+if [[ ! -r "$politica" ]]; then
+  echo "audit: no puedo leer la política $politica" >&2
+  exit 2
+fi
+if ! command -v ssh-audit >/dev/null; then
+  echo "audit: falta ssh-audit (uv tool install ssh-audit)" >&2
+  exit 1
+fi
+
+# Sin comillas al usarla: "ssh -F ruta" son varias palabras.
+ssh_cmd="${SSH_CMD:-ssh -F $kit/config}"
+resultado=0
+
+for host in "$@"; do
+  # TODO 3: saca el nombre real y el puerto de HOST con `$ssh_cmd -G`
+  #   (líneas "hostname" y "port"), sin conectar.
+  # TODO 4: ejecuta ssh-audit -n -P "$politica" -p PUERTO NOMBRE y, según
+  #   su código (0 cumple, 3 no cumple, 1 no conecta, otro: política mala),
+  #   escribe "HOST: cumple", "HOST: no cumple" seguido de las líneas
+  #   "  * ..." de la salida, o "HOST: no responde". Pon resultado=1 si no
+  #   cumple o no responde (3-proyecto/README.md, paso 2).
+  echo "audit: sin terminar (TODO 3 y 4)" >&2
+  resultado=1
+done
+exit "$resultado"

@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+#
+# sshd-deploy — aplica server/sshd_config.d del kit en un servidor y
+# comprueba, con una conexión nueva, que se puede seguir entrando.
+#
+# Uso: sshd-deploy HOST
+#
+#   1. Copia server/ a una carpeta temporal del servidor y ejecuta
+#      `sudo server/sshd-apply`: valida con sshd -t, instala y recarga.
+#   2. Abre una conexión NUEVA (sin el master del multiplexing) y crea el
+#      archivo que confirma el cambio.
+#   3. Si esa conexión falla, el servidor vuelve solo a la configuración
+#      anterior en DEPLOY_TIMEOUT segundos (60 por defecto).
+#
+# Necesitas sudo en el servidor. Conecta con `ssh -F config` del kit;
+# SSH_CMD lo cambia.
+#
+# Códigos de salida: 0 aplicada y confirmada, 1 no se aplicó o no se pudo
+# entrar después (se deshace sola), 2 uso incorrecto.
+
+set -euo pipefail
+
+if [[ $# -ne 1 ]]; then
+  echo "uso: sshd-deploy HOST" >&2
+  exit 2
+fi
+host=$1
+espera="${DEPLOY_TIMEOUT:-60}"
+if [[ ! "$espera" =~ ^[1-9][0-9]*$ ]]; then
+  echo "sshd-deploy: DEPLOY_TIMEOUT debe ser un entero mayor que 0" >&2
+  exit 2
+fi
+kit="$(cd "$(dirname "$0")/.." && pwd)"
+# Sin comillas al usarla: "ssh -F ruta" son varias palabras.
+ssh_cmd="${SSH_CMD:-ssh -F $kit/config}"
+
+# Qué: tar empaqueta server/ y lo manda por la entrada de ssh; en el
+#   servidor, mktemp crea una carpeta que solo es tuya, tar la llena y
+#   sshd-apply la instala. echo devuelve la carpeta para confirmar después.
+# Para qué: una sola conexión, sin dejar archivos a medias si algo falla.
+# shellcheck disable=SC2016  # $d se expande en el servidor, no aquí
+remoto='d=$(mktemp -d) && tar -xzf - -C "$d" && sudo sh "$d/sshd-apply" "$d" '"$espera"' && echo "$d"'
+# TODO 9: envía también pam.d y fail2ban si existen en server/
+#   (3-proyecto/README.md, paso 6).
+if ! carpeta=$(tar -czf - -C "$kit/server" sshd-apply sshd_config.d | $ssh_cmd "$host" "$remoto"); then
+  echo "sshd-deploy: no se aplicó nada en $host" >&2
+  exit 1
+fi
+
+# Qué: la prueba va por una conexión nueva, con ControlPath=none.
+# Para qué: un master abierto ya está autenticado con la configuración
+#   anterior: por él entrarías aunque la nueva te deje fuera.
+# Impacto: esta conexión vuelve a autenticarse; si tu llave tiene frase y
+#   no está en el agente, te la pide.
+if $ssh_cmd -o ControlPath=none "$host" "touch $carpeta/confirmado"; then
+  echo "sshd-deploy: aplicada y confirmada en $host"
+else
+  echo "sshd-deploy: no se pudo entrar con la configuración nueva; $host vuelve a la anterior en $espera s" >&2
+  exit 1
+fi

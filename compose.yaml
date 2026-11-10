@@ -12,6 +12,10 @@ x-servidor: &servidor
   build: lab
   image: bc-ssh-lab:24.04
   command: start-sshd
+  # Qué: permiso para cambiar el cortafuegos del contenedor (nftables).
+  # Para qué: que fail2ban bloquee de verdad una IP (semana 11).
+  # Impacto: solo afecta a la red del contenedor, nunca a la de tu equipo.
+  cap_add: [NET_ADMIN]
 
 services:
   server:
