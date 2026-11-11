@@ -1,0 +1,125 @@
+#!/usr/bin/env bash
+#
+# tunnel — abre, comprueba o cierra un túnel persistente definido en conf.d/.
+#
+# Uso: tunnel up NOMBRE [OPCIONES DE SSH...] | tunnel status NOMBRE | tunnel down NOMBRE
+#
+#   up      arranca `autossh` en segundo plano para el host NOMBRE del kit
+#           (por ejemplo tun-pg) y espera a que su LocalForward escuche.
+#           Si ya está activo, no arranca otro. Las opciones extra van a ssh
+#           (por ejemplo -o LogLevel=DEBUG).
+#   status  dice si el túnel está activo: proceso vivo y puerto escuchando.
+#   down    cierra el túnel (autossh y su ssh).
+#
+# autossh vuelve a lanzar ssh cada vez que muere: el túnel sobrevive a un
+# corte de red o a un reinicio del servidor. ServerAliveInterval (en el host
+# del túnel) es lo que detecta que la conexión murió sin avisar.
+#
+# TUNNEL_DIR guarda los PID (~/.ssh/tun); TUNNEL_TIMEOUT, los segundos que
+# `up` espera al puerto (10).
+# Códigos de salida: 0 bien (status: activo), 1 no se abrió o no está activo,
+# 2 uso incorrecto.
+
+set -euo pipefail
+
+uso() {
+  echo "uso: tunnel up NOMBRE [OPCIONES DE SSH...] | tunnel status NOMBRE | tunnel down NOMBRE" >&2
+  exit 2
+}
+[[ $# -ge 2 ]] || uso
+orden=$1 nombre=$2
+shift 2
+case "$orden" in
+  up) ;;
+  status | down) [[ $# -eq 0 ]] || uso ;;
+  *) uso ;;
+esac
+[[ "$nombre" =~ ^[A-Za-z0-9._-]+$ ]] || uso
+espera="${TUNNEL_TIMEOUT:-10}"
+[[ "$espera" =~ ^[1-9][0-9]*$ ]] || { echo "tunnel: TUNNEL_TIMEOUT debe ser un entero mayor que 0" >&2; exit 2; }
+
+kit="$(cd "$(dirname "$0")/.." && pwd)"
+dir="${TUNNEL_DIR:-$HOME/.ssh/tun}"
+pidfile="$dir/$nombre.pid"
+
+# El puerto local sale de la propia configuración: ssh -G escribe
+#   localforward [127.0.0.1]:15432 [db]:5432
+# Nos quedamos con el primero: 127.0.0.1 y 15432.
+fwd=$(ssh -G -F "$kit/config" "$nombre" | awk '$1 == "localforward" { print $2; exit }')
+if [[ -z "$fwd" ]]; then
+  echo "tunnel: $nombre no tiene LocalForward en el kit" >&2
+  exit 1
+fi
+puerto=${fwd##*:}
+ip=${fwd%:*}
+ip=${ip//[\[\]]/}
+# Un LocalForward sin dirección (solo el puerto) escucha en localhost.
+[[ "$ip" == "$puerto" || "$ip" == '*' || -z "$ip" ]] && ip=127.0.0.1
+
+# autossh borra su pidfile al salir: puede desaparecer entre comprobarlo y
+# leerlo, de ahí el 2>/dev/null de cat.
+vivo() {
+  local pid
+  pid=$(cat "$pidfile" 2>/dev/null) && kill -0 "$pid" 2>/dev/null
+}
+escucha() { nc -z -w 1 "$ip" "$puerto" 2>/dev/null; }
+
+parar() {
+  # autossh, al recibir TERM, cierra su ssh antes de salir. Se espera
+  # (hasta 5 s) a que salga: al volver, el puerto ya está libre.
+  local pid
+  if pid=$(cat "$pidfile" 2>/dev/null) && kill "$pid" 2>/dev/null; then
+    for ((i = 0; i < 50; i++)); do
+      kill -0 "$pid" 2>/dev/null || break
+      sleep 0.1
+    done
+  fi
+  rm -f "$pidfile"
+}
+
+case "$orden" in
+  status)
+    if vivo && escucha; then
+      echo "tunnel: $nombre activo (pid $(cat "$pidfile" 2>/dev/null)) en $ip:$puerto"
+      exit 0
+    fi
+    echo "tunnel: $nombre no está activo" >&2
+    exit 1
+    ;;
+  down)
+    parar
+    echo "tunnel: $nombre cerrado"
+    exit 0
+    ;;
+esac
+
+if vivo; then
+  echo "tunnel: $nombre ya estaba activo (pid $(cat "$pidfile")) en $ip:$puerto"
+  exit 0
+fi
+if escucha; then
+  echo "tunnel: $ip:$puerto ya está ocupado por otro programa" >&2
+  exit 1
+fi
+
+mkdir -p "$dir" && chmod 700 "$dir"
+# Qué: autossh lanza `ssh -F config NOMBRE` y lo relanza cada vez que muere.
+#   -M 0: sin puerto de vigilancia propio; confía en ServerAliveInterval.
+#   -f: se va a segundo plano. AUTOSSH_PIDFILE: dónde deja su PID.
+#   AUTOSSH_GATETIME=0: también reintenta si el primer intento falla.
+# Para qué: un túnel que vuelve solo tras un corte, sin vigilarlo tú.
+# Impacto: si la autenticación falla, reintentaría para siempre; por eso
+#   `up` espera TUNNEL_TIMEOUT segundos y, si el puerto no abre, lo para.
+AUTOSSH_PIDFILE="$pidfile" AUTOSSH_GATETIME=0 \
+  autossh -M 0 -f -F "$kit/config" "$@" "$nombre"
+
+for ((i = 0; i < espera * 2; i++)); do
+  if escucha; then
+    echo "tunnel: $nombre activo (pid $(cat "$pidfile" 2>/dev/null)) en $ip:$puerto"
+    exit 0
+  fi
+  sleep 0.5
+done
+parar
+echo "tunnel: $nombre no abrió $ip:$puerto en $espera s (prueba: ssh -F $kit/config -v $nombre)" >&2
+exit 1

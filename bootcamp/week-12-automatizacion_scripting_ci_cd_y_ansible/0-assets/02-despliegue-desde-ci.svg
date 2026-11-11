@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 420">
+  <defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8b949e"/></marker></defs>
+  <rect width="900" height="420" fill="#0d1117"/>
+  <text x="450" y="34" font-family="sans-serif" font-size="19" fill="#c9d1d9" text-anchor="middle">Despliegue desde un CI: secretos, runner y servidor</text>
+  <rect x="30" y="70" width="230" height="130" rx="6" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="145" y="96" font-family="sans-serif" font-size="14" fill="#c9d1d9" text-anchor="middle">Repositorio</text>
+  <text x="145" y="122" font-family="sans-serif" font-size="12" fill="#8b949e" text-anchor="middle">push a main</text>
+  <text x="145" y="148" font-family="sans-serif" font-size="12" fill="#d29922" text-anchor="middle">secretos (cifrados):</text>
+  <text x="145" y="168" font-family="monospace" font-size="11" fill="#d29922" text-anchor="middle">KIT_SSH_KEY</text>
+  <text x="145" y="186" font-family="monospace" font-size="11" fill="#d29922" text-anchor="middle">KIT_KNOWN_HOSTS</text>
+  <line x1="262" y1="135" x2="328" y2="135" stroke="#8b949e" stroke-width="2" marker-end="url(#fa)"/>
+  <text x="295" y="125" font-family="sans-serif" font-size="11" fill="#8b949e" text-anchor="middle">env:</text>
+  <rect x="330" y="70" width="260" height="250" rx="6" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+  <text x="460" y="96" font-family="sans-serif" font-size="14" fill="#c9d1d9" text-anchor="middle">Runner (temporal)</text>
+  <text x="460" y="124" font-family="monospace" font-size="11" fill="#c9d1d9" text-anchor="middle">umask 077; d=$(mktemp -d)</text>
+  <text x="460" y="144" font-family="monospace" font-size="11" fill="#c9d1d9" text-anchor="middle">trap 'rm -rf "$d"' EXIT</text>
+  <text x="460" y="164" font-family="monospace" font-size="11" fill="#c9d1d9" text-anchor="middle">$d/llave  $d/known_hosts</text>
+  <text x="460" y="198" font-family="monospace" font-size="11" fill="#3fb950" text-anchor="middle">BatchMode=yes</text>
+  <text x="460" y="216" font-family="monospace" font-size="11" fill="#3fb950" text-anchor="middle">StrictHostKeyChecking=yes</text>
+  <text x="460" y="250" font-family="monospace" font-size="11" fill="#f85149" text-anchor="middle">nunca: StrictHostKeyChecking no</text>
+  <text x="460" y="268" font-family="monospace" font-size="11" fill="#f85149" text-anchor="middle">nunca: ssh-keyscan · set -x</text>
+  <text x="460" y="300" font-family="sans-serif" font-size="12" fill="#8b949e" text-anchor="middle">el log lo leen más personas</text>
+  <line x1="592" y1="135" x2="658" y2="135" stroke="#8b949e" stroke-width="2" marker-end="url(#fa)"/>
+  <text x="625" y="125" font-family="sans-serif" font-size="11" fill="#8b949e" text-anchor="middle">ssh</text>
+  <rect x="660" y="70" width="210" height="250" rx="6" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="765" y="96" font-family="sans-serif" font-size="14" fill="#c9d1d9" text-anchor="middle">Servidor</text>
+  <text x="765" y="122" font-family="sans-serif" font-size="12" fill="#8b949e" text-anchor="middle">authorized_keys:</text>
+  <text x="765" y="146" font-family="monospace" font-size="11" fill="#58a6ff" text-anchor="middle">restrict,</text>
+  <text x="765" y="164" font-family="monospace" font-size="11" fill="#58a6ff" text-anchor="middle">from="IP del runner",</text>
+  <text x="765" y="182" font-family="monospace" font-size="11" fill="#58a6ff" text-anchor="middle">command="puerta"</text>
+  <text x="765" y="208" font-family="monospace" font-size="11" fill="#c9d1d9" text-anchor="middle">ssh-ed25519 … ci@kit</text>
+  <text x="765" y="246" font-family="sans-serif" font-size="12" fill="#8b949e" text-anchor="middle">(command= no sirve</text>
+  <text x="765" y="264" font-family="sans-serif" font-size="12" fill="#8b949e" text-anchor="middle">con Ansible)</text>
+  <rect x="30" y="345" width="840" height="50" rx="6" fill="#161b22" stroke="#d29922" stroke-width="2"/>
+  <text x="450" y="375" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">KIT_KNOWN_HOSTS = las líneas que tú comprobaste: si el servidor cambia de llave, el despliegue falla</text>
+</svg>

@@ -1,0 +1,46 @@
+# ssh-infra-kit — fail2ban para sshd. Se instala en /etc/fail2ban/jail.d/
+# (lo hace server/sshd-apply). Los .local se leen después de los .conf:
+# lo de aquí gana a jail.conf y a defaults-debian.conf.
+# Comprueba: sudo fail2ban-client -d | grep "'sshd'" y
+#            sudo fail2ban-client status sshd
+
+[sshd]
+# Qué: la jaula sshd del paquete, encendida.
+# Para qué: vigila el log de sshd y bloquea las IP que fallan demasiado.
+# Impacto: el bloqueo es en el cortafuegos (nftables): la IP no llega ni a
+#   ver el banner SSH.
+enabled  = true
+
+# Qué: modo normal: cuenta usuarios que no existen ("Invalid user"),
+#   contraseñas y códigos TOTP fallidos ("PAM: Authentication failure").
+# Para qué: es lo que hace un robot: probar root, admin, test, oracle...
+# Impacto: mode = aggressive contaría además cada conexión cerrada antes de
+#   autenticarse, y eso también lo hacen ssh-copy-id al probar llaves,
+#   ssh-audit (bin/audit) y cualquier escáner de inventario: te bloquearías
+#   a ti mismo. Y un bloqueo corta también tus conexiones abiertas.
+mode     = normal
+
+# Qué: lee el archivo de log, no el journal de systemd.
+# Para qué: defaults-debian.conf pone backend = systemd; en el laboratorio
+#   no hay systemd, y en un Ubuntu con rsyslog el archivo es /var/log/auth.log.
+# Impacto: en un servidor sin rsyslog, cambia a backend = systemd y quita
+#   logpath.
+backend  = auto
+logpath  = /var/log/auth.log
+
+# Qué: 5 fallos en 10 minutos bloquean la IP 1 hora.
+# Para qué: un humano que se equivoca no llega a 5; un robot, en segundos.
+# Impacto: cada nuevo bloqueo de la misma IP dura el doble, hasta 1 semana
+#   (bantime.increment): los reincidentes desaparecen.
+maxretry = 5
+findtime = 10m
+bantime  = 1h
+bantime.increment = true
+bantime.maxtime   = 1w
+
+# Qué: nunca bloquea estas IP.
+# Para qué: que el propio servidor no se bloquee a sí mismo.
+# Impacto: no añadas aquí redes enteras "por si acaso": cada IP de la lista
+#   puede probar contraseñas sin límite. Si te bloqueas, entra por consola y
+#   ejecuta: sudo fail2ban-client set sshd unbanip TU_IP
+ignoreip = 127.0.0.1/8 ::1

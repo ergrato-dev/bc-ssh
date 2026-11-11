@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+#
+# mirror — deja DESTINO igual que la carpeta local ORIGEN, borrando en
+# DESTINO lo que ya no está en ORIGEN.
+#
+# Uso: mirror [-y] ORIGEN DESTINO
+#
+#   Sin -y   solo muestra lo que cambiaría (rsync -n): no toca nada.
+#   -y       aplica los cambios.
+#
+#   ORIGEN   carpeta local; se copia su contenido, con o sin barra final.
+#   DESTINO  carpeta local o remota (lab-server:web). Se rechazan el home
+#            y la raíz (host:, host:~, host:/, /): un --delete ahí borra
+#            todo lo que no esté en ORIGEN.
+#
+# Cada línea de la salida es un cambio de rsync -i: ">f+++++++++ a.txt"
+# (archivo nuevo), "*deleting viejo.txt" (se borra).
+# Conecta con `ssh -F config` del kit; RSYNC_RSH lo cambia.
+#
+# Códigos de salida: 0 bien, 1 rsync falló, 2 uso incorrecto.
+
+set -euo pipefail
+
+uso() {
+  echo "uso: mirror [-y] ORIGEN DESTINO" >&2
+  exit 2
+}
+
+aplicar=no
+if [[ "${1:-}" == -y ]]; then
+  aplicar=si
+  shift
+fi
+[[ $# -eq 2 ]] || uso
+
+if [[ ! -d "$1" ]]; then
+  echo "mirror: $1 no es una carpeta local" >&2
+  exit 2
+fi
+origen="${1%/}/"
+
+# La ruta es lo que va tras el primer ":" (o todo, si es local).
+ruta="${2#*:}"
+case "${ruta%/}" in
+  "" | "~" | "." | "/" )
+    echo "mirror: destino peligroso: $2 (home o raíz)" >&2
+    exit 2
+    ;;
+esac
+
+kit="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+export RSYNC_RSH="${RSYNC_RSH:-ssh -F $kit/config}"
+
+# Qué: -a copia permisos y fechas; --delete borra en DESTINO lo que sobra;
+#   -i escribe una línea por cambio.
+# Para qué: que DESTINO sea una copia exacta, sin restos de versiones viejas.
+# Impacto: un ORIGEN equivocado (o vacío) vacía DESTINO. Por eso, sin -y,
+#   -n (--dry-run) solo lo enseña.
+opciones=(-a --delete -i)
+[[ "$aplicar" == si ]] || opciones+=(-n)
+
+if ! rsync "${opciones[@]}" "$origen" "$2"; then
+  echo "mirror: rsync falló" >&2
+  exit 1
+fi
+[[ "$aplicar" == si ]] || echo "mirror: vista previa, no se cambió nada; repite con -y para aplicar" >&2

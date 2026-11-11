@@ -78,6 +78,6 @@ bin/audit lab-server
 
 | Anterior | Actual | Siguiente |
 |---|---|---|
-| [← Semana 10 — Certificados SSH: CA, principals, KRL y rotación](../week-10-certificados_ssh_ca_principals_krl_y_rotacion/README.md) | **Semana 11 — 2FA, fail2ban y auditoría con ssh-audit** | Semana 12 — Automatización: scripting, CI/CD y Ansible (próximamente) |
+| [← Semana 10 — Certificados SSH: CA, principals, KRL y rotación](../week-10-certificados_ssh_ca_principals_krl_y_rotacion/README.md) | **Semana 11 — 2FA, fail2ban y auditoría con ssh-audit** | [Semana 12 — Automatización: scripting, CI/CD y Ansible →](../week-12-automatizacion_scripting_ci_cd_y_ansible/README.md) |
 
 [← Volver al índice del bootcamp](../README.md)

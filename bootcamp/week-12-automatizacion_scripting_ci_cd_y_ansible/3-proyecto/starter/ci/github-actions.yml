@@ -1,0 +1,10 @@
+# ssh-infra-kit — ejemplo de despliegue desde GitHub Actions.
+# Cópialo a .github/workflows/despliegue.yml en el repositorio del kit.
+#
+# TODO 8: con su Qué / Para qué / Impacto (y qué secretos necesita),
+#   - se ejecuta en cada push a main que toque server/ o ansible/, y a mano,
+#   - permisos: solo leer el repositorio,
+#   - un despliegue a la vez,
+#   - un job en ubuntu-24.04: checkout, setup-uv, ansible-core 2.21.5 con uv
+#     y bin/ci-deploy con KIT_SSH_KEY y KIT_KNOWN_HOSTS desde los secretos.
+name: despliegue

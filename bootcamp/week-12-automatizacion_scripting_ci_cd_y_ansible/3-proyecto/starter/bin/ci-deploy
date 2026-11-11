@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# ci-deploy — aplica ansible/servidores.yml desde un CI, sin nadie delante.
+#
+# Uso: ci-deploy [ARGUMENTOS DE ansible-playbook]
+#   KIT_SSH_KEY      la llave privada de despliegue (el texto, no una ruta)
+#   KIT_KNOWN_HOSTS  las líneas de known_hosts de los servidores
+#
+# TODO 7: Qué / Para qué / Impacto, y con qué códigos sale.
+set -euo pipefail
+
+# TODO 7:
+#   1. Si falta KIT_SSH_KEY o KIT_KNOWN_HOSTS (o está vacía), dilo por stderr
+#      nombrando la variable y sal con 2.
+#   2. Enlaza ~/.ssh/kit con bin/kit-link (sin su salida).
+#   3. Carpeta temporal que se borra al salir pase lo que pase (trap ... EXIT),
+#      umask 077, y escribe en ella la llave y el known_hosts.
+#   4. Desde ansible/, ansible-playbook servidores.yml con --private-key,
+#      --ssh-common-args (UserKnownHostsFile, StrictHostKeyChecking=yes,
+#      BatchMode=yes) y "$@".
+echo "ci-deploy: sin terminar (TODO 7)" >&2
+exit 1

@@ -27,10 +27,13 @@ RUN apt-get update \
 # Python solo con uv (ssh-audit, Ansible). Versión fijada en docs/stack-versions.md.
 COPY --from=ghcr.io/astral-sh/uv:0.12.2 /uv /uvx /usr/local/bin/
 
-# ssh-audit (semana 11) instalado al construir: los labs y el autograding no
-# salen a Internet. uv lo aísla en /opt/uv-tools con su propio entorno.
+# ssh-audit (semana 11) y ansible-core (semana 12) instalados al construir: los
+# labs y el autograding no salen a Internet. uv aísla cada uno en /opt/uv-tools
+# con su propio entorno; los comandos quedan en /usr/local/bin.
 RUN UV_TOOL_DIR=/opt/uv-tools UV_TOOL_BIN_DIR=/usr/local/bin \
-    uv tool install --python /usr/bin/python3 ssh-audit==3.3.0
+    uv tool install --python /usr/bin/python3 ssh-audit==3.3.0 \
+ && UV_TOOL_DIR=/opt/uv-tools UV_TOOL_BIN_DIR=/usr/local/bin \
+    uv tool install --python /usr/bin/python3 ansible-core==2.21.5
 
 # ubuntu:24.04 trae el usuario "ubuntu" con UID 1000: se renombra para que los
 # archivos creados en el volumen pertenezcan al estudiante en el host.

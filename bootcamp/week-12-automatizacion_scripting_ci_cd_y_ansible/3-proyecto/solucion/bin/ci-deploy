@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# ci-deploy — aplica ansible/servidores.yml desde un CI, sin nadie delante.
+#
+# Uso: ci-deploy [ARGUMENTOS DE ansible-playbook]
+#   KIT_SSH_KEY      la llave privada de despliegue (el texto, no una ruta)
+#   KIT_KNOWN_HOSTS  las líneas de known_hosts de los servidores
+#
+# Qué: enlaza ~/.ssh/kit, escribe llave y known_hosts en una carpeta temporal 700, ejecuta el
+#      playbook con ellos y BatchMode, y borra la carpeta al salir, pase lo que pase.
+# Para qué: el CI recibe los dos secretos como variables de entorno; nunca
+#           quedan en el disco del runner ni en su log.
+# Impacto: un servidor cuya host key no está en KIT_KNOWN_HOSTS no se toca
+#          (StrictHostKeyChecking yes): nunca se acepta una llave nueva sin mirar.
+# Sale con el código de ansible-playbook (0 si todo se aplicó), o 2 si falta
+# una variable.
+set -euo pipefail
+
+for v in KIT_SSH_KEY KIT_KNOWN_HOSTS; do
+  if [[ -z "${!v:-}" ]]; then
+    echo "ci-deploy: falta la variable $v" >&2
+    exit 2
+  fi
+done
+
+kit="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# Los alias del kit se leen a través de ~/.ssh/kit (Include de config).
+"$kit/bin/kit-link" >/dev/null
+d=$(mktemp -d)
+trap 'rm -rf "$d"' EXIT
+umask 077
+printf '%s\n' "$KIT_SSH_KEY" > "$d/llave"
+printf '%s\n' "$KIT_KNOWN_HOSTS" > "$d/known_hosts"
+
+cd "$kit/ansible"
+ansible-playbook servidores.yml \
+  --private-key "$d/llave" \
+  --ssh-common-args "-o UserKnownHostsFile=$d/known_hosts -o StrictHostKeyChecking=yes -o BatchMode=yes" \
+  "$@"

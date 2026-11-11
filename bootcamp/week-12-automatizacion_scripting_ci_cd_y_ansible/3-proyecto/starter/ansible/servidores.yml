@@ -1,0 +1,42 @@
+# ssh-infra-kit — playbook de los servidores: lo mismo que bin/sshd-deploy,
+# pero en todos los del inventario, solo lo que cambió y sin pasos a mano.
+#
+#   cd ansible
+#   ansible-playbook servidores.yml --check --diff    # qué cambiaría, sin tocar nada
+#   ansible-playbook servidores.yml                   # aplicarlo
+#
+# TODO 3: el resto de este comentario: qué no hace Ansible si te quedas fuera,
+#         y qué hace este playbook para que no pase.
+
+- name: Configuración SSH de los servidores del kit
+  hosts: servidores
+  become: true
+  # TODO 3: de uno en uno (serial), con su Qué / Para qué / Impacto.
+  vars:
+    kit_confs: "{{ query('fileglob', '../server/sshd_config.d/*.conf') | map('basename') | list }}"
+
+  tasks:
+    # TODO 3: lo que la configuración del kit da por hecho:
+    #   - los grupos ssh-users, sftp-only, saltadores y dosfa (ansible.builtin.group),
+    #   - quien despliega (ansible_facts.env.SUDO_USER) en ssh-users, sin quitarle
+    #     otros grupos; que no pare un --check en un servidor nuevo,
+    #   - /etc/ssh/revoked.krl, sin cambiar sus fechas si ya existe.
+
+    # TODO 4: probar y después instalar sshd_config.d:
+    #   - copia de ../server/sshd_config.d/ en /root/kit-sshd/sshd_config.d/,
+    #   - sshd -t con el sshd_config del servidor apuntando a esa copia (sin "changed"),
+    #   - copia a /etc/ssh/sshd_config.d/ (root, 0644) que avise al handler de sshd.
+
+    # TODO 5: lo que falta para dejar el servidor como el kit:
+    #   - borrar de /etc/ssh/sshd_config.d lo que no está en kit_confs (find + file),
+    #   - el PAM (../server/pam.d/sshd) con copia de seguridad,
+    #   - la jaula (../server/fail2ban/jail.d/), avisando al handler de fail2ban.
+
+    # TODO 6: comprobar al final: ejecutar ya los handlers, cerrar la conexión
+    #         (y su master) y entrar con una nueva (ansible.builtin.ping).
+    - name: Sin terminar
+      ansible.builtin.fail:
+        msg: "servidores.yml: sin terminar (TODOs 3 a 6)"
+
+  # TODO 5: los handlers "Recargar sshd" (HUP a /run/sshd.pid) y "Recargar
+  #         fail2ban" (validar, recargar o arrancar sin dejar la salida abierta).
