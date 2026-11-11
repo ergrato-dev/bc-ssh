@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+#
+# kit-check — comprueba el kit entero sin conectar a ningún servidor.
+#
+# Uso: kit-check [CARPETA]      (por defecto, la carpeta de este kit)
+#
+# Una línea por comprobación:
+#   ok      secretos
+#   fallo   permisos     bin/backup no es ejecutable
+#
+#   - secretos    ningún archivo del kit contiene una llave privada
+#   - permisos    todo lo de bin/ y ca/ es ejecutable
+#   - documentado el README nombra cada script de bin/ y ca/
+#   - pendientes  no queda ningún TODO
+#   - config      ssh lee config y conf.d/ sin errores (ssh -G de cada alias)
+#   - sshd        sshd acepta server/sshd_config.d/ entero (sshd -t)
+#   - shellcheck  los scripts pasan shellcheck ("omitido" si no está instalado)
+#
+# Para qué: antes de un commit, en el CI antes de desplegar, y en un equipo
+# nuevo después de copiar el kit. Un fallo aquí es uno menos en un servidor.
+#
+# Códigos de salida: 0 todo bien, 1 algún fallo, 2 uso incorrecto.
+set -euo pipefail
+
+if (( $# > 1 )); then
+  echo "uso: kit-check [CARPETA]" >&2
+  exit 2
+fi
+kit="${1:-$(dirname "${BASH_SOURCE[0]}")/..}"
+if [[ ! -f "$kit/config" ]]; then
+  echo "kit-check: $kit no es un kit (no tiene config)" >&2
+  exit 2
+fi
+kit="$(cd "$kit" && pwd)"
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
+fallos=0
+
+# res NOMBRE DETALLE: ok si DETALLE está vacío; si no, fallo con la primera
+# línea de DETALLE (y cuántas más hay).
+res() {
+  local n
+  if [[ -z "$2" ]]; then
+    printf 'ok      %s\n' "$1"
+    return
+  fi
+  n=$(wc -l <<<"$2")
+  printf 'fallo   %-12s %s%s\n' "$1" "$(head -1 <<<"$2")" "$( (( n > 1 )) && echo " (y $((n - 1)) más)")"
+  fallos=1
+}
+
+cd "$kit"
+scripts=$(find bin ca -type f | sort)
+
+# Qué: busca la cabecera de una llave privada (OpenSSH, PEM o PuTTY).
+# Para qué: una llave privada en git no se borra nunca de verdad: queda en
+#   el historial y en cada copia del repositorio.
+# Impacto: si sale, bórrala del kit y considérala comprometida (RUNBOOK.md).
+res secretos "$(grep -rlE -e '-----BEGIN [A-Z ]*PRIVATE KEY-----' -e '^PuTTY-User-Key-File' --exclude-dir=.git . | sed 's|^\./||; s|$| contiene una llave privada|')"
+
+res permisos "$(for f in $scripts; do [[ -x "$f" ]] || echo "$f no es ejecutable"; done)"
+
+res documentado "$(for f in $scripts; do grep -qF "\`$f\`" README.md || echo "$f no aparece en README.md"; done)"
+
+res pendientes "$(grep -rn --exclude-dir=.git TODO . | grep -v '^\./bin/kit-check:' | cut -d: -f1,2 | sed 's|^\./||; s|$|: TODO|')"
+
+# config incluye kit/conf.d/*.conf desde ~/.ssh: aquí se incluye la carpeta
+# que se comprueba, para no depender de ~/.ssh/kit.
+{ echo "Include $kit/conf.d/*.conf"; grep -v '^Include' config; } > "$tmp/config"
+alias=$(awk '$1 == "Host" { for (i = 2; i <= NF; i++) if ($i !~ /[*?!]/) print $i }' conf.d/*.conf)
+# Un error de sintaxis sale igual en cada alias: se escribe una vez.
+res config "$(for h in ${alias:-localhost}; do ssh -G -F "$tmp/config" "$h" >/dev/null 2>"$tmp/err" || head -1 "$tmp/err"; done | sort -u | sed "s|$tmp/config|config|")"
+
+# sshd -t sin root: una host key de prueba y un PID que no es el del sistema.
+# Los archivos que la configuración nombra (la CA, la KRL) no hacen falta,
+# salvo HostCertificate, que sshd carga al validar: en la copia se comenta.
+ssh-keygen -q -t ed25519 -N '' -f "$tmp/hostkey"
+mkdir "$tmp/sshd_config.d"
+for f in server/sshd_config.d/*.conf; do
+  sed '/^[[:space:]]*HostCertificate/s/^/#/' "$f" > "$tmp/sshd_config.d/${f##*/}"
+done
+echo "Include $tmp/sshd_config.d/*.conf" > "$tmp/sshd_config"
+res sshd "$(/usr/sbin/sshd -t -f "$tmp/sshd_config" -h "$tmp/hostkey" -o PidFile=none 2>&1 | sed "s|$tmp/|server/|")"
+
+if command -v shellcheck >/dev/null; then
+  # shellcheck disable=SC2086 # una palabra por script
+  res shellcheck "$(shellcheck -f gcc $scripts 2>&1)"
+else
+  printf 'omitido shellcheck   no está instalado\n'
+fi
+
+exit "$fallos"

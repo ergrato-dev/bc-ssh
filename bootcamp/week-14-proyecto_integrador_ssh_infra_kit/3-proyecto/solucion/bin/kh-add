@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+# kh-add — añade a known_hosts la host key de un servidor solo si su huella
+# coincide con la que obtuviste por un canal independiente.
+#
+# Uso: kh-add [-J SALTO] HOST[:PUERTO] HUELLA
+#   HUELLA: SHA256:... tal como la imprime `ssh-keygen -lf` en el servidor.
+#   -J SALTO: lee la llave a través de un bastion (un alias del kit), para
+#     hosts de una red privada a los que ssh-keyscan no llega.
+#
+# Qué: ssh-keyscan, comparación de huellas y una línea hasheada en known_hosts.
+# Para qué: cambiar el "yes" a ciegas de la primera conexión por una
+#   comparación hecha por la máquina, que no se salta un carácter.
+# Impacto: con `StrictHostKeyChecking yes` en config, esta es la única puerta
+#   de entrada a known_hosts; un intermediario no la cruza.
+#
+# Variables: KH_FILE (por defecto ~/.ssh/known_hosts), KH_TYPE (por defecto
+#   ed25519; con -J, la llave es la que negocia ssh: Ed25519 en OpenSSH).
+#   SSH_CMD: el ssh de -J (por defecto `ssh -F config` del kit).
+# Salida: 0 añadida o ya estaba, 1 huella distinta o conflicto, 2 uso incorrecto,
+#         3 no se pudo leer la host key.
+set -euo pipefail
+
+KH_FILE=${KH_FILE:-$HOME/.ssh/known_hosts}
+KH_TYPE=${KH_TYPE:-ed25519}
+
+uso() {
+  echo "uso: kh-add [-J SALTO] HOST[:PUERTO] HUELLA   (HUELLA = SHA256:...)" >&2
+  exit 2
+}
+
+salto=
+if [[ ${1:-} == -J ]]; then
+  [[ $# -ge 2 && -n $2 ]] || uso
+  salto=$2
+  shift 2
+fi
+[[ $# -eq 2 && $2 == SHA256:* ]] || uso
+destino=$1 esperada=$2
+host=${destino%%:*} puerto=22
+[[ $destino == *:* ]] && puerto=${destino#*:}
+[[ $puerto =~ ^[0-9]+$ ]] || uso
+
+# known_hosts escribe un puerto distinto de 22 como [host]:puerto.
+nombre=$host
+(( puerto == 22 )) || nombre="[$host]:$puerto"
+
+# Lee la host key a través del salto con una conexión SSH de verdad.
+# Qué: ssh entra por SALTO hasta HOST y guarda la llave que recibe en un
+#   known_hosts temporal (accept-new), sin preguntar (BatchMode). Da igual
+#   que la autenticación falle: la llave llega antes.
+# Para qué: ssh-keyscan no sabe saltar, y pedirle al bastion que haga él
+#   el ssh-keyscan necesita una shell que la cuenta de salto no tiene.
+# Impacto: el salto tiene que estar ya en known_hosts (la config del kit
+#   usa StrictHostKeyChecking yes): la confianza va de un host al siguiente.
+por_salto() {
+  local kit tmp ssh_cmd
+  kit="$(cd "$(dirname "$0")/.." && pwd)"
+  ssh_cmd="${SSH_CMD:-ssh -F $kit/config}"
+  tmp=$(mktemp)
+  # Sin comillas en $ssh_cmd: "ssh -F ruta" son varias palabras.
+  # shellcheck disable=SC2086
+  $ssh_cmd -J "$salto" -p "$puerto" -o UserKnownHostsFile="$tmp" \
+    -o GlobalKnownHostsFile=/dev/null -o StrictHostKeyChecking=accept-new \
+    -o HashKnownHosts=yes -o BatchMode=yes -o ControlPath=none \
+    "$host" true </dev/null >/dev/null 2>&1 || true
+  head -n 1 "$tmp"
+  rm -f "$tmp"
+}
+
+if [[ -n $salto ]]; then
+  linea=$(por_salto)
+else
+  # -H: la línea sale ya con el nombre hasheado, igual que con HashKnownHosts yes.
+  linea=$(ssh-keyscan -H -T 5 -p "$puerto" -t "$KH_TYPE" "$host" 2>/dev/null) || true
+fi
+[[ -n $linea ]] || { echo "$destino: no se pudo leer la host key" >&2; exit 3; }
+llave=${linea#* }   # "tipo base64", sin el nombre
+recibida=$(ssh-keygen -lf - <<<"$linea" | cut -d' ' -f2)
+
+if [[ $recibida != "$esperada" ]]; then
+  echo "$destino: HUELLA DISTINTA, esperada $esperada, recibida $recibida" >&2
+  exit 1
+fi
+
+# ssh-keygen -F encuentra el host también en líneas hasheadas.
+if conocidas=$(ssh-keygen -F "$nombre" -f "$KH_FILE" 2>/dev/null); then
+  # Las líneas @cert-authority (y @revoked) no son la llave del host: la de
+  # la CA que firma sus certificados (semana 10) no impide añadir esta.
+  conocidas=$(grep -v '^@' <<<"$conocidas" || true)
+  if grep -qF "$llave" <<<"$conocidas"; then
+    echo "$destino ya estaba"
+    exit 0
+  fi
+  # Otra llave del mismo tipo para el mismo host: es el aviso de "host key
+  # cambiada". No se resuelve sobrescribiendo: lo decide una persona.
+  if grep -q " ${llave%% *} " <<<"$conocidas"; then
+    echo "$destino: known_hosts ya tiene otra llave ${llave%% *}; verifica y usa ssh-keygen -R $nombre" >&2
+    exit 1
+  fi
+fi
+
+# umask 077: ~/.ssh (y cualquier directorio que falte) se crea solo para ti.
+(umask 077; mkdir -p "$(dirname "$KH_FILE")")
+echo "$linea" >> "$KH_FILE"
+echo "$destino añadida $recibida"

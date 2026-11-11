@@ -1,0 +1,41 @@
+# ssh-infra-kit — ejemplo de despliegue desde GitHub Actions.
+# Cópialo a .github/workflows/despliegue.yml en el repositorio del kit.
+#
+# Qué: aplica ansible/servidores.yml en cada push a main que toque server/ o ansible/.
+# Para qué: la configuración de los servidores es la del repositorio, sin pasos a mano.
+# Impacto: necesita dos secretos del repositorio (Settings → Secrets → Actions):
+#   KIT_SSH_KEY      la llave privada de despliegue (sin frase, solo para esto)
+#   KIT_KNOWN_HOSTS  las líneas de known_hosts de los servidores, comprobadas a mano
+# y que los servidores sean alcanzables desde los runners de GitHub.
+name: despliegue
+
+on:
+  push:
+    branches: [main]
+    paths: ["server/**", "ansible/**"]
+  workflow_dispatch: {}
+
+# Qué: el token del job solo puede leer el repositorio.
+# Impacto: un paso comprometido no puede escribir en el repositorio.
+permissions:
+  contents: read
+
+# Qué: un despliegue a la vez; el siguiente espera.
+# Impacto: dos pushes seguidos no aplican la configuración a medias.
+concurrency: despliegue
+
+jobs:
+  servidores:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv tool install ansible-core==2.21.5
+      # Qué: comprueba el kit (secretos, sintaxis de config y sshd, shellcheck).
+      # Impacto: un kit roto no llega a los servidores; shellcheck ya viene
+      #          en los runners ubuntu-24.04.
+      - run: bin/kit-check
+      - run: bin/ci-deploy
+        env:
+          KIT_SSH_KEY: ${{ secrets.KIT_SSH_KEY }}
+          KIT_KNOWN_HOSTS: ${{ secrets.KIT_KNOWN_HOSTS }}

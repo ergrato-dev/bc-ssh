@@ -1,0 +1,111 @@
+{
+  "semana": "14",
+  "titulo": "Proyecto integrador ssh-infra-kit",
+  "checks": [
+    {
+      "id": "kit-check-uso",
+      "descripcion": "bin/kit-check sale con 2 y dice cómo se usa con dos argumentos o con una carpeta que no es un kit",
+      "cmd": "d=$(mktemp -d); m=$({proyecto}/bin/kit-check a b 2>&1); a=$?; {proyecto}/bin/kit-check $d >/dev/null 2>&1; b=$?; rm -rf $d; echo \"$a $b $(grep -c \"^uso: kit-check\" <<<\"$m\")\"",
+      "assert": "stdout~^2 2 1$",
+      "pista": "3-proyecto/README.md, paso 1"
+    },
+    {
+      "id": "kit-check-limpio",
+      "descripcion": "bin/kit-check sale con 0 en tu kit, con una línea ok por cada comprobación",
+      "cmd": "o=$({proyecto}/bin/kit-check 2>&1); echo \"$? $(grep -cE \"^ok +(secretos|permisos|documentado|pendientes|config|sshd|shellcheck)$\" <<<\"$o\") $(grep -vc \"^ok\" <<<\"$o\")\"",
+      "assert": "stdout~^0 7 0$",
+      "pista": "3-proyecto/README.md, paso 1"
+    },
+    {
+      "id": "kit-check-secretos",
+      "descripcion": "bin/kit-check falla (solo en secretos) si el kit contiene una llave privada, y dice qué archivo",
+      "cmd": "d=$(mktemp -d); cp -a {proyecto} $d/kit; ssh-keygen -q -t ed25519 -N \"\" -f $d/kit/conf.d/olvidada; o=$($d/kit/bin/kit-check 2>&1); r=\"$? $(grep -c \"^fallo\" <<<\"$o\") $(grep -cE \"^fallo +secretos +.*conf.d/olvidada\" <<<\"$o\")\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^1 1 1$",
+      "pista": "3-proyecto/README.md, paso 1"
+    },
+    {
+      "id": "kit-check-permisos",
+      "descripcion": "bin/kit-check falla (solo en permisos) si un script de bin/ no es ejecutable",
+      "cmd": "d=$(mktemp -d); cp -a {proyecto} $d/kit; chmod -x $d/kit/bin/backup; o=$($d/kit/bin/kit-check 2>&1); r=\"$? $(grep -c \"^fallo\" <<<\"$o\") $(grep -cE \"^fallo +permisos +.*bin/backup\" <<<\"$o\")\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^1 1 1$",
+      "pista": "3-proyecto/README.md, paso 1"
+    },
+    {
+      "id": "kit-check-documentado",
+      "descripcion": "bin/kit-check falla (solo en documentado) si un script de bin/ no aparece en el README",
+      "cmd": "d=$(mktemp -d); cp -a {proyecto} $d/kit; echo \"#!/bin/sh\" > $d/kit/bin/nuevo; echo \"echo hola\" >> $d/kit/bin/nuevo; chmod +x $d/kit/bin/nuevo; o=$($d/kit/bin/kit-check 2>&1); r=\"$? $(grep -c \"^fallo\" <<<\"$o\") $(grep -cE \"^fallo +documentado +.*bin/nuevo\" <<<\"$o\")\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^1 1 1$",
+      "pista": "3-proyecto/README.md, paso 1"
+    },
+    {
+      "id": "kit-check-pendientes",
+      "descripcion": "bin/kit-check falla (solo en pendientes) si queda un TODO, y dice dónde",
+      "cmd": "d=$(mktemp -d); cp -a {proyecto} $d/kit; echo \"# TODO\" >> $d/kit/conf.d/10-lab.conf; o=$($d/kit/bin/kit-check 2>&1); r=\"$? $(grep -c \"^fallo\" <<<\"$o\") $(grep -cE \"^fallo +pendientes +.*conf.d/10-lab.conf\" <<<\"$o\")\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^1 1 1$",
+      "pista": "3-proyecto/README.md, paso 1"
+    },
+    {
+      "id": "kit-check-config",
+      "descripcion": "bin/kit-check falla (solo en config) si un archivo de conf.d/ tiene una opción que ssh no conoce",
+      "cmd": "d=$(mktemp -d); cp -a {proyecto} $d/kit; echo \"Hots x\" > $d/kit/conf.d/99-mal.conf; o=$($d/kit/bin/kit-check 2>&1); r=\"$? $(grep -c \"^fallo\" <<<\"$o\") $(grep -cE \"^fallo +config +.*99-mal.conf\" <<<\"$o\")\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^1 1 1$",
+      "pista": "3-proyecto/README.md, paso 1"
+    },
+    {
+      "id": "kit-check-sshd",
+      "descripcion": "bin/kit-check falla (solo en sshd) si server/sshd_config.d/ tiene un valor que sshd no acepta",
+      "cmd": "d=$(mktemp -d); cp -a {proyecto} $d/kit; echo \"PermitRootLogin quizas\" > $d/kit/server/sshd_config.d/99-mal.conf; o=$($d/kit/bin/kit-check 2>&1); r=\"$? $(grep -c \"^fallo\" <<<\"$o\") $(grep -cE \"^fallo +sshd +.*99-mal.conf\" <<<\"$o\")\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^1 1 1$",
+      "pista": "3-proyecto/README.md, paso 1"
+    },
+    {
+      "id": "doctor-certificado-de-host",
+      "descripcion": "Con un servidor que presenta certificado de host, bin/doctor escribe su tipo, la serie, el ID y la CA en host key",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); u=$(id -un); for k in ca hed k; do ssh-keygen -q -t ed25519 -N \"\" -f $d/$k; done; ssh-keygen -q -s $d/ca -h -I prueba -n 127.0.0.1 -z 7 $d/hed.pub; cp $d/k.pub $d/ak; echo \"@cert-authority * $(cat $d/ca.pub)\" > $d/kh; /usr/sbin/sshd -f /dev/null -p 2218 -o ListenAddress=127.0.0.1 -h $d/hed -o HostCertificate=$d/hed-cert.pub -o AuthorizedKeysFile=$d/ak -o StrictModes=no -o PidFile=$d/pid; sleep 0.5; echo \"Include {proyecto}/conf.d/*.conf\" > $d/cfg; echo \"Host cert\" >> $d/cfg; for l in \"HostName 127.0.0.1\" \"Port 2218\" \"User $u\" \"IdentityFile $d/k\" \"UserKnownHostsFile $d/kh\"; do echo \"  $l\"; done >> $d/cfg; o=$(SSH_CMD=\"ssh -F $d/cfg\" timeout 30 {proyecto}/bin/doctor cert 2>&1); r=\"$? $(grep -cE \"^host key: +ssh-ed25519-cert-v01@openssh.com SHA256:.*serial 7 ID .prueba. CA ssh-ed25519 SHA256:\" <<<\"$o\")\"; pkill -F $d/pid; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^0 1$",
+      "pista": "3-proyecto/README.md, paso 2"
+    },
+    {
+      "id": "doctor-pista-cortafuegos",
+      "descripcion": "Con la conexión rechazada, la pista de bin/doctor habla del puerto y también de una IP bloqueada (fail2ban)",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); for l in \"Host cerrado\" \"  HostName 127.0.0.1\" \"  Port 2216\"; do echo \"$l\"; done > $d/cfg; o=$(SSH_CMD=\"ssh -F $d/cfg\" {proyecto}/bin/doctor cerrado 2>&1); r=\"$? $(grep -cE \"^pista:.*puerto.*fail2ban\" <<<\"$o\")\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^255 1$",
+      "pista": "3-proyecto/README.md, paso 2"
+    },
+    {
+      "id": "kh-add-con-cert-authority",
+      "descripcion": "bin/kh-add añade la host key aunque known_hosts tenga una línea @cert-authority que cubre el host, y sigue negándose si hay otra llave",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); u=$(id -un); for k in ca hed k; do ssh-keygen -q -t ed25519 -N \"\" -f $d/$k; done; ssh-keygen -q -s $d/ca -h -I prueba -n 127.0.0.1 -z 7 $d/hed.pub; cp $d/k.pub $d/ak; echo \"@cert-authority * $(cat $d/ca.pub)\" > $d/kh; /usr/sbin/sshd -f /dev/null -p 2218 -o ListenAddress=127.0.0.1 -h $d/hed -o HostCertificate=$d/hed-cert.pub -o AuthorizedKeysFile=$d/ak -o StrictModes=no -o PidFile=$d/pid; sleep 0.5; f=$(ssh-keygen -lf $d/hed.pub | cut -d\" \" -f2); KH_FILE=$d/kh {proyecto}/bin/kh-add 127.0.0.1:2218 $f >/dev/null 2>&1; a=$?; echo \"[127.0.0.1]:2218 $(cat $d/k.pub)\" > $d/kh2; KH_FILE=$d/kh2 {proyecto}/bin/kh-add 127.0.0.1:2218 $f >/dev/null 2>&1; r=\"$a $? $(ssh-keygen -F \"[127.0.0.1]:2218\" -f $d/kh | grep -vc \"^[#@]\")\"; pkill -F $d/pid; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^0 1 1$",
+      "pista": "3-proyecto/README.md, paso 3"
+    },
+    {
+      "id": "runbook-procedimientos",
+      "descripcion": "RUNBOOK.md tiene los siete procedimientos, cada uno con Síntoma, Comprobación y el comando del kit que lo resuelve",
+      "cmd": "f={proyecto}/RUNBOOK.md; test -f $f || { echo \"sin RUNBOOK.md\"; exit 1; }; n=0; for s in \"No puedo entrar|bin/doctor\" \"La host key cambió|bin/kh-add\" \"Perdí una llave o un equipo|ca/ca-revoke\" \"Alta de una persona|ca/ca-sign\" \"Baja de una persona|ca/ca-revoke\" \"Un servidor nuevo|ansible-playbook\" \"La CA queda expuesta|ca/ca-init\"; do t=${s%%|*}; c=${s#*|}; b=$(awk -v t=\"## $t\" 'index($0, t) == 1 {p=1; next} /^## / {p=0} p' $f); grep -q \"Síntoma\" <<<\"$b\" && grep -q \"Comprobación\" <<<\"$b\" && grep -qF \"$c\" <<<\"$b\" && n=$((n+1)) || echo \"falta o incompleta: $t\"; done; echo \"$n\"",
+      "assert": "stdout~^7$",
+      "pista": "3-proyecto/README.md, paso 4"
+    },
+    {
+      "id": "readme-final",
+      "descripcion": "El README empieza por dónde mirar, documenta kit-check y RUNBOOK.md, dice qué protege el kit y qué no, y tiene la semana 14 en la bitácora",
+      "cmd": "f={proyecto}/README.md; grep -q \"RUNBOOK.md\" <(head -12 $f) && grep -q \"^| .bin/kit-check. |\" $f && grep -q \"^| .RUNBOOK.md. |\" $f && grep -q \"^## Qué protege el kit y qué no\" $f && grep -q \"^| 14 |\" $f && grep -qi \"no protege\" $f",
+      "assert": "exit0",
+      "pista": "3-proyecto/README.md, paso 5"
+    },
+    {
+      "id": "ci-kit-check-antes",
+      "descripcion": "El workflow del CI ejecuta bin/kit-check antes de bin/ci-deploy",
+      "cmd": "f={proyecto}/ci/github-actions.yml; a=$(grep -n \"run: bin/kit-check\" $f | cut -d: -f1); b=$(grep -n \"run: bin/ci-deploy\" $f | cut -d: -f1); test -n \"$a\" && test -n \"$b\" && test \"$a\" -lt \"$b\"",
+      "assert": "exit0",
+      "pista": "3-proyecto/README.md, paso 6"
+    },
+    {
+      "id": "kit-completo-y-limpio",
+      "descripcion": "Sin TODOs, shellcheck sin avisos y los scripts de semanas anteriores siguen respondiendo",
+      "cmd": "! grep -rn TODO {proyecto}/README.md {proyecto}/RUNBOOK.md {proyecto}/config {proyecto}/conf.d {proyecto}/ca {proyecto}/server {proyecto}/ansible {proyecto}/ci && ! grep -n TODO $(ls {proyecto}/bin/* | grep -v kit-check) && shellcheck {proyecto}/bin/* {proyecto}/ca/* && { {proyecto}/bin/ak-line; a=$?; {proyecto}/bin/audit 2>/dev/null; b=$?; {proyecto}/bin/doctor 2>/dev/null; c=$?; {proyecto}/bin/key-audit 2>/dev/null; e=$?; {proyecto}/ca/ca-sign 2>/dev/null; [ \"$a$b$c$e$?\" = 22222 ]; }",
+      "assert": "exit0",
+      "pista": "3-proyecto/README.md, paso 7"
+    }
+  ]
+}

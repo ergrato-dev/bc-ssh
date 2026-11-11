@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" font-family="sans-serif">
+  <title>Mapa de ssh-infra-kit: dónde vive cada pieza y qué la conecta</title>
+  <defs>
+    <marker id="f" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8b949e"/>
+    </marker>
+  </defs>
+  <rect width="900" height="520" fill="#0d1117"/>
+  <text x="450" y="34" fill="#c9d1d9" font-size="20" text-anchor="middle" font-weight="bold">ssh-infra-kit: las piezas y lo que las une</text>
+
+  <!-- Tu equipo -->
+  <rect x="30" y="60" width="300" height="250" rx="8" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+  <text x="180" y="86" fill="#58a6ff" font-size="16" text-anchor="middle" font-weight="bold">Tu equipo</text>
+  <text x="50" y="114" fill="#c9d1d9" font-size="13">~/ssh-infra-kit (repositorio git)</text>
+  <text x="62" y="136" fill="#8b949e" font-size="12" font-family="monospace">config  conf.d/  bin/  ca/</text>
+  <text x="62" y="154" fill="#8b949e" font-size="12" font-family="monospace">server/  ansible/  ci/</text>
+  <text x="62" y="172" fill="#8b949e" font-size="12" font-family="monospace">README.md  RUNBOOK.md</text>
+  <text x="50" y="202" fill="#c9d1d9" font-size="13">~/.ssh (fuera del repositorio)</text>
+  <text x="62" y="224" fill="#8b949e" font-size="12" font-family="monospace">lab  lab.pub  known_hosts</text>
+  <text x="62" y="242" fill="#8b949e" font-size="12" font-family="monospace">kit -&gt; ~/ssh-infra-kit  cm/</text>
+  <text x="50" y="272" fill="#c9d1d9" font-size="13">~/.ssh-ca (fuera, con frase)</text>
+  <text x="62" y="294" fill="#8b949e" font-size="12" font-family="monospace">user_ca  host_ca  revoked.krl</text>
+
+  <!-- CI -->
+  <rect x="380" y="60" width="200" height="120" rx="8" fill="#161b22" stroke="#d29922" stroke-width="2"/>
+  <text x="480" y="86" fill="#d29922" font-size="16" text-anchor="middle" font-weight="bold">CI</text>
+  <text x="480" y="112" fill="#c9d1d9" font-size="12" text-anchor="middle" font-family="monospace">bin/kit-check</text>
+  <text x="480" y="132" fill="#c9d1d9" font-size="12" text-anchor="middle" font-family="monospace">bin/ci-deploy</text>
+  <text x="480" y="152" fill="#8b949e" font-size="11" text-anchor="middle" font-family="monospace">KIT_SSH_KEY</text>
+  <text x="480" y="168" fill="#8b949e" font-size="11" text-anchor="middle" font-family="monospace">KIT_KNOWN_HOSTS (secretos)</text>
+
+  <!-- Servidores -->
+  <rect x="630" y="60" width="240" height="250" rx="8" fill="#161b22" stroke="#3fb950" stroke-width="2"/>
+  <text x="750" y="86" fill="#3fb950" font-size="16" text-anchor="middle" font-weight="bold">Servidores</text>
+  <text x="650" y="114" fill="#c9d1d9" font-size="13">server, bastion</text>
+  <text x="662" y="138" fill="#8b949e" font-size="12" font-family="monospace">sshd_config.d/</text>
+  <text x="662" y="156" fill="#8b949e" font-size="12" font-family="monospace">pam.d/sshd  fail2ban</text>
+  <text x="662" y="174" fill="#8b949e" font-size="12" font-family="monospace">user_ca.pub  revoked.krl</text>
+  <text x="662" y="192" fill="#8b949e" font-size="12" font-family="monospace">principals/  host cert</text>
+  <rect x="650" y="220" width="200" height="70" rx="6" fill="#0d1117" stroke="#30363d"/>
+  <text x="750" y="246" fill="#c9d1d9" font-size="13" text-anchor="middle">interno (red privada)</text>
+  <text x="750" y="268" fill="#8b949e" font-size="12" text-anchor="middle">solo por ProxyJump</text>
+
+  <!-- Flechas -->
+  <line x1="330" y1="120" x2="378" y2="120" stroke="#8b949e" stroke-width="2" marker-end="url(#f)"/>
+  <text x="354" y="110" fill="#8b949e" font-size="11" text-anchor="middle">push</text>
+  <line x1="580" y1="120" x2="628" y2="120" stroke="#8b949e" stroke-width="2" marker-end="url(#f)"/>
+  <text x="604" y="110" fill="#8b949e" font-size="11" text-anchor="middle">Ansible</text>
+  <line x1="330" y1="230" x2="628" y2="230" stroke="#58a6ff" stroke-width="2" marker-end="url(#f)"/>
+  <text x="480" y="222" fill="#58a6ff" font-size="12" text-anchor="middle">ssh, scp, rsync, túneles, bin/doctor, bin/audit</text>
+  <line x1="330" y1="280" x2="628" y2="280" stroke="#8b949e" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#f)"/>
+  <text x="480" y="272" fill="#8b949e" font-size="12" text-anchor="middle">certificados y KRL (ca/ca-sign, ca/ca-revoke)</text>
+
+  <!-- Leyenda -->
+  <rect x="30" y="340" width="840" height="160" rx="8" fill="#161b22" stroke="#30363d"/>
+  <text x="50" y="368" fill="#c9d1d9" font-size="14" font-weight="bold">Tres reglas que mantienen el kit entero</text>
+  <text x="50" y="396" fill="#c9d1d9" font-size="13">1. Lo secreto nunca entra en el repositorio: las llaves en ~/.ssh, la CA en ~/.ssh-ca, lo del CI en sus secretos.</text>
+  <text x="50" y="422" fill="#c9d1d9" font-size="13">2. Lo que llega a un servidor sale del repositorio: sshd_config.d, PAM y fail2ban los instala el playbook, no una mano.</text>
+  <text x="50" y="448" fill="#c9d1d9" font-size="13">3. Cada cambio pasa antes por bin/kit-check (en tu equipo y en el CI): un fallo aquí es uno menos en producción.</text>
+  <text x="50" y="480" fill="#f85149" font-size="13">Si una llave privada aparece en el repositorio: revócala (RUNBOOK.md). Borrarla no basta, sigue en el historial.</text>
+</svg>

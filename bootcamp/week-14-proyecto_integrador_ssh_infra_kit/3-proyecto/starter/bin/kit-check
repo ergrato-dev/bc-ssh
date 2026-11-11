@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+#
+# kit-check — comprueba el kit entero sin conectar a ningún servidor.
+#
+# Uso: kit-check [CARPETA]      (por defecto, la carpeta de este kit)
+#
+# Una línea por comprobación ("ok      NOMBRE" o "fallo   NOMBRE   DETALLE"):
+# secretos, permisos, documentado, pendientes, config, sshd y shellcheck.
+# Códigos de salida: 0 todo bien, 1 algún fallo, 2 uso incorrecto.
+# Detalle de cada una: 3-proyecto/README.md, paso 1.
+set -euo pipefail
+
+# TODO 1: uso. Más de un argumento, o una CARPETA sin config: "uso: kit-check [CARPETA]" y sale con 2.
+
+# TODO 2: secretos, permisos, documentado y pendientes (sobre los archivos del kit).
+
+# TODO 3: config (ssh -G de cada alias de conf.d/), sshd (sshd -t de server/sshd_config.d/) y shellcheck.
+
+echo "kit-check: sin terminar" >&2
+exit 1

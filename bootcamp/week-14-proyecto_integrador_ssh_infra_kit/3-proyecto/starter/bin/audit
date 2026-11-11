@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+#
+# audit — comprueba con ssh-audit que cada servidor ofrece solo los
+# algoritmos que permite la política del kit.
+#
+# Uso: audit [-p POLÍTICA] HOST...
+#
+#   HOST      un alias de conf.d/ (lab-server) o un nombre. El nombre real y
+#             el puerto salen de `ssh -G`, igual que al conectar (SSH_CMD
+#             cambia el ssh; `ssh -F config` del kit por defecto).
+#   -p        otra política (por defecto server/ssh-audit-politica.txt).
+#
+# Escribe una línea por host: "HOST: cumple", "HOST: no cumple" seguida de
+# lo que falla, o "HOST: no responde".
+#
+# Necesita ssh-audit (uv tool install ssh-audit). Solo mira lo que el
+# servidor anuncia al conectar: no entra, no necesita llave ni cuenta.
+#
+# Códigos de salida: 0 todos cumplen, 1 alguno no cumple o no responde,
+# 2 uso incorrecto.
+set -euo pipefail
+
+kit="$(cd "$(dirname "$0")/.." && pwd)"
+politica="$kit/server/ssh-audit-politica.txt"
+
+uso() {
+  echo "uso: audit [-p POLÍTICA] HOST..." >&2
+  exit 2
+}
+
+while getopts p: opcion; do
+  case $opcion in
+    p) politica=$OPTARG ;;
+    *) uso ;;
+  esac
+done
+shift $((OPTIND - 1))
+[[ $# -ge 1 ]] || uso
+if [[ ! -r "$politica" ]]; then
+  echo "audit: no puedo leer la política $politica" >&2
+  exit 2
+fi
+if ! command -v ssh-audit >/dev/null; then
+  echo "audit: falta ssh-audit (uv tool install ssh-audit)" >&2
+  exit 1
+fi
+
+# Sin comillas al usarla: "ssh -F ruta" son varias palabras.
+ssh_cmd="${SSH_CMD:-ssh -F $kit/config}"
+resultado=0
+
+for host in "$@"; do
+  # Qué: ssh -G imprime la configuración final de HOST sin conectar.
+  # Para qué: auditar lab-server es auditar server:22, como lo ve tu ssh.
+  # Impacto: un HOST que no está en conf.d/ se usa tal cual, en el 22.
+  read -r nombre puerto < <($ssh_cmd -G "$host" 2>/dev/null |
+    awk '$1 == "hostname" { h = $2 } $1 == "port" { p = $2 } END { print h, p }')
+  # Qué: -P compara lo que anuncia el servidor con la política; -n quita
+  #   los colores. ssh-audit sale con 0 si cumple, 3 si no, 1 si no conecta
+  #   y con otro código si no entiende la política.
+  codigo=0
+  salida=$(ssh-audit -n -P "$politica" -p "${puerto:-22}" "${nombre:-$host}" 2>&1) || codigo=$?
+  case $codigo in
+    0) echo "$host: cumple" ;;
+    3)
+      echo "$host: no cumple"
+      # Solo el titular de cada error: "  * MACs did not match."
+      grep '^  \*' <<<"$salida" || true
+      resultado=1
+      ;;
+    1)
+      echo "$host: no responde"
+      resultado=1
+      ;;
+    *)
+      echo "audit: ssh-audit falló con $codigo; ¿es válida la política $politica?" >&2
+      resultado=1
+      ;;
+  esac
+done
+exit "$resultado"

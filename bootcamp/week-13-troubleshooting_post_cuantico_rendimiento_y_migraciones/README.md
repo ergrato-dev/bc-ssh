@@ -75,6 +75,6 @@ bin/doctor lab-server && bin/doctor lab-bastion
 
 | Anterior | Actual | Siguiente |
 |---|---|---|
-| [← Semana 12 — Automatización: scripting, CI/CD y Ansible](../week-12-automatizacion_scripting_ci_cd_y_ansible/README.md) | **Semana 13 — Operación y troubleshooting: algoritmos post-cuánticos, rendimiento y migraciones** | Semana 14 — Proyecto integrador `ssh-infra-kit` (próximamente) |
+| [← Semana 12 — Automatización: scripting, CI/CD y Ansible](../week-12-automatizacion_scripting_ci_cd_y_ansible/README.md) | **Semana 13 — Operación y troubleshooting: algoritmos post-cuánticos, rendimiento y migraciones** | [Semana 14 — Proyecto integrador `ssh-infra-kit` →](../week-14-proyecto_integrador_ssh_infra_kit/README.md) |
 
 [← Volver al índice del bootcamp](../README.md)

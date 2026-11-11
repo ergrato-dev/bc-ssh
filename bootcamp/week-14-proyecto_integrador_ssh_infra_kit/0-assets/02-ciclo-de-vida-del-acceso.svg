@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 420" font-family="sans-serif">
+  <title>Ciclo de vida del acceso de una persona, con el comando del kit en cada fase</title>
+  <defs>
+    <marker id="f" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8b949e"/>
+    </marker>
+  </defs>
+  <rect width="900" height="420" fill="#0d1117"/>
+  <text x="450" y="34" fill="#c9d1d9" font-size="20" text-anchor="middle" font-weight="bold">El acceso de una persona, de principio a fin</text>
+
+  <rect x="30" y="70" width="190" height="130" rx="8" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+  <text x="125" y="98" fill="#58a6ff" font-size="16" text-anchor="middle" font-weight="bold">Alta</text>
+  <text x="125" y="124" fill="#c9d1d9" font-size="12" text-anchor="middle" font-family="monospace">bin/key-new</text>
+  <text x="125" y="144" fill="#c9d1d9" font-size="12" text-anchor="middle" font-family="monospace">ca/ca-sign</text>
+  <text x="125" y="164" fill="#c9d1d9" font-size="12" text-anchor="middle" font-family="monospace">principals/</text>
+  <text x="125" y="186" fill="#8b949e" font-size="11" text-anchor="middle">solo la pública viaja</text>
+
+  <rect x="250" y="70" width="190" height="130" rx="8" fill="#161b22" stroke="#3fb950" stroke-width="2"/>
+  <text x="345" y="98" fill="#3fb950" font-size="16" text-anchor="middle" font-weight="bold">Uso</text>
+  <text x="345" y="124" fill="#c9d1d9" font-size="12" text-anchor="middle" font-family="monospace">bin/agent-up</text>
+  <text x="345" y="144" fill="#c9d1d9" font-size="12" text-anchor="middle" font-family="monospace">bin/doctor</text>
+  <text x="345" y="164" fill="#c9d1d9" font-size="12" text-anchor="middle" font-family="monospace">bin/mux</text>
+  <text x="345" y="186" fill="#8b949e" font-size="11" text-anchor="middle">certificado de 8 h</text>
+
+  <rect x="470" y="70" width="190" height="130" rx="8" fill="#161b22" stroke="#d29922" stroke-width="2"/>
+  <text x="565" y="98" fill="#d29922" font-size="16" text-anchor="middle" font-weight="bold">Renovar y migrar</text>
+  <text x="565" y="124" fill="#c9d1d9" font-size="12" text-anchor="middle" font-family="monospace">ca/ca-sign (mañana)</text>
+  <text x="565" y="144" fill="#c9d1d9" font-size="12" text-anchor="middle" font-family="monospace">bin/key-audit</text>
+  <text x="565" y="164" fill="#c9d1d9" font-size="12" text-anchor="middle" font-family="monospace">UpdateHostKeys</text>
+  <text x="565" y="186" fill="#8b949e" font-size="11" text-anchor="middle">añadir antes de quitar</text>
+
+  <rect x="690" y="70" width="180" height="130" rx="8" fill="#161b22" stroke="#8b949e" stroke-width="2"/>
+  <text x="780" y="98" fill="#c9d1d9" font-size="16" text-anchor="middle" font-weight="bold">Baja</text>
+  <text x="780" y="124" fill="#c9d1d9" font-size="12" text-anchor="middle" font-family="monospace">ca/ca-revoke</text>
+  <text x="780" y="144" fill="#c9d1d9" font-size="12" text-anchor="middle" font-family="monospace">gpasswd -d</text>
+  <text x="780" y="164" fill="#c9d1d9" font-size="12" text-anchor="middle" font-family="monospace">pkill -u</text>
+  <text x="780" y="186" fill="#8b949e" font-size="11" text-anchor="middle">y rotar lo compartido</text>
+
+  <line x1="220" y1="135" x2="248" y2="135" stroke="#8b949e" stroke-width="2" marker-end="url(#f)"/>
+  <line x1="440" y1="135" x2="468" y2="135" stroke="#8b949e" stroke-width="2" marker-end="url(#f)"/>
+  <line x1="660" y1="135" x2="688" y2="135" stroke="#8b949e" stroke-width="2" marker-end="url(#f)"/>
+  <path d="M565,200 L565,232 L345,232 L345,202" fill="none" stroke="#8b949e" stroke-width="2" marker-end="url(#f)"/>
+  <text x="455" y="250" fill="#8b949e" font-size="11" text-anchor="middle">cada día, hasta la baja</text>
+
+  <rect x="250" y="290" width="410" height="100" rx="8" fill="#161b22" stroke="#f85149" stroke-width="2"/>
+  <text x="455" y="318" fill="#f85149" font-size="16" text-anchor="middle" font-weight="bold">Incidente: llave o equipo perdido</text>
+  <text x="455" y="344" fill="#c9d1d9" font-size="12" text-anchor="middle">revocar hoy, cortar lo abierto, comprobar, llave nueva</text>
+  <text x="455" y="366" fill="#c9d1d9" font-size="12" text-anchor="middle" font-family="monospace">RUNBOOK.md#perdí-una-llave-o-un-equipo</text>
+  <path d="M660,340 L780,340 L780,202" fill="none" stroke="#f85149" stroke-width="2" stroke-dasharray="5,4" marker-end="url(#f)"/>
+  <text x="790" y="290" fill="#f85149" font-size="11">como una baja,</text>
+  <text x="790" y="306" fill="#f85149" font-size="11">pero hoy</text>
+</svg>

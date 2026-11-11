@@ -1,0 +1,127 @@
+# ssh-infra-kit — playbook de los servidores: lo mismo que bin/sshd-deploy,
+# pero en todos los del inventario, solo lo que cambió y sin pasos a mano.
+#
+#   cd ansible
+#   ansible-playbook servidores.yml --check --diff    # qué cambiaría, sin tocar nada
+#   ansible-playbook servidores.yml                   # aplicarlo
+#
+# Ansible no deshace nada si te quedas fuera: valida antes de instalar, recarga
+# solo si algo cambió, va de un servidor en un servidor (serial: 1) y comprueba
+# al final con una conexión nueva. Mantén una sesión abierta mientras lo pruebas.
+
+- name: Configuración SSH de los servidores del kit
+  hosts: servidores
+  become: true
+  # Qué: de uno en uno.
+  # Para qué: si un servidor falla, el playbook se para antes de tocar el siguiente.
+  # Impacto: tarda más con muchos servidores; sube el número cuando confíes en él.
+  serial: 1
+  vars:
+    kit_confs: "{{ query('fileglob', '../server/sshd_config.d/*.conf') | map('basename') | list }}"
+
+  tasks:
+    # Lo que la configuración del kit da por hecho (semanas 07-11).
+    - name: Grupos que usa sshd_config.d
+      ansible.builtin.group:
+        name: "{{ item }}"
+      loop: [ssh-users, sftp-only, saltadores, dosfa]
+
+    - name: Quien despliega sigue pudiendo entrar (AllowGroups ssh-users)
+      ansible.builtin.user:
+        name: "{{ ansible_facts.env.SUDO_USER }}"
+        groups: ssh-users
+        append: true
+      # Con --check el grupo de la tarea anterior no se crea de verdad y esta
+      # tarea fallaría en un servidor nuevo: en ese caso, el fallo no para nada.
+      ignore_errors: "{{ ansible_check_mode }}"
+
+    # Qué: crear la KRL vacía si no existe, sin cambiar sus fechas si existe.
+    # Impacto: con RevokedKeys y sin el archivo, sshd rechaza todas las llaves.
+    - name: KRL de 50-ca.conf
+      ansible.builtin.file:
+        path: /etc/ssh/revoked.krl
+        state: touch
+        mode: "0644"
+        modification_time: preserve
+        access_time: preserve
+
+    # Qué: probar sshd_config.d nuevo con el sshd_config del servidor, antes de instalarlo.
+    # Para qué: un error de sintaxis no llega nunca a /etc/ssh.
+    # Impacto: si sshd -t falla, el playbook se para aquí y no cambia nada.
+    - name: Copia de prueba de sshd_config.d
+      ansible.builtin.copy:
+        src: ../server/sshd_config.d/
+        dest: /root/kit-sshd/sshd_config.d/
+        mode: "0644"
+
+    - name: Validar la configuración completa (sshd -t)
+      ansible.builtin.shell: >
+        sed 's#/etc/ssh/sshd_config.d#/root/kit-sshd/sshd_config.d#'
+        /etc/ssh/sshd_config > /root/kit-sshd/sshd_config &&
+        sshd -t -f /root/kit-sshd/sshd_config
+      changed_when: false
+
+    - name: Instalar sshd_config.d
+      ansible.builtin.copy:
+        src: ../server/sshd_config.d/
+        dest: /etc/ssh/sshd_config.d/
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Recargar sshd
+
+    # Qué: borrar de /etc/ssh/sshd_config.d lo que no está en el kit.
+    # Para qué: copy añade y sustituye, pero no borra; un .conf viejo seguiría mandando.
+    # Impacto: el kit es la única fuente de sshd_config.d (como sshd-apply).
+    - name: Archivos de sshd_config.d que hay en el servidor
+      ansible.builtin.find:
+        paths: /etc/ssh/sshd_config.d
+      register: actuales
+
+    - name: Quitar los que no son del kit
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ actuales.files }}"
+      loop_control:
+        label: "{{ item.path | basename }}"
+      when: item.path | basename not in kit_confs
+      notify: Recargar sshd
+
+    - name: PAM de sshd (código TOTP para dosfa)
+      ansible.builtin.copy:
+        src: ../server/pam.d/sshd
+        dest: /etc/pam.d/sshd
+        owner: root
+        group: root
+        mode: "0644"
+        backup: true
+
+    - name: Jaula de fail2ban
+      ansible.builtin.copy:
+        src: ../server/fail2ban/jail.d/
+        dest: /etc/fail2ban/jail.d/
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Recargar fail2ban
+
+    # Qué: ejecutar ya las recargas pendientes y abrir una conexión nueva.
+    # Para qué: comprobar que se sigue entrando con la configuración nueva.
+    # Impacto: si no entra, el playbook falla aquí y no pasa al siguiente servidor.
+    - name: Recargas pendientes
+      ansible.builtin.meta: flush_handlers
+
+    - name: Cerrar la conexión (y su master)
+      ansible.builtin.meta: reset_connection
+
+    - name: Entrar con una conexión nueva
+      ansible.builtin.ping:
+
+  handlers:
+    - name: Recargar sshd
+      ansible.builtin.shell: kill -HUP "$(cat /run/sshd.pid)" && sleep 1
+
+    - name: Recargar fail2ban
+      ansible.builtin.shell: >
+        fail2ban-client -t && { fail2ban-client reload || fail2ban-client start; } </dev/null >/dev/null 2>&1

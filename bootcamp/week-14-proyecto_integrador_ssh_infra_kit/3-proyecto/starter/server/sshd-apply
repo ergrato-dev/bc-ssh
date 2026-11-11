@@ -1,0 +1,115 @@
+#!/bin/sh
+#
+# sshd-apply — instala una carpeta sshd_config.d nueva en ESTE servidor (y,
+# si vienen, el PAM de sshd y las jaulas de fail2ban) y lo deshace todo solo
+# si nadie confirma que se puede seguir entrando.
+#
+# Uso (en el servidor, como root): sshd-apply CARPETA SEGUNDOS
+#
+#   CARPETA   contiene sshd_config.d/ con los .conf nuevos y, opcionales,
+#             pam.d/sshd (sustituye a /etc/pam.d/sshd) y fail2ban/jail.d/
+#             (sus .local se añaden a /etc/fail2ban/jail.d). Para confirmar,
+#             se crea el archivo CARPETA/confirmado (lo hace bin/sshd-deploy
+#             con una conexión SSH nueva).
+#   SEGUNDOS  tiempo para confirmar. Si pasa sin confirmar, vuelve la
+#             configuración anterior y CARPETA se borra.
+#
+# Lo normal es no ejecutarlo a mano: bin/sshd-deploy lo copia y lo lanza.
+# Es sh y no bash para que funcione en cualquier servidor.
+#
+# Códigos de salida: 0 aplicada (falta confirmar), 1 configuración inválida
+# (no se aplicó nada), 2 uso incorrecto.
+
+set -eu
+
+if [ $# -ne 2 ] || [ ! -d "$1/sshd_config.d" ]; then
+  echo "uso: sshd-apply CARPETA SEGUNDOS (CARPETA/sshd_config.d debe existir)" >&2
+  exit 2
+fi
+carpeta=$1
+espera=$2
+dir=/etc/ssh/sshd_config.d
+anterior=$dir.anterior
+pam=/etc/pam.d/sshd
+jaulas=/etc/fail2ban/jail.d
+
+# Qué: solo se tocan PAM y fail2ban si el kit los trae (y fail2ban está
+#   instalado). Para qué: el mismo sshd-apply sirve para un servidor sin 2FA
+#   ni fail2ban. Impacto: lo que no viene en CARPETA no cambia.
+con_pam=no
+con_f2b=no
+[ -f "$carpeta/pam.d/sshd" ] && con_pam=si
+if [ -d "$carpeta/fail2ban/jail.d" ] && command -v fail2ban-client >/dev/null; then
+  con_f2b=si
+fi
+
+# Qué: sshd vuelve a leer su configuración sin cortar las sesiones abiertas.
+# systemd en un servidor real; en el contenedor del laboratorio, la señal HUP
+# al proceso cuyo PID guarda sshd en /run/sshd.pid.
+# sleep 1: con HUP, sshd tarda unos milisegundos en volver a escuchar; una
+# conexión que llegue antes recibe "Connection refused" y la prueba de
+# bin/sshd-deploy daría por malo un cambio bueno.
+# PAM no se recarga: sshd lee /etc/pam.d/sshd en cada conexión.
+# fail2ban: reload si ya corre; si no (el laboratorio no tiene systemd), start.
+recargar() {
+  systemctl reload ssh 2>/dev/null || kill -HUP "$(cat /run/sshd.pid)"
+  if [ "$con_f2b" = si ]; then
+    fail2ban-client reload >/dev/null 2>&1 || fail2ban-client start </dev/null >/dev/null 2>&1 || true
+  fi
+  sleep 1
+}
+restaurar() {
+  rm -rf "$dir"
+  cp -a "$anterior" "$dir"
+  if [ "$con_pam" = si ]; then cp -a "$pam.anterior" "$pam"; fi
+  if [ "$con_f2b" = si ]; then
+    rm -rf "$jaulas"
+    cp -a "$jaulas.anterior" "$jaulas"
+  fi
+}
+
+# La carpeta entera se sustituye: lo que no está en el kit no está en el
+# servidor (también un 50-cloud-init.conf con PasswordAuthentication yes).
+rm -rf "$anterior"
+cp -a "$dir" "$anterior"
+rm -rf "$dir"
+cp -r "$carpeta/sshd_config.d" "$dir"
+chown -R root:root "$dir"
+chmod 755 "$dir"
+chmod 644 "$dir"/*
+if [ "$con_pam" = si ]; then
+  cp -a "$pam" "$pam.anterior"
+  install -m 644 -o root -g root "$carpeta/pam.d/sshd" "$pam"
+fi
+if [ "$con_f2b" = si ]; then
+  rm -rf "$jaulas.anterior"
+  cp -a "$jaulas" "$jaulas.anterior"
+  install -m 644 -o root -g root "$carpeta"/fail2ban/jail.d/*.local "$jaulas/"
+fi
+
+# sshd -t lee la configuración como al arrancar y sale con 1 si hay un
+# error. Recargar con un error haría que sshd no arranque: nadie entraría.
+# fail2ban-client -t hace lo mismo con las jaulas.
+if ! sshd -t || { [ "$con_f2b" = si ] && ! fail2ban-client -t >/dev/null 2>&1; }; then
+  restaurar
+  rm -rf "$carpeta"
+  echo "sshd-apply: configuración inválida, no se aplicó nada" >&2
+  exit 1
+fi
+recargar
+
+# Qué: un proceso en segundo plano que espera SEGUNDOS y, si no hay
+#   confirmación, restaura y recarga.
+# Para qué: si la configuración nueva te deja fuera, no puedes entrar a
+#   deshacerla; este proceso lo hace por ti.
+# Impacto: < /dev/null y > /dev/null sueltan la conexión SSH, que así
+#   termina sin esperar a que acabe el sleep.
+(
+  sleep "$espera"
+  if [ ! -e "$carpeta/confirmado" ]; then
+    restaurar
+    recargar
+  fi
+  rm -rf "$carpeta"
+) </dev/null >/dev/null 2>&1 &
+echo "sshd-apply: aplicada; se deshace en $espera s si no se confirma" >&2

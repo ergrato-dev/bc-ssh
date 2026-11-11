@@ -17,6 +17,6 @@ Estado de cada semana. ✅ = migrada a la estructura de `CLAUDE.md` (labs con st
 | [11](week-11-2fa_fail2ban_y_auditoria/README.md) | 2FA, fail2ban y auditoría | Seguridad avanzada | ✅ |
 | [12](week-12-automatizacion_scripting_ci_cd_y_ansible/README.md) | Automatización: scripting, CI/CD y Ansible | Automatización | ✅ |
 | [13](week-13-troubleshooting_post_cuantico_rendimiento_y_migraciones/README.md) | Operación y troubleshooting: algoritmos post-cuánticos, rendimiento y migraciones | Operación | ✅ |
-| 14 | Proyecto integrador `ssh-infra-kit` | Integración | ⬜ |
+| [14](week-14-proyecto_integrador_ssh_infra_kit/README.md) | Proyecto integrador `ssh-infra-kit` | Integración | ✅ |
 
 **Total: 14 semanas × 12 h = 168 horas.**
