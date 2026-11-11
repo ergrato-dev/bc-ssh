@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 400">
+  <defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8b949e"/></marker></defs>
+  <rect width="900" height="400" fill="#0d1117"/>
+  <text x="450" y="34" font-family="sans-serif" font-size="19" fill="#c9d1d9" text-anchor="middle">Rotar una host key en dos fases con UpdateHostKeys</text>
+  <rect x="40" y="70" width="250" height="210" rx="6" fill="#161b22" stroke="#8b949e" stroke-width="2"/>
+  <text x="165" y="98" font-family="sans-serif" font-size="15" fill="#8b949e" text-anchor="middle">Antes</text>
+  <text x="165" y="132" font-family="sans-serif" font-size="12" fill="#8b949e" text-anchor="middle">servidor</text>
+  <text x="165" y="154" font-family="monospace" font-size="13" fill="#c9d1d9" text-anchor="middle">HostKey: vieja</text>
+  <text x="165" y="192" font-family="sans-serif" font-size="12" fill="#8b949e" text-anchor="middle">cliente que entra</text>
+  <text x="165" y="214" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">conoce la vieja</text>
+  <line x1="292" y1="175" x2="328" y2="175" stroke="#8b949e" stroke-width="2" marker-end="url(#fa)"/>
+  <rect x="330" y="70" width="250" height="210" rx="6" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+  <text x="455" y="98" font-family="sans-serif" font-size="15" fill="#58a6ff" text-anchor="middle">Fase 1 (semanas)</text>
+  <text x="455" y="132" font-family="sans-serif" font-size="12" fill="#8b949e" text-anchor="middle">servidor</text>
+  <text x="455" y="154" font-family="monospace" font-size="13" fill="#c9d1d9" text-anchor="middle">HostKey: vieja, nueva</text>
+  <text x="455" y="192" font-family="sans-serif" font-size="12" fill="#8b949e" text-anchor="middle">cliente que entra</text>
+  <text x="455" y="214" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">entra con la vieja y aprende la nueva</text>
+  <line x1="582" y1="175" x2="618" y2="175" stroke="#8b949e" stroke-width="2" marker-end="url(#fa)"/>
+  <rect x="620" y="70" width="250" height="210" rx="6" fill="#161b22" stroke="#3fb950" stroke-width="2"/>
+  <text x="745" y="98" font-family="sans-serif" font-size="15" fill="#3fb950" text-anchor="middle">Fase 2</text>
+  <text x="745" y="132" font-family="sans-serif" font-size="12" fill="#8b949e" text-anchor="middle">servidor</text>
+  <text x="745" y="154" font-family="monospace" font-size="13" fill="#c9d1d9" text-anchor="middle">HostKey: nueva</text>
+  <text x="745" y="192" font-family="sans-serif" font-size="12" fill="#8b949e" text-anchor="middle">cliente que entra</text>
+  <text x="745" y="214" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">entra con la nueva sin aviso</text>
+  <text x="745" y="234" font-family="sans-serif" font-size="12" fill="#c9d1d9" text-anchor="middle">olvida la vieja</text>
+  <rect x="40" y="300" width="830" height="70" rx="6" fill="#161b22" stroke="#d29922" stroke-width="2"/>
+  <text x="455" y="328" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">Un cliente que no entró durante la fase 1 ve REMOTE HOST IDENTIFICATION HAS CHANGED:</text>
+  <text x="455" y="352" font-family="sans-serif" font-size="13" fill="#d29922" text-anchor="middle">comprueba la huella nueva por otro canal y añádela con bin/kh-add. Nunca la aceptes sin mirar.</text>
+</svg>

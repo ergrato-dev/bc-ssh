@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+#
+# key-audit — dice qué llaves de un authorized_keys (o de cualquier lista de
+# llaves públicas) hay que migrar.
+#
+# Uso: key-audit ARCHIVO...      (- lee la entrada estándar)
+#
+#   ssh lab-server cat .ssh/authorized_keys | bin/key-audit -
+#
+# Una línea por llave:
+#   ok      ED25519 256  ana@portatil
+#   migrar  RSA 2048     luis@viejo   RSA de menos de 3072 bits
+#
+# Qué se migra:
+#   DSA          OpenSSH 10.0 ya no la admite; la 9.6 la rechaza por defecto.
+#   RSA < 3072   112 bits de seguridad o menos; RequiredRSASize 3072 del kit
+#                (15-algoritmos.conf) la rechaza.
+#   ECDSA        curvas NIST: el kit las quita de las host keys (semana 11);
+#                aquí se avisa para pasarlas a Ed25519 con calma.
+# Lo demás (Ed25519, RSA de 3072 o más, llaves -sk) está bien.
+#
+# Códigos de salida: 0 todas bien, 1 alguna para migrar, 2 uso incorrecto o
+# archivo ilegible.
+set -euo pipefail
+
+if (( $# == 0 )); then
+  echo "uso: key-audit ARCHIVO..." >&2
+  exit 2
+fi
+
+migrar=0
+for archivo in "$@"; do
+  [[ $archivo == - ]] && archivo=/dev/stdin
+  # Qué: ssh-keygen -l imprime "BITS HUELLA COMENTARIO (TIPO)" por llave, y
+  #   entiende las opciones de authorized_keys (restrict, command=...).
+  # Impacto: líneas en blanco y comentarios no salen; una línea rota, tampoco.
+  if ! lista=$(ssh-keygen -lf "$archivo" 2>/dev/null); then
+    echo "key-audit: $archivo no tiene llaves públicas legibles" >&2
+    exit 2
+  fi
+  while read -r bits _ resto; do
+    tipo=${resto##*(}; tipo=${tipo%)}
+    comentario=${resto% (*}
+    case $tipo in
+      DSA) motivo="DSA: OpenSSH 10.0 ya no la admite" ;;
+      RSA) (( bits < 3072 )) && motivo="RSA de menos de 3072 bits" || motivo="" ;;
+      ECDSA) motivo="ECDSA (curva NIST): mejor Ed25519" ;;
+      *) motivo="" ;;
+    esac
+    if [[ -n $motivo ]]; then
+      printf 'migrar  %-12s %s   %s\n' "$tipo $bits" "$comentario" "$motivo"
+      migrar=1
+    else
+      printf 'ok      %-12s %s\n' "$tipo $bits" "$comentario"
+    fi
+  done <<<"$lista"
+done
+exit "$migrar"

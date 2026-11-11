@@ -1,0 +1,30 @@
+# ssh-infra-kit — política de ssh-audit: lo único que pueden ofrecer tus
+# servidores. La usa bin/audit (ssh-audit -P). Sale de 15-algoritmos.conf.
+
+name = "ssh-infra-kit"
+version = 1
+
+# Qué: el servidor puede ofrecer menos algoritmos, o en otro orden.
+# Para qué: la política dice qué está permitido, no qué es obligatorio; un
+#   servidor más estricto también cumple.
+# Impacto: uno que ofrezca algo que no está en estas listas, no cumple.
+allow_algorithm_subset_and_reordering = true
+
+# Qué: llaves más grandes que las de host_key_sizes también valen.
+# Impacto: una host key RSA de 4096 bits cumple; una de 2048, no.
+allow_larger_keys = true
+host_key_sizes = {"rsa-sha2-512": {"hostkey_size": 3072}, "rsa-sha2-256": {"hostkey_size": 3072}, "ssh-ed25519": {"hostkey_size": 256}}
+dh_modulus_sizes = {"diffie-hellman-group-exchange-sha256": 3072}
+
+host keys = ssh-ed25519, rsa-sha2-512, rsa-sha2-256
+# Los certificados de host (50-ca.conf, semana 10) pueden aparecer o no.
+optional host keys = ssh-ed25519-cert-v01@openssh.com, rsa-sha2-512-cert-v01@openssh.com, rsa-sha2-256-cert-v01@openssh.com
+
+# mlkem768x25519-sha256: OpenSSH 9.9+. Con 9.6 no aparece y se cumple igual.
+# ext-info-s y kex-strict-s-v00: no son algoritmos, sino avisos de que el
+# servidor admite extensiones (RFC 8308) y la defensa contra Terrapin.
+key exchanges = mlkem768x25519-sha256, sntrup761x25519-sha512@openssh.com, curve25519-sha256, curve25519-sha256@libssh.org, diffie-hellman-group-exchange-sha256, diffie-hellman-group16-sha512, diffie-hellman-group18-sha512, ext-info-s, kex-strict-s-v00@openssh.com
+
+ciphers = chacha20-poly1305@openssh.com, aes256-gcm@openssh.com, aes128-gcm@openssh.com, aes256-ctr, aes192-ctr, aes128-ctr
+
+macs = hmac-sha2-512-etm@openssh.com, hmac-sha2-256-etm@openssh.com, umac-128-etm@openssh.com

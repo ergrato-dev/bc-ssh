@@ -78,6 +78,6 @@ ansible-playbook servidores.yml --check
 
 | Anterior | Actual | Siguiente |
 |---|---|---|
-| [← Semana 11 — 2FA, fail2ban y auditoría con ssh-audit](../week-11-2fa_fail2ban_y_auditoria/README.md) | **Semana 12 — Automatización: scripting, CI/CD y Ansible** | Semana 13 — Operación y troubleshooting: algoritmos post-cuánticos, rendimiento y migraciones (próximamente) |
+| [← Semana 11 — 2FA, fail2ban y auditoría con ssh-audit](../week-11-2fa_fail2ban_y_auditoria/README.md) | **Semana 12 — Automatización: scripting, CI/CD y Ansible** | [Semana 13 — Operación y troubleshooting: algoritmos post-cuánticos, rendimiento y migraciones →](../week-13-troubleshooting_post_cuantico_rendimiento_y_migraciones/README.md) |
 
 [← Volver al índice del bootcamp](../README.md)

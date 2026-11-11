@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+#
+# doctor — conecta con un host y explica qué pasó: qué algoritmos se
+# negociaron, con qué se entró o, si falla, en qué capa y qué revisar.
+#
+# Uso: doctor HOST [OPCIÓN_DE_SSH...]
+#
+#   HOST      un alias de conf.d/ (lab-server) o un nombre. SSH_CMD cambia
+#             el ssh (`ssh -F config` del kit por defecto).
+#   OPCIÓN    se pasa tal cual a ssh, antes de HOST: -o KexAlgorithms=...
+#
+# Si entra, escribe:
+#   destino:  alumno@server:22
+#   kex:      sntrup761x25519-sha512@openssh.com (postcuántico)
+#   host key: ssh-ed25519 SHA256:...
+#   cifrado:  chacha20-poly1305@openssh.com
+#   entrada:  publickey
+# Si no, el error de ssh y una pista ("pista: ...").
+#
+# Siempre abre una conexión nueva, sin master y sin preguntar nada
+# (BatchMode): lo que mide es lo que le pasaría a una conexión de verdad.
+#
+# Códigos de salida: los de ssh (0 si entra, 255 si falla la conexión),
+# o 2 por uso incorrecto.
+set -uo pipefail
+
+kit="$(cd "$(dirname "$0")/.." && pwd)"
+
+if (( $# == 0 )); then
+  echo "uso: doctor HOST [OPCIÓN_DE_SSH...]" >&2
+  exit 2
+fi
+host=$1
+shift
+
+# Sin comillas al usarla: "ssh -F ruta" son varias palabras.
+ssh_cmd="${SSH_CMD:-ssh -F $kit/config}"
+
+# Qué: ssh -G resuelve el alias como al conectar, sin conectar.
+# Para qué: que la primera línea diga a dónde va de verdad la conexión;
+#   medio diagnóstico es descubrir que el alias apunta a otro sitio.
+read -r usuario nombre puerto < <($ssh_cmd "$@" -G "$host" 2>/dev/null |
+  awk '$1 == "user" { u = $2 } $1 == "hostname" { h = $2 } $1 == "port" { p = $2 }
+       END { print u, h, p }')
+echo "destino:  ${usuario:-?}@${nombre:-$host}:${puerto:-22}"
+
+# Qué: -v escribe cada paso de la conexión en stderr.
+# Para qué: de ahí salen los algoritmos negociados y el error exacto.
+# Impacto: ControlPath=none ignora un master abierto, que no negocia nada
+#   ni se vuelve a autenticar; ConnectTimeout evita esperar 2 min.
+codigo=0
+log=$($ssh_cmd -v -o BatchMode=yes -o ControlMaster=no -o ControlPath=none \
+  -o ConnectTimeout=5 "$@" "$host" true 2>&1 </dev/null) || codigo=$?
+# Los mensajes de -v acaban en CRLF: sin quitar el CR, "postcuántico\r".
+log=${log//$'\r'/}
+
+if (( codigo == 0 )); then
+  kex=$(sed -n 's/^debug1: kex: algorithm: //p' <<<"$log")
+  # sntrup761 (OpenSSH 9.0+) y mlkem768 (9.9+) son los híbridos postcuánticos.
+  case $kex in
+    sntrup761*|mlkem*) pq="postcuántico" ;;
+    *) pq="no postcuántico" ;;
+  esac
+  echo "kex:      $kex ($pq)"
+  echo "host key: $(sed -n 's/^debug1: Server host key: //p' <<<"$log")"
+  echo "cifrado:  $(sed -n 's/^debug1: kex: client->server cipher: \([^ ]*\).*/\1/p' <<<"$log")"
+  echo "entrada:  $(sed -n 's/^Authenticated to .* using "\(.*\)".*/\1/p' <<<"$log")"
+  exit 0
+fi
+
+# El error: las líneas de ssh que no son de depuración (sin "debug1:").
+error=$(grep -v '^debug1:' <<<"$log" | grep -v '^OpenSSH_' | tail -3)
+echo "error:    ${error//$'\n'/$'\n'          }"
+
+# Qué: una pista por capa, de abajo arriba (como bin/lab-check).
+# Para qué: el mismo "no conecta" tiene arreglos que no se parecen.
+case $log in
+  *"Could not resolve hostname"*)
+    pista="el nombre no resuelve: revisa HostName (ssh -G HOST) y el DNS" ;;
+  *"Connection refused"*)
+    pista="nadie escucha en ese puerto: ¿sshd está arrancado? ¿es el puerto correcto?" ;;
+  *"timed out"*)
+    pista="no hay respuesta: host apagado, cortafuegos o una IP bloqueada (fail2ban)" ;;
+  *"no matching"*)
+    pista="sin algoritmo en común: 'Their offer' es lo que ofrece el servidor. Si es un equipo viejo que no puedes actualizar, dale un alias legado-* (conf.d/90-legado.conf)" ;;
+  *"IDENTIFICATION HAS CHANGED"*|*"host key is known"*|*"Host key verification failed"*)
+    pista="host key desconocida o cambiada: comprueba la huella por otro canal y añádela con bin/kh-add; nunca la aceptes sin comprobar" ;;
+  *"Too many authentication failures"*)
+    pista="demasiadas llaves ofrecidas: usa IdentityFile e IdentitiesOnly yes" ;;
+  *"Permission denied"*)
+    pista="el servidor no aceptó la llave: mira qué llaves se ofrecieron (ssh -v, 'Offering') y la razón en el log del servidor (sudo sshd -d en otro puerto)" ;;
+  *"closed by"*|*"reset by"*)
+    pista="el servidor cortó: revisa su log (AllowGroups, MaxStartups, fail2ban, RequiredRSASize)" ;;
+  *)
+    pista="revisa la salida completa: $ssh_cmd -v $host" ;;
+esac
+echo "pista:    $pista"
+exit "$codigo"

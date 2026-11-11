@@ -1,0 +1,104 @@
+{
+  "semana": "13",
+  "titulo": "Operación y troubleshooting: algoritmos post-cuánticos, rendimiento y migraciones",
+  "checks": [
+    {
+      "id": "doctor-uso",
+      "descripcion": "bin/doctor sin argumentos sale con 2 y dice cómo se usa",
+      "cmd": "o=$({proyecto}/bin/doctor 2>&1); echo \"$? $(grep -c \"^uso: doctor\" <<<\"$o\")\"",
+      "assert": "stdout~^2 1$",
+      "pista": "3-proyecto/README.md, paso 1"
+    },
+    {
+      "id": "doctor-entra",
+      "descripcion": "bin/doctor entra con una conexión nueva aunque haya un master abierto, y escribe destino, kex postcuántico, host key, cifrado y método de entrada",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); u=$(id -un); for k in k k2 hed; do ssh-keygen -q -t ed25519 -N \"\" -f $d/$k; done; ssh-keygen -q -t rsa -b 3072 -N \"\" -f $d/hrsa; cp $d/k.pub $d/ak; D() { /usr/sbin/sshd -f /dev/null -p $1 -o ListenAddress=127.0.0.1 -o AuthorizedKeysFile=$d/ak -o StrictModes=no -o PidFile=$d/$1.pid \"${@:2}\"; }; D 2213 -h $d/hed; D 2214 -h $d/hed -o KexAlgorithms=curve25519-sha256; D 2215 -h $d/hrsa -o KexAlgorithms=diffie-hellman-group14-sha1 -o HostKeyAlgorithms=ssh-rsa; for p in 2213 2214; do echo \"[127.0.0.1]:$p $(cat $d/hed.pub)\"; done > $d/kh; echo \"[127.0.0.1]:2215 $(cat $d/hrsa.pub)\" >> $d/kh; echo \"[127.0.0.1]:2213 $(cat $d/k2.pub)\" > $d/kh2; echo \"Include {proyecto}/conf.d/*.conf\" > $d/cfg; for h in \"moderno 2213 k kh\" \"sinpq 2214 k kh\" \"viejo 2215 k kh\" \"legado-prueba 2215 k kh\" \"cambiada 2213 k kh2\" \"intruso 2213 k2 kh\" \"cerrado 2216 k kh\"; do set -- $h; echo \"Host $1\"; for l in \"HostName 127.0.0.1\" \"Port $2\" \"User $u\" \"IdentityFile $d/$3\" \"IdentitiesOnly yes\" \"UserKnownHostsFile $d/$4\" \"StrictHostKeyChecking yes\" \"ControlMaster auto\" \"ControlPath $d/cm-%C\" \"ControlPersist 60\"; do echo \"  $l\"; done; done >> $d/cfg; sleep 0.5; DR() { SSH_CMD=\"ssh -F $d/cfg\" timeout 30 {proyecto}/bin/doctor \"$@\" 2>&1; }; ssh -F $d/cfg moderno true >/dev/null 2>&1; o=$(DR moderno); r=\"$? $(grep -cE \"^destino: +$u@127.0.0.1:2213$\" <<<\"$o\") $(grep -cE \"^kex: +sntrup761x25519-sha512@openssh.com .postcuántico.$\" <<<\"$o\") $(grep -cE \"^host key: +ssh-ed25519 SHA256:\" <<<\"$o\") $(grep -cE \"^cifrado: +chacha20-poly1305@openssh.com$\" <<<\"$o\") $(grep -cE \"^entrada: +publickey$\" <<<\"$o\")\"; for p in $d/*.pid; do pkill -F $p; done; pkill -f \"$d/cm-\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^0 1 1 1 1 1$",
+      "pista": "3-proyecto/README.md, paso 2"
+    },
+    {
+      "id": "doctor-sin-postcuantico",
+      "descripcion": "bin/doctor avisa cuando el intercambio de llaves no es postcuántico",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); u=$(id -un); for k in k k2 hed; do ssh-keygen -q -t ed25519 -N \"\" -f $d/$k; done; ssh-keygen -q -t rsa -b 3072 -N \"\" -f $d/hrsa; cp $d/k.pub $d/ak; D() { /usr/sbin/sshd -f /dev/null -p $1 -o ListenAddress=127.0.0.1 -o AuthorizedKeysFile=$d/ak -o StrictModes=no -o PidFile=$d/$1.pid \"${@:2}\"; }; D 2213 -h $d/hed; D 2214 -h $d/hed -o KexAlgorithms=curve25519-sha256; D 2215 -h $d/hrsa -o KexAlgorithms=diffie-hellman-group14-sha1 -o HostKeyAlgorithms=ssh-rsa; for p in 2213 2214; do echo \"[127.0.0.1]:$p $(cat $d/hed.pub)\"; done > $d/kh; echo \"[127.0.0.1]:2215 $(cat $d/hrsa.pub)\" >> $d/kh; echo \"[127.0.0.1]:2213 $(cat $d/k2.pub)\" > $d/kh2; echo \"Include {proyecto}/conf.d/*.conf\" > $d/cfg; for h in \"moderno 2213 k kh\" \"sinpq 2214 k kh\" \"viejo 2215 k kh\" \"legado-prueba 2215 k kh\" \"cambiada 2213 k kh2\" \"intruso 2213 k2 kh\" \"cerrado 2216 k kh\"; do set -- $h; echo \"Host $1\"; for l in \"HostName 127.0.0.1\" \"Port $2\" \"User $u\" \"IdentityFile $d/$3\" \"IdentitiesOnly yes\" \"UserKnownHostsFile $d/$4\" \"StrictHostKeyChecking yes\" \"ControlMaster auto\" \"ControlPath $d/cm-%C\" \"ControlPersist 60\"; do echo \"  $l\"; done; done >> $d/cfg; sleep 0.5; DR() { SSH_CMD=\"ssh -F $d/cfg\" timeout 30 {proyecto}/bin/doctor \"$@\" 2>&1; }; o=$(DR sinpq); r=\"$? $(grep -cE \"^kex: +curve25519-sha256 .no postcuántico.$\" <<<\"$o\")\"; for p in $d/*.pid; do pkill -F $p; done; pkill -f \"$d/cm-\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^0 1$",
+      "pista": "3-proyecto/README.md, paso 2"
+    },
+    {
+      "id": "doctor-pasa-opciones",
+      "descripcion": "bin/doctor pasa a ssh las opciones que siguen al host (-o KexAlgorithms=...)",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); u=$(id -un); for k in k k2 hed; do ssh-keygen -q -t ed25519 -N \"\" -f $d/$k; done; ssh-keygen -q -t rsa -b 3072 -N \"\" -f $d/hrsa; cp $d/k.pub $d/ak; D() { /usr/sbin/sshd -f /dev/null -p $1 -o ListenAddress=127.0.0.1 -o AuthorizedKeysFile=$d/ak -o StrictModes=no -o PidFile=$d/$1.pid \"${@:2}\"; }; D 2213 -h $d/hed; D 2214 -h $d/hed -o KexAlgorithms=curve25519-sha256; D 2215 -h $d/hrsa -o KexAlgorithms=diffie-hellman-group14-sha1 -o HostKeyAlgorithms=ssh-rsa; for p in 2213 2214; do echo \"[127.0.0.1]:$p $(cat $d/hed.pub)\"; done > $d/kh; echo \"[127.0.0.1]:2215 $(cat $d/hrsa.pub)\" >> $d/kh; echo \"[127.0.0.1]:2213 $(cat $d/k2.pub)\" > $d/kh2; echo \"Include {proyecto}/conf.d/*.conf\" > $d/cfg; for h in \"moderno 2213 k kh\" \"sinpq 2214 k kh\" \"viejo 2215 k kh\" \"legado-prueba 2215 k kh\" \"cambiada 2213 k kh2\" \"intruso 2213 k2 kh\" \"cerrado 2216 k kh\"; do set -- $h; echo \"Host $1\"; for l in \"HostName 127.0.0.1\" \"Port $2\" \"User $u\" \"IdentityFile $d/$3\" \"IdentitiesOnly yes\" \"UserKnownHostsFile $d/$4\" \"StrictHostKeyChecking yes\" \"ControlMaster auto\" \"ControlPath $d/cm-%C\" \"ControlPersist 60\"; do echo \"  $l\"; done; done >> $d/cfg; sleep 0.5; DR() { SSH_CMD=\"ssh -F $d/cfg\" timeout 30 {proyecto}/bin/doctor \"$@\" 2>&1; }; o=$(DR moderno -o KexAlgorithms=curve25519-sha256); r=\"$? $(grep -cE \"^kex: +curve25519-sha256 .no postcuántico.$\" <<<\"$o\")\"; for p in $d/*.pid; do pkill -F $p; done; pkill -f \"$d/cm-\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^0 1$",
+      "pista": "3-proyecto/README.md, paso 2"
+    },
+    {
+      "id": "doctor-sin-algoritmo",
+      "descripcion": "Contra un servidor viejo, bin/doctor sale con 255, enseña lo que ofrece el servidor y apunta a los alias legado-*",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); u=$(id -un); for k in k k2 hed; do ssh-keygen -q -t ed25519 -N \"\" -f $d/$k; done; ssh-keygen -q -t rsa -b 3072 -N \"\" -f $d/hrsa; cp $d/k.pub $d/ak; D() { /usr/sbin/sshd -f /dev/null -p $1 -o ListenAddress=127.0.0.1 -o AuthorizedKeysFile=$d/ak -o StrictModes=no -o PidFile=$d/$1.pid \"${@:2}\"; }; D 2213 -h $d/hed; D 2214 -h $d/hed -o KexAlgorithms=curve25519-sha256; D 2215 -h $d/hrsa -o KexAlgorithms=diffie-hellman-group14-sha1 -o HostKeyAlgorithms=ssh-rsa; for p in 2213 2214; do echo \"[127.0.0.1]:$p $(cat $d/hed.pub)\"; done > $d/kh; echo \"[127.0.0.1]:2215 $(cat $d/hrsa.pub)\" >> $d/kh; echo \"[127.0.0.1]:2213 $(cat $d/k2.pub)\" > $d/kh2; echo \"Include {proyecto}/conf.d/*.conf\" > $d/cfg; for h in \"moderno 2213 k kh\" \"sinpq 2214 k kh\" \"viejo 2215 k kh\" \"legado-prueba 2215 k kh\" \"cambiada 2213 k kh2\" \"intruso 2213 k2 kh\" \"cerrado 2216 k kh\"; do set -- $h; echo \"Host $1\"; for l in \"HostName 127.0.0.1\" \"Port $2\" \"User $u\" \"IdentityFile $d/$3\" \"IdentitiesOnly yes\" \"UserKnownHostsFile $d/$4\" \"StrictHostKeyChecking yes\" \"ControlMaster auto\" \"ControlPath $d/cm-%C\" \"ControlPersist 60\"; do echo \"  $l\"; done; done >> $d/cfg; sleep 0.5; DR() { SSH_CMD=\"ssh -F $d/cfg\" timeout 30 {proyecto}/bin/doctor \"$@\" 2>&1; }; o=$(DR viejo); r=\"$? $(grep -cE \"^error:.*no matching key exchange method found. Their offer: diffie-hellman-group14-sha1\" <<<\"$o\") $(grep -cE \"^pista:.*legado-\" <<<\"$o\")\"; for p in $d/*.pid; do pkill -F $p; done; pkill -f \"$d/cm-\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^255 1 1$",
+      "pista": "3-proyecto/README.md, paso 3"
+    },
+    {
+      "id": "doctor-host-key",
+      "descripcion": "Con una host key cambiada, bin/doctor sale con 255 y apunta a comprobar la huella con bin/kh-add",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); u=$(id -un); for k in k k2 hed; do ssh-keygen -q -t ed25519 -N \"\" -f $d/$k; done; ssh-keygen -q -t rsa -b 3072 -N \"\" -f $d/hrsa; cp $d/k.pub $d/ak; D() { /usr/sbin/sshd -f /dev/null -p $1 -o ListenAddress=127.0.0.1 -o AuthorizedKeysFile=$d/ak -o StrictModes=no -o PidFile=$d/$1.pid \"${@:2}\"; }; D 2213 -h $d/hed; D 2214 -h $d/hed -o KexAlgorithms=curve25519-sha256; D 2215 -h $d/hrsa -o KexAlgorithms=diffie-hellman-group14-sha1 -o HostKeyAlgorithms=ssh-rsa; for p in 2213 2214; do echo \"[127.0.0.1]:$p $(cat $d/hed.pub)\"; done > $d/kh; echo \"[127.0.0.1]:2215 $(cat $d/hrsa.pub)\" >> $d/kh; echo \"[127.0.0.1]:2213 $(cat $d/k2.pub)\" > $d/kh2; echo \"Include {proyecto}/conf.d/*.conf\" > $d/cfg; for h in \"moderno 2213 k kh\" \"sinpq 2214 k kh\" \"viejo 2215 k kh\" \"legado-prueba 2215 k kh\" \"cambiada 2213 k kh2\" \"intruso 2213 k2 kh\" \"cerrado 2216 k kh\"; do set -- $h; echo \"Host $1\"; for l in \"HostName 127.0.0.1\" \"Port $2\" \"User $u\" \"IdentityFile $d/$3\" \"IdentitiesOnly yes\" \"UserKnownHostsFile $d/$4\" \"StrictHostKeyChecking yes\" \"ControlMaster auto\" \"ControlPath $d/cm-%C\" \"ControlPersist 60\"; do echo \"  $l\"; done; done >> $d/cfg; sleep 0.5; DR() { SSH_CMD=\"ssh -F $d/cfg\" timeout 30 {proyecto}/bin/doctor \"$@\" 2>&1; }; o=$(DR cambiada); r=\"$? $(grep -cE \"IDENTIFICATION HAS CHANGED|Host key verification failed\" <<<\"$o\") $(grep -cE \"^pista:.*kh-add\" <<<\"$o\")\"; for p in $d/*.pid; do pkill -F $p; done; pkill -f \"$d/cm-\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^255 [1-9] 1$",
+      "pista": "3-proyecto/README.md, paso 3"
+    },
+    {
+      "id": "doctor-sin-permiso",
+      "descripcion": "Con una llave que el servidor no acepta, bin/doctor sale con 255 y apunta al log del servidor (sshd -d)",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); u=$(id -un); for k in k k2 hed; do ssh-keygen -q -t ed25519 -N \"\" -f $d/$k; done; ssh-keygen -q -t rsa -b 3072 -N \"\" -f $d/hrsa; cp $d/k.pub $d/ak; D() { /usr/sbin/sshd -f /dev/null -p $1 -o ListenAddress=127.0.0.1 -o AuthorizedKeysFile=$d/ak -o StrictModes=no -o PidFile=$d/$1.pid \"${@:2}\"; }; D 2213 -h $d/hed; D 2214 -h $d/hed -o KexAlgorithms=curve25519-sha256; D 2215 -h $d/hrsa -o KexAlgorithms=diffie-hellman-group14-sha1 -o HostKeyAlgorithms=ssh-rsa; for p in 2213 2214; do echo \"[127.0.0.1]:$p $(cat $d/hed.pub)\"; done > $d/kh; echo \"[127.0.0.1]:2215 $(cat $d/hrsa.pub)\" >> $d/kh; echo \"[127.0.0.1]:2213 $(cat $d/k2.pub)\" > $d/kh2; echo \"Include {proyecto}/conf.d/*.conf\" > $d/cfg; for h in \"moderno 2213 k kh\" \"sinpq 2214 k kh\" \"viejo 2215 k kh\" \"legado-prueba 2215 k kh\" \"cambiada 2213 k kh2\" \"intruso 2213 k2 kh\" \"cerrado 2216 k kh\"; do set -- $h; echo \"Host $1\"; for l in \"HostName 127.0.0.1\" \"Port $2\" \"User $u\" \"IdentityFile $d/$3\" \"IdentitiesOnly yes\" \"UserKnownHostsFile $d/$4\" \"StrictHostKeyChecking yes\" \"ControlMaster auto\" \"ControlPath $d/cm-%C\" \"ControlPersist 60\"; do echo \"  $l\"; done; done >> $d/cfg; sleep 0.5; DR() { SSH_CMD=\"ssh -F $d/cfg\" timeout 30 {proyecto}/bin/doctor \"$@\" 2>&1; }; o=$(DR intruso); r=\"$? $(grep -cE \"^error:.*Permission denied\" <<<\"$o\") $(grep -cE \"^pista:.*sshd -d\" <<<\"$o\")\"; for p in $d/*.pid; do pkill -F $p; done; pkill -f \"$d/cm-\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^255 1 1$",
+      "pista": "3-proyecto/README.md, paso 3"
+    },
+    {
+      "id": "doctor-sin-servidor",
+      "descripcion": "Sin nadie escuchando, bin/doctor sale con 255 y habla del puerto",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); u=$(id -un); for k in k k2 hed; do ssh-keygen -q -t ed25519 -N \"\" -f $d/$k; done; ssh-keygen -q -t rsa -b 3072 -N \"\" -f $d/hrsa; cp $d/k.pub $d/ak; D() { /usr/sbin/sshd -f /dev/null -p $1 -o ListenAddress=127.0.0.1 -o AuthorizedKeysFile=$d/ak -o StrictModes=no -o PidFile=$d/$1.pid \"${@:2}\"; }; D 2213 -h $d/hed; D 2214 -h $d/hed -o KexAlgorithms=curve25519-sha256; D 2215 -h $d/hrsa -o KexAlgorithms=diffie-hellman-group14-sha1 -o HostKeyAlgorithms=ssh-rsa; for p in 2213 2214; do echo \"[127.0.0.1]:$p $(cat $d/hed.pub)\"; done > $d/kh; echo \"[127.0.0.1]:2215 $(cat $d/hrsa.pub)\" >> $d/kh; echo \"[127.0.0.1]:2213 $(cat $d/k2.pub)\" > $d/kh2; echo \"Include {proyecto}/conf.d/*.conf\" > $d/cfg; for h in \"moderno 2213 k kh\" \"sinpq 2214 k kh\" \"viejo 2215 k kh\" \"legado-prueba 2215 k kh\" \"cambiada 2213 k kh2\" \"intruso 2213 k2 kh\" \"cerrado 2216 k kh\"; do set -- $h; echo \"Host $1\"; for l in \"HostName 127.0.0.1\" \"Port $2\" \"User $u\" \"IdentityFile $d/$3\" \"IdentitiesOnly yes\" \"UserKnownHostsFile $d/$4\" \"StrictHostKeyChecking yes\" \"ControlMaster auto\" \"ControlPath $d/cm-%C\" \"ControlPersist 60\"; do echo \"  $l\"; done; done >> $d/cfg; sleep 0.5; DR() { SSH_CMD=\"ssh -F $d/cfg\" timeout 30 {proyecto}/bin/doctor \"$@\" 2>&1; }; o=$(DR cerrado); r=\"$? $(grep -cE \"^error:.*Connection refused\" <<<\"$o\") $(grep -cE \"^pista:.*puerto\" <<<\"$o\")\"; for p in $d/*.pid; do pkill -F $p; done; pkill -f \"$d/cm-\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^255 1 1$",
+      "pista": "3-proyecto/README.md, paso 3"
+    },
+    {
+      "id": "legado-entra",
+      "descripcion": "conf.d/90-legado.conf deja entrar a un alias legado-* en un servidor con grupo 14 SHA-1 y host key ssh-rsa",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); u=$(id -un); for k in k k2 hed; do ssh-keygen -q -t ed25519 -N \"\" -f $d/$k; done; ssh-keygen -q -t rsa -b 3072 -N \"\" -f $d/hrsa; cp $d/k.pub $d/ak; D() { /usr/sbin/sshd -f /dev/null -p $1 -o ListenAddress=127.0.0.1 -o AuthorizedKeysFile=$d/ak -o StrictModes=no -o PidFile=$d/$1.pid \"${@:2}\"; }; D 2213 -h $d/hed; D 2214 -h $d/hed -o KexAlgorithms=curve25519-sha256; D 2215 -h $d/hrsa -o KexAlgorithms=diffie-hellman-group14-sha1 -o HostKeyAlgorithms=ssh-rsa; for p in 2213 2214; do echo \"[127.0.0.1]:$p $(cat $d/hed.pub)\"; done > $d/kh; echo \"[127.0.0.1]:2215 $(cat $d/hrsa.pub)\" >> $d/kh; echo \"[127.0.0.1]:2213 $(cat $d/k2.pub)\" > $d/kh2; echo \"Include {proyecto}/conf.d/*.conf\" > $d/cfg; for h in \"moderno 2213 k kh\" \"sinpq 2214 k kh\" \"viejo 2215 k kh\" \"legado-prueba 2215 k kh\" \"cambiada 2213 k kh2\" \"intruso 2213 k2 kh\" \"cerrado 2216 k kh\"; do set -- $h; echo \"Host $1\"; for l in \"HostName 127.0.0.1\" \"Port $2\" \"User $u\" \"IdentityFile $d/$3\" \"IdentitiesOnly yes\" \"UserKnownHostsFile $d/$4\" \"StrictHostKeyChecking yes\" \"ControlMaster auto\" \"ControlPath $d/cm-%C\" \"ControlPersist 60\"; do echo \"  $l\"; done; done >> $d/cfg; sleep 0.5; DR() { SSH_CMD=\"ssh -F $d/cfg\" timeout 30 {proyecto}/bin/doctor \"$@\" 2>&1; }; ssh -F $d/cfg -o BatchMode=yes legado-prueba true; r=$?; for p in $d/*.pid; do pkill -F $p; done; pkill -f \"$d/cm-\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^0$",
+      "pista": "3-proyecto/README.md, paso 4"
+    },
+    {
+      "id": "legado-solo-legado",
+      "descripcion": "Los algoritmos viejos solo se añaden a los alias legado-*: lab-server sigue sin ellos",
+      "cmd": "d=$(mktemp -d); echo \"Include {proyecto}/conf.d/*.conf\" > $d/cfg; for h in lab-server legado-x; do ssh -G -F $d/cfg $h > $d/g; echo \"$h $(grep -cE \"^kexalgorithms .*diffie-hellman-group14-sha1\" $d/g) $(grep -cE \"^hostkeyalgorithms (.*,)?ssh-rsa(,|$)\" $d/g) $(grep -cE \"^pubkeyacceptedalgorithms (.*,)?ssh-rsa(,|$)\" $d/g)\"; done | paste -sd\" \"; rm -rf $d",
+      "assert": "stdout~^lab-server 0 0 0 legado-x 1 1 1$",
+      "pista": "3-proyecto/README.md, paso 4"
+    },
+    {
+      "id": "key-audit-detecta",
+      "descripcion": "bin/key-audit marca DSA, RSA de 2048 y ECDSA, acepta Ed25519 (con opciones) y RSA de 3072, y sale con 1",
+      "cmd": "d=$(mktemp -d); for t in \"ed25519 256 ana\" \"rsa 3072 luis\" \"rsa 2048 eva\" \"ecdsa 256 dan\" \"dsa 1024 sol\"; do set -- $t; ssh-keygen -q -t $1 -b $2 -N \"\" -C \"$3@equipo viejo\" -f $d/$3; done; q=$(printf \"%c\" 34); { echo \"restrict,command=${q}uptime${q} $(cat $d/ana.pub)\"; echo \"# comentario\"; echo; cat $d/luis.pub $d/eva.pub $d/dan.pub $d/sol.pub; } > $d/ak; o=$({proyecto}/bin/key-audit $d/ak 2>&1); r=\"$? $(grep -cE \"^ok .*(ana|luis)@equipo viejo\" <<<\"$o\") $(grep -cE \"^migrar .*(eva|dan|sol)@equipo viejo\" <<<\"$o\") $(grep -c . <<<\"$o\")\"; rm -rf $d; echo \"$r\"",
+      "assert": "stdout~^1 2 3 5$",
+      "pista": "3-proyecto/README.md, paso 5"
+    },
+    {
+      "id": "key-audit-limpio-y-uso",
+      "descripcion": "bin/key-audit sale con 0 si todo está bien (también leyendo de -), y con 2 sin argumentos o con un archivo sin llaves",
+      "cmd": "d=$(mktemp -d); ssh-keygen -q -t ed25519 -N \"\" -f $d/a; {proyecto}/bin/key-audit - < $d/a.pub > /dev/null; a=$?; {proyecto}/bin/key-audit 2>/dev/null; b=$?; {proyecto}/bin/key-audit $d/nada 2>/dev/null; c=$?; {proyecto}/bin/key-audit $d/a.pub $d/nada >/dev/null 2>&1; echo \"$a $b $c $?\"; rm -rf $d",
+      "assert": "stdout~^0 2 2 2$",
+      "pista": "3-proyecto/README.md, paso 5"
+    },
+    {
+      "id": "sshd-rsa-minimo",
+      "descripcion": "15-algoritmos.conf exige RSA de 3072 bits: un sshd con él rechaza una llave RSA de 2048 y acepta una de 3072",
+      "cmd": "test -n \"$BC_SSH_LAB\" || { echo \"solo dentro del laboratorio\"; exit 1; }; d=$(mktemp -d); ssh-keygen -q -t ed25519 -N \"\" -f $d/h; for b in 2048 3072; do ssh-keygen -q -t rsa -b $b -N \"\" -f $d/r$b; done; cat $d/r2048.pub $d/r3072.pub > $d/ak; echo \"Include {proyecto}/server/sshd_config.d/15-algoritmos.conf\" > $d/c; t=$(/usr/sbin/sshd -T -f $d/c -h $d/h 2>/dev/null | grep -i \"^requiredrsasize\"); /usr/sbin/sshd -f $d/c -h $d/h -p 2217 -o ListenAddress=127.0.0.1 -o AuthorizedKeysFile=$d/ak -o StrictModes=no -o PidFile=$d/pid; sleep 0.5; for b in 2048 3072; do ssh -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o IdentitiesOnly=yes -o ControlPath=none -i $d/r$b -p 2217 127.0.0.1 true 2>/dev/null; t=\"$t $?\"; done; pkill -F $d/pid; rm -rf $d; echo \"$t\"",
+      "assert": "stdout~^requiredrsasize 3072 255 0$",
+      "pista": "3-proyecto/README.md, paso 6"
+    },
+    {
+      "id": "kit-completo-y-limpio",
+      "descripcion": "Sin TODOs, shellcheck sin avisos, el README documenta lo nuevo y los scripts anteriores siguen respondiendo",
+      "cmd": "! grep -rn TODO {proyecto}/README.md {proyecto}/config {proyecto}/conf.d {proyecto}/bin {proyecto}/ca {proyecto}/server {proyecto}/ansible {proyecto}/ci && shellcheck {proyecto}/bin/* {proyecto}/ca/* && grep -q \"^| 13 |\" {proyecto}/README.md && grep -q \"bin/doctor\" {proyecto}/README.md && grep -q \"bin/key-audit\" {proyecto}/README.md && grep -q \"90-legado.conf\" {proyecto}/README.md && { {proyecto}/bin/ak-line; a=$?; {proyecto}/bin/audit 2>/dev/null; b=$?; {proyecto}/bin/ci-deploy >/dev/null 2>&1; c=$?; {proyecto}/ca/ca-sign 2>/dev/null; [ \"$a$b$c$?\" = 2222 ]; }",
+      "assert": "exit0",
+      "pista": "3-proyecto/README.md, paso 7"
+    }
+  ]
+}

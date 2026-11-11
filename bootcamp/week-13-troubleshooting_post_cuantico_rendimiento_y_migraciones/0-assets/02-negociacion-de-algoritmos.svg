@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 420">
+  <defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8b949e"/></marker></defs>
+  <rect width="900" height="420" fill="#0d1117"/>
+  <text x="450" y="34" font-family="sans-serif" font-size="19" fill="#c9d1d9" text-anchor="middle">Negociación: gana el primero del cliente que el servidor admite</text>
+  <rect x="40" y="60" width="360" height="250" rx="6" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="220" y="86" font-family="sans-serif" font-size="14" fill="#c9d1d9" text-anchor="middle">Cliente: KexAlgorithms (en orden)</text>
+  <rect x="500" y="60" width="360" height="250" rx="6" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="680" y="86" font-family="sans-serif" font-size="14" fill="#c9d1d9" text-anchor="middle">Servidor: lo que admite</text>
+  <text x="60" y="120" font-family="monospace" font-size="13" fill="#3fb950" text-anchor="start">1. sntrup761x25519-sha512</text>
+  <text x="60" y="164" font-family="monospace" font-size="13" fill="#c9d1d9" text-anchor="start">2. curve25519-sha256</text>
+  <text x="60" y="208" font-family="monospace" font-size="13" fill="#c9d1d9" text-anchor="start">3. ecdh-sha2-nistp256</text>
+  <text x="60" y="252" font-family="monospace" font-size="13" fill="#c9d1d9" text-anchor="start">4. diffie-hellman-group16-sha512</text>
+  <text x="520" y="120" font-family="monospace" font-size="13" fill="#c9d1d9" text-anchor="start">curve25519-sha256</text>
+  <text x="520" y="164" font-family="monospace" font-size="13" fill="#3fb950" text-anchor="start">sntrup761x25519-sha512</text>
+  <text x="520" y="208" font-family="monospace" font-size="13" fill="#c9d1d9" text-anchor="start">diffie-hellman-group14-sha1</text>
+  <line x1="300" y1="116" x2="515" y2="160" stroke="#3fb950" stroke-width="2" marker-end="url(#fa)"/>
+  <text x="450" y="345" font-family="sans-serif" font-size="13" fill="#3fb950" text-anchor="middle">Elegido: sntrup761x25519-sha512 (postcuántico). El orden del servidor no cuenta.</text>
+  <text x="450" y="372" font-family="sans-serif" font-size="13" fill="#c9d1d9" text-anchor="middle">Lo mismo para host key, cifrado y MAC. Sin nada en común:</text>
+  <text x="450" y="396" font-family="monospace" font-size="13" fill="#f85149" text-anchor="middle">no matching key exchange method found. Their offer: ...</text>
+</svg>

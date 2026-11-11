@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+#
+# doctor — conecta con un host y explica qué pasó: qué algoritmos se
+# negociaron, con qué se entró o, si falla, en qué capa y qué revisar.
+#
+# Uso: doctor HOST [OPCIÓN_DE_SSH...]
+#
+# Códigos de salida: los de ssh (0 si entra, 255 si falla la conexión),
+# o 2 por uso incorrecto.
+set -uo pipefail
+
+# TODO 1: sin argumentos, "uso: doctor HOST [OPCIÓN_DE_SSH...]" en stderr y
+#   sale con 2. Si no, HOST es $1 y el resto son opciones para ssh.
+# TODO 2: escribe "destino:  USUARIO@NOMBRE:PUERTO" con ssh -G y conecta con
+#   ssh -v -o BatchMode=yes -o ControlMaster=no -o ControlPath=none HOST true,
+#   guardando stderr (quítale los \r). Si entra, escribe las líneas kex:
+#   (con "(postcuántico)" o "(no postcuántico)"), host key:, cifrado: y
+#   entrada:, y sale con 0.
+# TODO 3: si falla, escribe "error:" con los mensajes de ssh que no son de
+#   depuración y "pista:" según la capa, y sale con el código de ssh.
+echo "doctor: sin terminar (TODO 1-3)" >&2
+exit 1
